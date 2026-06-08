@@ -4,98 +4,80 @@ hide:
   - toc
 ---
 
+<style>
+.md-typeset h1 { display: none; }
+</style>
+
 <div class="hero-section" markdown>
 
 # OpenShell on OpenShift
 
-<p class="subtitle">Deploy safe, sandboxed AI agent runtimes on Red Hat OpenShift — from first install to production-ready operation.</p>
+<p class="subtitle">Deploy safe, sandboxed AI agent runtimes on Red Hat OpenShift — from first install to production-ready.</p>
 
 <span class="badge badge-nvidia">NVIDIA OpenShell</span>
 <span class="badge badge-openshift">OpenShift 4.x</span>
 
+[Get Started :material-arrow-right:](getting-started/prerequisites.md){ .md-button .md-button--primary }
+[GitOps Path :material-git:](production/gitops.md){ .md-button }
+
 </div>
 
-## What You'll Build
-
-By the end of this tutorial you will have a fully operational OpenShell gateway on OpenShift, capable of provisioning sandboxed environments for autonomous AI agents with declarative network policies.
+---
 
 ```mermaid
 flowchart LR
-    CLI["openshell CLI"] -->|gRPC| GW["OpenShell Gateway<br/>(OpenShift Pod)"]
-    GW -->|"Sandbox CR"| K8s["Agent Sandbox<br/>Controller"]
-    K8s -->|creates| Pod["Sandbox Pod<br/>(policy-enforced)"]
-    Pod -->|"ConnectSupervisor"| GW
+    CLI["openshell CLI"] -->|gRPC| GW["Gateway Pod"]
+    GW -->|"Sandbox CR"| ASC["Agent Sandbox"]
+    ASC -->|creates| Pod["Sandbox Pod"]
+    Pod -->|"relay"| GW
 ```
 
 ---
 
-<div class="grid-cards" markdown>
+<div class="grid cards" markdown>
 
-<div class="card" markdown>
+-   :material-clock-fast:{ .lg .middle } __Set up in 5 minutes__
 
-### :material-rocket-launch: Getting Started
+    ---
 
-Install prerequisites, deploy the gateway, and verify everything is running.
+    Install prerequisites, deploy the gateway, create your first sandbox.
 
-[:octicons-arrow-right-24: Start here](getting-started/prerequisites.md)
+    [:octicons-arrow-right-24: Getting started](getting-started/index.md)
 
-</div>
+-   :material-shield-check:{ .lg .middle } __Policy-enforced isolation__
 
-<div class="card" markdown>
+    ---
 
-### :material-cube-outline: Using Sandboxes
+    Default-deny networking, L7 inspection, Landlock filesystem, seccomp.
 
-Create your first sandbox, connect an agent, and configure network policies.
+    [:octicons-arrow-right-24: Network policies](sandboxes/network-policies.md)
 
-[:octicons-arrow-right-24: Create a sandbox](sandboxes/first-sandbox.md)
+-   :material-lock:{ .lg .middle } __Zero secrets in Git__
 
-</div>
+    ---
 
-<div class="card" markdown>
+    Vault + External Secrets Operator. Pre-commit hooks block leaks.
 
-### :material-shield-check: Production
+    [:octicons-arrow-right-24: GitOps deployment](production/gitops.md)
 
-Expose externally via OpenShift Routes, add OIDC auth, and configure HA with PostgreSQL.
+-   :material-server:{ .lg .middle } __Production ready__
 
-[:octicons-arrow-right-24: Go to production](production/expose-route.md)
+    ---
 
-</div>
+    OpenShift Routes, OIDC auth, PostgreSQL HA, ArgoCD GitOps.
 
-<div class="card" markdown>
-
-### :material-wrench: Troubleshooting
-
-Common issues on OpenShift and how to resolve them.
-
-[:octicons-arrow-right-24: Get help](troubleshooting.md)
-
-</div>
+    [:octicons-arrow-right-24: Production guide](production/index.md)
 
 </div>
 
 ---
 
-## Architecture on OpenShift
+## Tested On
 
-OpenShell deploys as a StatefulSet in the `openshell` namespace. The gateway manages sandbox lifecycle through the Kubernetes Agent Sandbox controller, which creates sandbox pods with the OpenShell supervisor injected as a sideloaded binary.
-
-| Component | OpenShift Resource | Namespace |
-|---|---|---|
-| Gateway | StatefulSet + Service | `openshell` |
-| Sandbox pods | Managed by Agent Sandbox controller | `openshell` |
-| PKI secrets | Opaque Secrets (auto-generated) | `openshell` |
-| RBAC | Role + ClusterRole | `openshell` + cluster |
-
-!!! info "Experimental"
-    The OpenShift deployment path is under active development. This tutorial tracks the latest `main` branch and uses TLS-disabled mode for initial evaluation.
-
----
-
-## Version Compatibility
-
-| Component | Tested Version |
+| Component | Version |
 |---|---|
-| OpenShift | 4.14+ |
-| Helm chart | `0.0.0-dev` (latest main) or `0.6.0`+ |
-| Agent Sandbox controller | v0.4.6+ |
-| OpenShell CLI | Latest from `install.sh` |
+| OpenShift | 4.20 (Kubernetes 1.33) |
+| OpenShell Helm chart | `0.0.0-dev` |
+| Agent Sandbox | v0.4.6 |
+| External Secrets Operator | v1 |
+| HashiCorp Vault | 1.19 (dev mode) |

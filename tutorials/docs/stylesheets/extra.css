@@ -9,6 +9,7 @@
   --md-default-bg-color: #0d1117;
   --md-default-fg-color: rgba(230, 237, 243, 0.87);
   --md-code-bg-color: #161b22;
+  --md-typeset-a-color: #76b900;
 }
 
 .md-header {
@@ -19,14 +20,18 @@
   background: #161b22;
 }
 
+.md-tabs__link--active {
+  border-bottom: 2px solid #76b900;
+}
+
+/* Hero section */
 .hero-section {
   text-align: center;
-  padding: 1.5rem 1rem 1rem;
-  margin-bottom: 1rem;
+  padding: 2rem 1rem 1rem;
 }
 
 .hero-section h1 {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: 800;
   background: linear-gradient(135deg, #76b900, #a0e030);
   -webkit-background-clip: text;
@@ -39,57 +44,60 @@
   font-size: 1.1rem;
   opacity: 0.8;
   max-width: 600px;
-  margin: 0 auto;
+  margin: 0 auto 1rem;
 }
 
-.grid-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem;
-  margin: 1rem 0;
+.hero-section .md-button {
+  margin: 0.3rem;
 }
 
-.grid-cards .card {
-  border: 1px solid var(--md-default-fg-color--lightest);
-  border-radius: 8px;
-  padding: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.grid-cards .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(118, 185, 0, 0.15);
-}
-
-.grid-cards .card h3 {
-  margin-top: 0;
-  color: var(--md-primary-fg-color);
-}
-
+/* Badges */
 .badge {
   display: inline-block;
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin: 0 0.2rem 0.8rem;
 }
 
 .badge-nvidia {
   background: rgba(118, 185, 0, 0.15);
   color: #76b900;
+  border: 1px solid rgba(118, 185, 0, 0.3);
 }
 
 .badge-openshift {
-  background: rgba(238, 0, 0, 0.15);
+  background: rgba(238, 0, 0, 0.1);
   color: #ee0000;
+  border: 1px solid rgba(238, 0, 0, 0.2);
 }
 
-.architecture-diagram {
-  background: var(--md-code-bg-color);
-  border-radius: 8px;
-  padding: 2rem;
-  margin: 1.5rem 0;
-  overflow-x: auto;
+/* Announcement bar */
+.md-banner {
+  background: linear-gradient(90deg, #76b900, #5a8f00);
+  color: white;
+}
+
+/* Grid cards enhancement */
+.md-typeset .grid.cards > ul > li {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+  transform: translateY(-2px);
+  border-color: var(--md-primary-fg-color);
+}
+
+/* Code blocks */
+.md-typeset code {
+  border-radius: 4px;
+}
+
+/* Footer */
+.md-footer {
+  background: #0d1117;
 }

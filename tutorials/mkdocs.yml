@@ -1,4 +1,4 @@
-site_name: OpenShell on OpenShift  
+site_name: OpenShell on OpenShift
 site_description: End-to-end guide for deploying and operating OpenShell on Red Hat OpenShift
 site_url: https://rrbanda.github.io/openshell-openshift-reference/
 repo_url: https://github.com/rrbanda/openshell-openshift-reference
@@ -27,18 +27,25 @@ theme:
     text: Inter
     code: JetBrains Mono
   features:
+    - announce.dismiss
     - navigation.instant
+    - navigation.instant.prefetch
     - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
-    - navigation.expand
+    - navigation.indexes
     - navigation.top
     - navigation.footer
+    - navigation.path
     - toc.follow
     - search.suggest
     - search.highlight
+    - search.share
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
+    - content.tooltips
   icon:
     repo: fontawesome/brands/github
 
@@ -48,19 +55,46 @@ extra_css:
 extra:
   social:
     - icon: fontawesome/brands/github
+      link: https://github.com/rrbanda/openshell-openshift-reference
+    - icon: fontawesome/brands/github
       link: https://github.com/NVIDIA/OpenShell
+      name: NVIDIA OpenShell
   generator: false
+  status:
+    new: Recently added
+    deprecated: Deprecated
 
 plugins:
   - search
   - glightbox
 
 markdown_extensions:
+  - abbr
   - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
   - pymdownx.details
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -68,33 +102,27 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.mark
-  - pymdownx.critic
-  - pymdownx.keys
-  - attr_list
-  - md_in_html
-  - tables
-  - toc:
-      permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
 
 nav:
   - Home: index.md
   - Getting Started:
+      - getting-started/index.md
       - Prerequisites: getting-started/prerequisites.md
       - Install Agent Sandbox: getting-started/agent-sandbox.md
       - Deploy the Gateway: getting-started/deploy-gateway.md
       - Verify Installation: getting-started/verify.md
-  - Using Sandboxes:
+  - Sandboxes:
+      - sandboxes/index.md
       - Create Your First Sandbox: sandboxes/first-sandbox.md
       - Connect an Agent: sandboxes/connect-agent.md
       - Network Policies: sandboxes/network-policies.md
   - Production:
+      - production/index.md
       - Expose via OpenShift Route: production/expose-route.md
       - OIDC Authentication: production/oidc-auth.md
       - PostgreSQL for HA: production/postgresql.md
