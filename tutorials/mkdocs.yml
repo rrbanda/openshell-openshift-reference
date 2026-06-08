@@ -1,4 +1,4 @@
-site_name: OpenShell on OpenShift
+site_name: OpenShell on OpenShift  
 site_description: End-to-end guide for deploying and operating OpenShell on Red Hat OpenShift
 site_url: https://rrbanda.github.io/openshell-openshift-reference/
 repo_url: https://github.com/rrbanda/openshell-openshift-reference
