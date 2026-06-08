@@ -15,8 +15,6 @@ hide:
 
 </div>
 
----
-
 ## What You'll Build
 
 By the end of this tutorial you will have a fully operational OpenShell gateway on OpenShift, capable of provisioning sandboxed environments for autonomous AI agents with declarative network policies.
