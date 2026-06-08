@@ -1,0 +1,12 @@
+# Dev overlay: TLS disabled, secrets from Vault via ESO.
+# Use this for evaluation on a private network only.
+
+server:
+  disableTls: true
+  auth:
+    allowUnauthenticatedUsers: true
+
+# PKI init job disabled — JWT signing keys are managed by
+# External Secrets Operator syncing from HashiCorp Vault.
+pkiInitJob:
+  enabled: false

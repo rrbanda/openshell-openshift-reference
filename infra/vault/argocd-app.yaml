@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/part-of: openshell-infra
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://helm.releases.hashicorp.com
+    chart: vault
+    targetRevision: 0.29.1
+    helm:
+      releaseName: vault
+      values: |
+        global:
+          openshift: true
+        server:
+          image:
+            repository: docker.io/hashicorp/vault
+            tag: "1.19"
+          dev:
+            enabled: true
+            devRootToken: "root"
+          standalone:
+            enabled: true
+          podSecurityContext: null
+          containerSecurityContext: null
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 256Mi
+              cpu: 250m
+          readinessProbe:
+            enabled: true
+            path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+          extraEnvironmentVars:
+            VAULT_LOG_LEVEL: info
+        injector:
+          enabled: false
+        ui:
+          enabled: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vault
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 1m

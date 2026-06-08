@@ -1,0 +1,102 @@
+site_name: OpenShell on OpenShift
+site_description: End-to-end guide for deploying and operating OpenShell on Red Hat OpenShift
+site_url: https://rrbanda.github.io/openshell-openshift-reference/
+repo_url: https://github.com/rrbanda/openshell-openshift-reference
+repo_name: rrbanda/openshell-openshift-reference
+edit_uri: edit/main/tutorials/docs/
+
+theme:
+  name: material
+  custom_dir: overrides
+  logo: assets/logo.svg
+  favicon: assets/favicon.png
+  palette:
+    - scheme: slate
+      primary: custom
+      accent: lime
+      toggle:
+        icon: material/brightness-7
+        name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: lime
+      toggle:
+        icon: material/brightness-4
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/NVIDIA/OpenShell
+  generator: false
+
+plugins:
+  - search
+  - glightbox
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.mark
+  - pymdownx.critic
+  - pymdownx.keys
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Prerequisites: getting-started/prerequisites.md
+      - Install Agent Sandbox: getting-started/agent-sandbox.md
+      - Deploy the Gateway: getting-started/deploy-gateway.md
+      - Verify Installation: getting-started/verify.md
+  - Using Sandboxes:
+      - Create Your First Sandbox: sandboxes/first-sandbox.md
+      - Connect an Agent: sandboxes/connect-agent.md
+      - Network Policies: sandboxes/network-policies.md
+  - Production:
+      - Expose via OpenShift Route: production/expose-route.md
+      - OIDC Authentication: production/oidc-auth.md
+      - PostgreSQL for HA: production/postgresql.md
+      - GitOps with ArgoCD: production/gitops.md
+  - Troubleshooting: troubleshooting.md

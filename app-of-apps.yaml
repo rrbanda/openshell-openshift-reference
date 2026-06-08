@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: openshell
+  namespace: openshift-gitops
+spec:
+  description: OpenShell platform deployment
+  sourceRepos:
+    - "https://github.com/NVIDIA/OpenShell.git"
+    - "https://github.com/rrbanda/openshell-openshift-reference.git"
+    - "https://helm.releases.hashicorp.com"
+    - "ghcr.io/nvidia/openshell"
+  destinations:
+    - namespace: "*"
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+---
+# App-of-Apps: single entry point that deploys Vault + OpenShell.
+# Sync waves ensure correct ordering:
+#   wave 0: Vault server (Helm chart)
+#   wave 1: Vault configuration (auth, policies, JWT keygen, vault-token)
+#   wave 2: OpenShell (namespace, SCC, SecretStore, ExternalSecret, Helm chart)
+#
+# Apply this single file to bootstrap the entire platform:
+#   oc apply -f deploy/gitops/app-of-apps.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openshell-platform
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/part-of: openshell
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: openshell
+  source:
+    repoURL: https://github.com/rrbanda/openshell-openshift-reference.git
+    targetRevision: main
+    path: .
+    directory:
+      include: "{argocd-app.yaml,infra/vault/argocd-app.yaml,infra/vault-config/argocd-app.yaml}"
+      recurse: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 1m

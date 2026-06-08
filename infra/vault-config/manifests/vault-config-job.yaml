@@ -1,0 +1,201 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-configurator
+  namespace: vault
+  labels:
+    app.kubernetes.io/part-of: openshell-infra
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-configurator-tokenreview
+  labels:
+    app.kubernetes.io/part-of: openshell-infra
+subjects:
+  - kind: ServiceAccount
+    name: vault-configurator
+    namespace: vault
+roleRef:
+  kind: ClusterRole
+  name: system:auth-delegator
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-configurator-anyuid-scc
+  labels:
+    app.kubernetes.io/part-of: openshell-infra
+subjects:
+  - kind: ServiceAccount
+    name: vault-configurator
+    namespace: vault
+roleRef:
+  kind: ClusterRole
+  name: system:openshift:scc:anyuid
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vault-configurator-secrets
+  namespace: openshell
+  labels:
+    app.kubernetes.io/part-of: openshell-infra
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-configurator-secrets
+  namespace: openshell
+  labels:
+    app.kubernetes.io/part-of: openshell-infra
+subjects:
+  - kind: ServiceAccount
+    name: vault-configurator
+    namespace: vault
+roleRef:
+  kind: Role
+  name: vault-configurator-secrets
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-config-script
+  namespace: vault
+  labels:
+    app.kubernetes.io/part-of: openshell-infra
+data:
+  configure.sh: |
+    #!/bin/sh
+    set -e
+
+    VAULT_ADDR="http://vault.vault.svc.cluster.local:8200"
+    export VAULT_ADDR
+
+    echo "Waiting for Vault to be ready..."
+    until vault status 2>/dev/null; do
+      sleep 2
+    done
+
+    echo "Enabling KV v2 secrets engine at openshell/..."
+    vault secrets enable -path=openshell kv-v2 2>/dev/null || echo "Already enabled"
+
+    echo "Enabling Kubernetes auth..."
+    vault auth enable kubernetes 2>/dev/null || echo "Already enabled"
+
+    echo "Configuring Kubernetes auth..."
+    vault write auth/kubernetes/config \
+      kubernetes_host="https://kubernetes.default.svc" \
+      disable_iss_validation=true
+
+    echo "Creating openshell read policy..."
+    vault policy write openshell - <<POLICY
+    path "openshell/data/*" {
+      capabilities = ["read", "list"]
+    }
+    path "openshell/metadata/*" {
+      capabilities = ["read", "list"]
+    }
+    POLICY
+
+    echo "Creating Kubernetes auth role for openshell namespace..."
+    vault write auth/kubernetes/role/openshell-dev \
+      bound_service_account_names=openshell \
+      bound_service_account_namespaces=openshell \
+      policies=openshell \
+      ttl=1h
+
+    echo "Installing dependencies..."
+    apk add --no-cache openssl curl
+
+    echo "Generating Ed25519 JWT signing keys..."
+    openssl genpkey -algorithm ed25519 -out /tmp/signing.pem
+    openssl pkey -in /tmp/signing.pem -pubout -out /tmp/public.pem
+    KID=$(cat /proc/sys/kernel/random/uuid 2>/dev/null || openssl rand -hex 16)
+
+    echo "Storing JWT keys in Vault..."
+    vault kv put openshell/jwt-keys \
+      signing_pem=@/tmp/signing.pem \
+      public_pem=@/tmp/public.pem \
+      kid="$KID"
+    rm -f /tmp/signing.pem /tmp/public.pem
+
+    echo "Creating vault-token Secret in openshell namespace for ESO..."
+    SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+    K8S_API="https://kubernetes.default.svc"
+    CA_CERT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+    TOKEN_B64=$(printf "root" | base64)
+
+    SECRET_JSON="{\"apiVersion\":\"v1\",\"kind\":\"Secret\",\"metadata\":{\"name\":\"vault-token\",\"namespace\":\"openshell\",\"labels\":{\"app.kubernetes.io/part-of\":\"openshell-infra\"}},\"type\":\"Opaque\",\"data\":{\"token\":\"${TOKEN_B64}\"}}"
+
+    # Try POST (create). If it already exists (409), try PUT (replace).
+    HTTP_CODE=$(curl -sk -o /tmp/k8s-response -w "%{http_code}" \
+      -X POST "${K8S_API}/api/v1/namespaces/openshell/secrets" \
+      -H "Authorization: Bearer ${SA_TOKEN}" \
+      -H "Content-Type: application/json" \
+      --cacert "${CA_CERT}" \
+      -d "${SECRET_JSON}")
+
+    if [ "$HTTP_CODE" = "201" ]; then
+      echo "vault-token Secret created successfully."
+    elif [ "$HTTP_CODE" = "409" ]; then
+      echo "vault-token Secret already exists, updating..."
+      curl -sk -o /dev/null -w "%{http_code}" \
+        -X PUT "${K8S_API}/api/v1/namespaces/openshell/secrets/vault-token" \
+        -H "Authorization: Bearer ${SA_TOKEN}" \
+        -H "Content-Type: application/json" \
+        --cacert "${CA_CERT}" \
+        -d "${SECRET_JSON}"
+      echo " (updated)"
+    else
+      echo "WARNING: vault-token Secret creation returned HTTP ${HTTP_CODE}"
+      cat /tmp/k8s-response 2>/dev/null
+    fi
+
+    echo "Vault configuration complete."
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-configure
+  namespace: vault
+  labels:
+    app.kubernetes.io/part-of: openshell-infra
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: vault-config
+    spec:
+      serviceAccountName: vault-configurator
+      restartPolicy: OnFailure
+      containers:
+        - name: configure
+          image: docker.io/hashicorp/vault:1.19
+          command: ["/bin/sh", "/scripts/configure.sh"]
+          env:
+            - name: VAULT_ADDR
+              value: "http://vault.vault.svc.cluster.local:8200"
+            - name: VAULT_TOKEN
+              value: "root"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+          securityContext:
+            runAsUser: 0
+      volumes:
+        - name: scripts
+          configMap:
+            name: vault-config-script
+            defaultMode: 0755

@@ -1,0 +1,10 @@
+# Agent Sandbox controller install
+# This is applied as a remote resource via kustomization.yaml
+# The CRD and controller are prerequisites for the OpenShell Helm chart.
+#
+# In air-gapped clusters, mirror the manifest and images to your internal
+# registry and reference the local copy instead.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/kubernetes-sigs/agent-sandbox/releases/latest/download/manifest.yaml

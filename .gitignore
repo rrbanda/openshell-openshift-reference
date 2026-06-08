@@ -1,0 +1,12 @@
+# Never commit actual secret values
+*.secret
+*.secret.yaml
+*.secret.json
+*-credentials.yaml
+*-credentials.json
+.env
+.env.*
+kubeconfig
+*.pem
+*.key
+*.p12

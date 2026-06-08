@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openshell
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/part-of: openshell
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: openshell
+  sources:
+    # Source 1: Kustomize overlay (namespace, SCC, ESO SecretStore + ExternalSecret)
+    - repoURL: https://github.com/rrbanda/openshell-openshift-reference.git
+      targetRevision: main
+      path: overlays/openshift-dev
+      kustomize: {}
+
+    # Source 2: Helm chart from OCI registry
+    - repoURL: ghcr.io/nvidia/openshell
+      chart: helm-chart
+      targetRevision: 0.0.0-dev
+      helm:
+        releaseName: openshell
+        valueFiles:
+          - $values/base/values-base.yaml
+          - $values/overlays/openshift-dev/values-patch.yaml
+
+    # Source 3: Values repo reference (for multi-source value files)
+    - repoURL: https://github.com/rrbanda/openshell-openshift-reference.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshell
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      jsonPointers:
+        - /data
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /spec/volumeClaimTemplates

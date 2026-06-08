@@ -1,0 +1,54 @@
+# Base Helm values for OpenShell on OpenShift
+# No secrets or environment-specific values belong here.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/nvidia/openshell/gateway
+  pullPolicy: IfNotPresent
+
+supervisor:
+  image:
+    repository: ghcr.io/nvidia/openshell/supervisor
+
+# OpenShift SCC compatibility: let admission controller assign UID/GID
+podSecurityContext:
+  fsGroup: null
+
+securityContext:
+  runAsUser: null
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+# Gateway server config
+server:
+  logLevel: info
+  sandboxImage: "ghcr.io/nvidia/openshell-community/sandboxes/base:latest"
+  sandboxNamespace: openshell
+  appArmorProfile: "Unconfined"
+
+# Probes
+probes:
+  startup:
+    failureThreshold: 30
+    periodSeconds: 2
+  liveness:
+    initialDelaySeconds: 2
+    periodSeconds: 5
+  readiness:
+    initialDelaySeconds: 1
+    periodSeconds: 2
+
+# Service
+service:
+  type: ClusterIP
+  port: 8080
+  healthPort: 8081
+  metricsPort: 9090
+
+# Network policy restricts SSH ingress on sandbox pods to gateway only
+networkPolicy:
+  enabled: true
