@@ -441,7 +441,7 @@ const agents = {
   langgraph: { name: 'LangGraph', by: 'LangChain', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Graph-based agent orchestration with durable execution, checkpointing, and state management' },
   crewai: { name: 'CrewAI', by: 'CrewAI', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Role-based multi-agent framework with task delegation, tool sharing, and parallel execution' },
   strands: { name: 'Strands', by: 'AWS (open-source)', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'AWS open-source agent SDK with model-driven orchestration, tools, and sessions' },
-  watsonx: { name: 'watsonx Orchestrate', by: 'IBM', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Enterprise agentic control plane with workflow builder, ADK, AgentOps, agent catalog, and MCP tool governance. Deploys on IBM Cloud, AWS, or Red Hat OpenShift AI.' },
+  watsonx: { name: 'watsonx Orchestrate', by: 'IBM', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Enterprise agentic control plane: workflow builder, ADK, AgentOps (eval + red teaming), built-in security enforcement (IDP, vault, credentials), agent catalog, and MCP tool governance.' },
   openclaw: { name: 'OpenClaw', by: 'Community', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Always-on personal assistant with multi-channel messaging, persistent memory, and heartbeat' },
   hermes: { name: 'Hermes', by: 'Nous Research', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Self-improving agent with learning loop, persistent skills, and cross-session memory' },
   deepagents: { name: 'LangChain Deep Agents Code', by: 'LangChain', type: 'coding', hasOwnSandbox: false, nemoclaw: true, desc: 'Terminal coding agent (dcode) with persistent memory, custom skills, remote sandboxes, and human-in-the-loop controls' },
@@ -541,8 +541,8 @@ function showResult() {
   if (a && a.nemoclaw) governanceItems.push('NemoClaw onboarding (nemoclaw onboard)');
   if (chkMcp) governanceItems.push('MCP Gateway — OAuth2 token exchange, identity-based tool filtering');
   if (chkGuardrails) {
-    governanceItems.push('NeMo Guardrails + Garak — prompt injection defense, content moderation');
-    governanceItems.push('watsonx.governance — agentic monitoring, guardrail manager, compliance (200+ frameworks)');
+    governanceItems.push('NeMo Guardrails + Garak — inline prompt injection defense, content moderation');
+    governanceItems.push('watsonx.governance — GRC lifecycle, guardrail manager, agentic monitoring, eval metrics');
   }
   const governanceSection = governanceItems.length ? `
           <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(230,237,243,0.06)">
