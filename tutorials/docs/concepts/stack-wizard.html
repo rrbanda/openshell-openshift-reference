@@ -696,7 +696,7 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
   <p class="tagline">Agent = Model + Harness · BYOA on Red Hat OpenShift AI · product at the base</p>
   <details>
     <summary>About · sources</summary>
-    Maps agents and use cases to a Red Hat OpenShift AI stack. Sources: Red Hat AI Agentic Strategy 2026, Kagenti→OpenShell field guide, Sandboxing for Agents (July 2026). OpenShell planned DP in OpenShift AI 3.5 → TP in 3.6.
+    Agent matrix from <a href="https://docs.nvidia.com/openshell/about/supported-agents" target="_blank" rel="noopener">OpenShell Supported Agents</a>, Community <code>--from</code> sandboxes, and <a href="https://docs.nvidia.com/nemoclaw/" target="_blank" rel="noopener">NemoClaw</a> (OpenClaw / Hermes / Deep Agents). Isolation profiles from Red Hat AI Sandboxing for Agents. Product base: Red Hat OpenShift AI.
   </details>
 </div>
 
@@ -723,7 +723,7 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
   <div class="step active" id="step1" role="tabpanel">
     <div class="step-label">Step 1 — Choose your agent</div>
     <div class="question">I'm using (or plan to use)…</div>
-    <p class="hint">Tap <strong>i</strong> for detail. Amber badges = not fully ready. Pattern 1 = whole-agent; Pattern 2 = harness-native (OpenClaw shipped; Hermes announced). Gemini is not in the base-image matrix yet.</p>
+    <p class="hint">Tap <strong>i</strong> for detail. Badges follow NVIDIA OpenShell Supported Agents (base / Community / NemoClaw) or BYO <code>--from</code> image. NemoClaw path uses <code>nemoclaw onboard</code>.</p>
     <div class="agent-grid" id="agentGrid"></div>
   </div>
 
@@ -764,46 +764,39 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
 
 <script>
 /**
- * Accuracy sources (July 2026 field enablement — keep in sync):
- * - From Kagenti to OpenShell (Field Positioning Guide)
- * - Red Hat AI — Agentic AI Product Strategy 2026
- * - Red Hat AI Sandboxing for Agents (July 2026)
- * - OpenShell upstream supported-agents + architecture
+ * Accuracy sources (keep in sync — prefer primary docs over field slides):
+ * - https://docs.nvidia.com/openshell/about/supported-agents
+ * - https://docs.nvidia.com/openshell/sandboxes/manage-sandboxes ( --from )
+ * - https://github.com/NVIDIA/OpenShell-Community (community sandboxes, e.g. gemini)
+ * - https://docs.nvidia.com/nemoclaw/ (OpenClaw / Hermes / Deep Agents)
+ * - https://docs.nvidia.com/nemoclaw/user-guide/openclaw/about/ecosystem (NemoClaw vs OpenShell path)
+ * - Red Hat AI Sandboxing for Agents / Agentic Strategy 2026 (OpenShift AI product + isolation profiles only)
  *
- * Layering (compose, do not conflate):
- *   Kata / OSC     = hardware / dedicated-kernel isolation (GA layered product)
- *   OpenShell      = in-sandbox policy: Landlock, seccomp, netns, OPA L4/L7,
- *                    inference.local cred injection, OCSF audit
- *   agent-sandbox  = Sandbox CRD lifecycle (kubernetes-sigs; ships with OSC path)
- *   MCP Gateway    = Red Hat AI tool governance (Envoy + Kuadrant AuthPolicy + Authorino)
- *   ogx            = Open Responses / Mode-2 platform API surface (not OpenShell core)
- *   MLflow/OTEL    = OpenShift AI · AgentRuntime tracing/eval (not OpenShell OCSF)
- *
- * Identity: Kagenti had full SPIRE via AuthBridge (Dev Preview, converged away).
- * OpenShell closes the gap with JWT-SVID grants / exchange; Red Hat contributes
- * OIDC + SPIFFE identity drivers. Subjects are SPIFFE-shaped today.
- *
- * Product vs capability (Red Hat AI Agentic Strategy 2026 Appendix A):
- *   Product = Red Hat OpenShift AI (Red Hat AI portfolio).
- *   OpenShell = capability (Planned DP in OpenShift AI 3.5, targeting TP in 3.6; NVIDIA collab).
- *   MCP Gateway, ogx, NeMo Guardrails, EvalHub, Garak, MLflow = capabilities (not products).
- *   Kata / OSC = GA layered capability (OpenShift Sandboxed Containers) composing under OpenShift AI.
- * Upstream OpenShell is also alpha / single-player-first.
+ * Do not invent: "Custom img", RHAISTRAT tickets, harness.use_plugin("openshell"),
+ * or Pattern 1/2 badges — those are not NVIDIA OpenShell/NemoClaw matrix labels.
+ * Use OpenShell path vs NemoClaw path (ecosystem docs).
  */
 
 const POLICY_BADGES = {
-  full: { cls: "badge-full", text: "Policy: full" },
-  partial: { cls: "badge-partial", text: "Policy: partial" },
-  none: { cls: "badge-none", text: "Policy: none" },
-  blueprint: { cls: "badge-blueprint", text: "NemoClaw blueprint" },
-  bundled: { cls: "badge-bundled", text: "Community image" },
-  custom: { cls: "badge-custom", text: "Custom / validated image" },
-  framework: { cls: "badge-custom", text: "BYOA image" },
+  full: { cls: "badge-full", text: "Full coverage" },
+  partial: { cls: "badge-partial", text: "Partial coverage" },
+  none: { cls: "badge-none", text: "No coverage" },
+  blueprint: { cls: "badge-blueprint", text: "Blueprint-managed" },
+  bundled: { cls: "badge-bundled", text: "Bundled policy" },
+  byo: { cls: "badge-custom", text: "BYO image + policy" },
 };
 
-const ENTRY_PATTERNS = {
-  whole: "Pattern 1 — Whole-agent sandboxing (openshell sandbox create)",
-  harness: "Pattern 2 — Harness-native (harness.use_plugin(\"openshell\"))",
+const SOURCE_BADGES = {
+  base: { cls: "badge-bundled", text: "base" },
+  community: { cls: "badge-bundled", text: "Community" },
+  nemoclaw: { cls: "badge-nc", text: "NemoClaw" },
+  byo: { cls: "badge-custom", text: "BYO" },
+};
+
+/** NVIDIA ecosystem: OpenShell path vs NemoClaw reference path. */
+const ENTRY_PATHS = {
+  openshell: "OpenShell path — openshell sandbox create",
+  nemoclaw: "NemoClaw path — nemoclaw onboard (reference stack)",
 };
 
 /** Isolation profiles from Red Hat AI Sandboxing for Agents (July 2026). */
@@ -835,125 +828,112 @@ const ISOLATION_PROFILES = {
   },
 };
 
+/**
+ * Agent catalog aligned to NVIDIA OpenShell Supported Agents + NemoClaw supported runtimes.
+ * Frameworks / OpenHands are BYO OpenShell images (documented --from container path), not matrix rows.
+ */
 const agents = {
   claude: {
     name: "Claude Code", by: "Anthropic", type: "coding",
-    hasOwnSandbox: true, nemoclaw: false, source: "base", policy: "full",
-    entry: "whole",
+    nemoclaw: false, source: "base", policy: "full", path: "openshell",
     command: "openshell sandbox create -- claude",
-    desc: "Whole-agent Pattern 1. Built-in harness. OpenShell default policy: full coverage. ANTHROPIC_API_KEY or inference.local + provider.",
+    desc: "OpenShell Supported Agents: source base, full coverage. Trailing command on the base image. ANTHROPIC_API_KEY or inference.local + provider.",
   },
   copilot: {
     name: "GitHub Copilot CLI", by: "GitHub", type: "coding",
-    hasOwnSandbox: false, nemoclaw: false, source: "base", policy: "full",
-    entry: "whole",
+    nemoclaw: false, source: "base", policy: "full", path: "openshell",
     command: "openshell sandbox create -- copilot",
-    desc: "Whole-agent Pattern 1. Base image. Default policy: full. GITHUB_TOKEN or COPILOT_GITHUB_TOKEN.",
+    desc: "OpenShell Supported Agents: source base, full coverage. GITHUB_TOKEN or COPILOT_GITHUB_TOKEN.",
   },
   opencode: {
     name: "OpenCode", by: "Open-source", type: "coding",
-    hasOwnSandbox: false, nemoclaw: false, source: "base", policy: "partial",
-    entry: "whole",
+    nemoclaw: false, source: "base", policy: "partial", path: "openshell",
     command: "openshell sandbox create -- opencode",
-    desc: "Whole-agent Pattern 1. Default policy: partial — add opencode.ai + binary paths for full function. Often pairs with inference.local.",
+    desc: "OpenShell Supported Agents: source base, partial coverage. Add opencode.ai endpoint and OpenCode binary paths for full function; often pairs with inference.local.",
   },
   codex: {
     name: "Codex CLI", by: "OpenAI", type: "coding",
-    hasOwnSandbox: true, nemoclaw: false, source: "base", policy: "none",
-    entry: "whole",
+    nemoclaw: false, source: "base", policy: "none", path: "openshell",
     command: "openshell sandbox create --policy ./codex-policy.yaml -- codex",
-    desc: "Whole-agent Pattern 1. Default policy: none — custom OpenAI endpoints + Codex binary paths required.",
+    desc: "OpenShell Supported Agents: source base, no default coverage. Custom policy with OpenAI endpoints + Codex binary paths. OPENAI_API_KEY.",
   },
   gemini: {
     name: "Gemini CLI", by: "Google", type: "coding",
-    hasOwnSandbox: true, nemoclaw: false, source: "custom", policy: "custom",
-    entry: "whole",
-    command: "openshell sandbox create --from <validated-image> --policy ./gemini-policy.yaml -- gemini",
-    desc: "Field guide lists Gemini CLI under whole-agent Pattern 1 (package image + OpenShell policy). Not in the OpenShell base-image supported-agents matrix yet — use a validated/custom image (RHAISTRAT-1349 tracks Red Hat validated images).",
+    nemoclaw: false, source: "community", policy: "bundled", path: "openshell",
+    command: "openshell sandbox create --from gemini",
+    desc: "OpenShell Community sandbox (not in base image). NVIDIA OpenShell-Community: openshell sandbox create --from gemini. Bundled image + policy for Gemini CLI.",
   },
   ollama: {
     name: "Ollama sandbox", by: "Community", type: "coding",
-    hasOwnSandbox: false, nemoclaw: false, source: "community", policy: "bundled",
-    entry: "whole",
+    nemoclaw: false, source: "community", policy: "bundled", path: "openshell",
     command: "openshell sandbox create --from ollama",
-    desc: "Community image with bundled policy. Separate from host Ollama.",
+    desc: "OpenShell Supported Agents: source ollama, bundled policy. Launch with --from ollama.",
   },
   pi: {
     name: "Pi", by: "Community", type: "coding",
-    hasOwnSandbox: false, nemoclaw: false, source: "community", policy: "bundled",
-    entry: "whole",
+    nemoclaw: false, source: "community", policy: "bundled", path: "openshell",
     command: "openshell sandbox create --from pi",
-    desc: "Community image with Pi pre-installed.",
+    desc: "OpenShell Supported Agents: source pi, bundled policy. Launch with --from pi.",
   },
   openclaw: {
     name: "OpenClaw", by: "Community", type: "assistant",
-    hasOwnSandbox: false, nemoclaw: true, source: "nemoclaw", policy: "blueprint",
-    entry: "harness",
-    command: "nemoclaw onboard   # or harness.use_plugin(\"openshell\")",
-    desc: "Harness-native Pattern 2 (shipped for OpenClaw). Prefer NemoClaw onboard / plugin path so blueprint policy + managed inference stay consistent. BYOA: OpenClaw is a first-class Red Hat AI target runtime.",
+    nemoclaw: true, source: "nemoclaw", policy: "blueprint", path: "nemoclaw",
+    command: "nemoclaw onboard",
+    desc: "OpenShell Supported Agents + NemoClaw: blueprint-managed. Prefer nemoclaw onboard (reference stack). Community alternative: openshell sandbox create --from openclaw (less automation/hardening than NemoClaw).",
   },
   hermes: {
     name: "Hermes", by: "Nous Research", type: "assistant",
-    hasOwnSandbox: false, nemoclaw: true, source: "nemoclaw", policy: "blueprint",
-    entry: "harness",
-    command: "nemoclaw onboard --agent hermes",
-    desc: "Harness-native Pattern 2 (announced). NemoClaw packaging for OpenShell — not a base-image trailing command.",
+    nemoclaw: true, source: "nemoclaw", policy: "blueprint", path: "nemoclaw",
+    command: "nemohermes onboard",
+    desc: "NemoClaw supported agent (Tested per NemoClaw platform support). Onboard with nemohermes onboard or nemoclaw onboard --agent hermes. Not a base-image trailing command. Production parity with OpenClaw is not asserted.",
   },
   deepagents: {
     name: "Deep Agents (dcode)", by: "LangChain", type: "coding",
-    hasOwnSandbox: false, nemoclaw: true, source: "nemoclaw", policy: "blueprint",
-    entry: "harness",
-    command: "nemoclaw onboard --agent langchain-deepagents-code",
-    desc: "LangChain coding harness. NemoClaw packaging path. LangChain is an active Red Hat co-sell / validated-architecture partner on OpenShift + NVIDIA.",
+    nemoclaw: true, source: "nemoclaw", policy: "blueprint", path: "nemoclaw",
+    command: "nemo-deepagents onboard",
+    desc: "NemoClaw supported agent: LangChain Deep Agents Code. Onboard with nemo-deepagents onboard or nemoclaw onboard --agent langchain-deepagents-code (NEMOCLAW_AGENT=langchain-deepagents-code).",
   },
   openhands: {
     name: "OpenHands", by: "Open-source", type: "coding",
-    hasOwnSandbox: true, nemoclaw: false, source: "custom", policy: "custom",
-    entry: "whole",
-    command: "openshell sandbox create --from <openhands-image> --policy ./policy.yaml",
-    desc: "Own sandbox notions + whole-agent Pattern 1 on OpenShell when packaged as an OCI image with policy.",
+    nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
+    command: "openshell sandbox create --from <image> --policy ./policy.yaml",
+    desc: "Not listed on OpenShell Supported Agents. OpenShell path: bring your own container image via --from (registry image or local build) and author policy.",
   },
   adk: {
     name: "Google ADK", by: "Google", type: "workflow",
-    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
-    entry: "whole",
+    nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "BYOA framework target. Red Hat positions as complement to Vertex/Agent Engine: same ADK agent on OpenShift AI / air-gap with OpenShell + platform identity — not a Vertex lock-in.",
+    desc: "Not listed on OpenShell Supported Agents. BYO framework image on the OpenShell path (--from + policy).",
   },
   langgraph: {
     name: "LangGraph", by: "LangChain", type: "workflow",
-    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
-    entry: "whole",
+    nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "BYOA framework. Active LangChain partnership: framework + Red Hat platform + NVIDIA inference.",
+    desc: "Not listed on OpenShell Supported Agents. BYO framework image on the OpenShell path. (LangChain Deep Agents Code is a separate NemoClaw-supported runtime.)",
   },
   crewai: {
     name: "CrewAI", by: "CrewAI", type: "workflow",
-    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
-    entry: "whole",
+    nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "BYOA multi-agent framework. Starter-kit target in Red Hat AI onboarding theme.",
+    desc: "Not listed on OpenShell Supported Agents. BYO framework image on the OpenShell path (--from + policy).",
   },
   strands: {
     name: "Strands", by: "AWS (open-source)", type: "workflow",
-    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
-    entry: "whole",
+    nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "BYOA SDK (Apache 2.0). Compete with AgentCore on portability: same agent on OpenShift AI anywhere, OpenShell for process sandboxing.",
+    desc: "Not listed on OpenShell Supported Agents. BYO SDK image on the OpenShell path (--from + policy).",
   },
   watsonx: {
     name: "watsonx Orchestrate", by: "IBM", type: "workflow",
-    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
-    entry: "whole",
+    nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Enterprise harness/control plane. Watson.x also appears as a multi-provider inference backend in Red Hat AI strategy. OpenShell is still the sandbox runtime when workloads run in OpenShell; watsonx control-plane ≠ OpenShell.",
+    desc: "Not listed on OpenShell Supported Agents. If the workload runs in OpenShell, use a BYO image + policy; watsonx control plane is not OpenShell.",
   },
   custom: {
     name: "Custom / Other", by: "You", type: "any",
-    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
-    entry: "whole",
+    nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-image> --policy ./policy.yaml -- <entrypoint>",
-    desc: "BYOA: Red Hat does not pick framework winners. Package as OCI; OpenShell enforces allow/deny at the runtime boundary.",
+    desc: "OpenShell documented BYO path: --from a community name, local directory, or container image; supply policy as needed.",
   },
 };
 
@@ -1150,8 +1130,6 @@ const MATURITY_BADGES = {
   "closing-gap": { cls: "badge-maturity", text: "Gap" },
   alpha: { cls: "badge-maturity", text: "Alpha" },
   "rhoai-dp": { cls: "badge-maturity", text: "DP 3.5 → TP 3.6" },
-  announced: { cls: "badge-maturity", text: "Announced" },
-  "not-in-matrix": { cls: "badge-maturity", text: "Custom img" },
   capability: { cls: "badge-bundled", text: "Capability" },
 };
 
@@ -1194,7 +1172,12 @@ document.addEventListener("click", (e) => {
 });
 
 function policyBadge(policy) {
-  const b = POLICY_BADGES[policy] || POLICY_BADGES.custom;
+  const b = POLICY_BADGES[policy] || POLICY_BADGES.byo;
+  return `<span class="badge ${b.cls}">${b.text}</span>`;
+}
+
+function sourceBadge(source) {
+  const b = SOURCE_BADGES[source] || SOURCE_BADGES.byo;
   return `<span class="badge ${b.cls}">${b.text}</span>`;
 }
 
@@ -1229,9 +1212,7 @@ function setJourney(type) {
   updateProgress(0);
 }
 
-function agentMaturity(a) {
-  if (a.name === "Hermes") return "announced";
-  if (a.name === "Gemini CLI") return "not-in-matrix";
+function agentMaturity(_a) {
   return null;
 }
 
@@ -1247,10 +1228,9 @@ function renderAgentGrid() {
       </div>
       <p>${a.by}</p>
       <div class="meta">
+        ${sourceBadge(a.source)}
         ${policyBadge(a.policy)}
         ${maturityBadge(agentMaturity(a))}
-        ${a.nemoclaw ? `<span class="badge badge-nc">NemoClaw</span>` : ""}
-        <span class="badge badge-bundled">${a.entry === "harness" ? "Pattern 2" : "Pattern 1"}</span>
       </div>
     </div>
   `).join("");
@@ -1318,7 +1298,7 @@ function selectAgent(id) {
   selectedUseCase = null;
   renderAgentGrid();
   const a = agents[id];
-  enterStep2(a.name, `· ${a.by} · ${a.entry === "harness" ? "Pattern 2" : "Pattern 1"}`, defaultCapsForAgent());
+  enterStep2(a.name, `· ${a.by} · ${a.path === "nemoclaw" ? "NemoClaw path" : "OpenShell path"}`, defaultCapsForAgent());
 }
 
 function selectUseCase(id) {
@@ -1348,22 +1328,19 @@ function readCaps() {
 function policyCallout(a) {
   if (!a) return "";
   if (a.policy === "none") {
-    return `<div class="callout callout-warn"><strong>Policy gap:</strong> Codex has <em>no</em> default OpenShell policy coverage. Ship custom endpoints + binary paths before relying on deny-by-default egress.</div>`;
+    return `<div class="callout callout-warn"><strong>No coverage:</strong> Codex needs a custom policy (OpenAI endpoints + Codex binary paths) per OpenShell Supported Agents.</div>`;
   }
   if (a.policy === "partial") {
-    return `<div class="callout callout-warn"><strong>Partial policy:</strong> OpenCode needs extra endpoints/binaries (e.g. opencode.ai). See OpenShell supported-agents.</div>`;
+    return `<div class="callout callout-warn"><strong>Partial coverage:</strong> OpenCode needs extra endpoints/binaries (e.g. opencode.ai). See OpenShell Supported Agents.</div>`;
   }
-  if (a.policy === "custom" && a.name.includes("Gemini")) {
-    return `<div class="callout callout-info"><strong>Whole-agent Pattern 1:</strong> Field guide lists Gemini CLI as package-image + OpenShell. Not yet in the base-image matrix — use a validated/custom image (Red Hat validated images tracked under RHAISTRAT-1349).</div>`;
+  if (a.source === "community") {
+    return `<div class="callout callout-info"><strong>Community sandbox:</strong> Use <code>${escapeHtml(a.command)}</code> (OpenShell Community / Supported Agents <code>--from</code> path).</div>`;
   }
-  if (a.policy === "custom") {
-    return `<div class="callout callout-warn"><strong>Custom image:</strong> Author network/binary policy for your container.</div>`;
-  }
-  if (a.policy === "framework") {
-    return `<div class="callout callout-info"><strong>BYOA:</strong> Red Hat does not pick framework winners. Package as OCI; OpenShell + platform layers make it production-ready.</div>`;
+  if (a.policy === "byo") {
+    return `<div class="callout callout-info"><strong>BYO image:</strong> Not on the OpenShell Supported Agents matrix. Use <code>openshell sandbox create --from</code> with your image and author policy.</div>`;
   }
   if (a.policy === "blueprint") {
-    return `<div class="callout callout-info"><strong>Harness-native Pattern 2:</strong> Prefer NemoClaw / <code>harness.use_plugin("openshell")</code> so blueprint policy and inference wiring stay consistent. OpenClaw shipped; Hermes announced.</div>`;
+    return `<div class="callout callout-info"><strong>NemoClaw path:</strong> Prefer <code>${escapeHtml(a.command)}</code> so blueprint policy and managed inference stay consistent. See NemoClaw ecosystem: NemoClaw path vs OpenShell path.</div>`;
   }
   return "";
 }
@@ -1422,7 +1399,7 @@ function showResult() {
     addonItems.push("EvalHub — OpenShift AI evaluation capability (orchestrates Garak and other providers)");
     addonItems.push("Garak — adversarial scanning capability via EvalHub providers");
   }
-  if (a?.nemoclaw) addonItems.push(`NemoClaw / Pattern 2: <code>${a.command}</code>`);
+  if (a?.nemoclaw) addonItems.push(`NemoClaw path: <code>${a.command}</code>`);
 
   const resultName = a?.name || uc?.name || "Stack";
   const harnessName = a?.name || uc?.harnessSuggest || "Your harness";
@@ -1450,10 +1427,10 @@ function showResult() {
     : "OpenShift eval overlays (disableTls + allowUnauthenticatedUsers) are trusted-network only.");
 
   const entryLine = a
-    ? ENTRY_PATTERNS[a.entry]
+    ? ENTRY_PATHS[a.path]
     : (uc?.name?.includes("Mode 2") || caps.ogx
       ? "Mode 2 — Sandbox execution via platform APIs (ogx / Responses)"
-      : "Mode 1 — Sandbox the whole agent (typical OpenShell path)");
+      : "OpenShell path — openshell sandbox create");
 
   syncUrl(caps);
 
@@ -1490,9 +1467,10 @@ function showResult() {
   })();
   const harnessTip = [
     "Agent = Model + Harness (LangChain): if you're not the model, you're the harness — tools, skills/MCP, orchestration, filesystem, hooks.",
-    "BYOA: you bring this layer; OpenShift AI does not pick a winning framework.",
+    "Integration path (NVIDIA): OpenShell path vs NemoClaw reference path — see NemoClaw ecosystem docs.",
     harnessDesc,
     entryLine,
+    a?.command ? `Command: ${a.command}` : "",
     policyTip,
   ].filter(Boolean).join(" ");
 
@@ -1564,16 +1542,17 @@ function showResult() {
             <span class="cake-index">02 · Harness</span>
             <div class="cake-title-row">
               <div class="cake-product">${harnessName}</div>
-              <span class="badge badge-bundled">BYOA</span>
+              ${a ? sourceBadge(a.source) : '<span class="badge badge-bundled">BYOA</span>'}
               ${harnessMaturity}
               ${a ? policyBadge(a.policy) : ""}
-              ${a?.nemoclaw ? '<span class="badge badge-nc">NemoClaw</span>' : ""}
               ${infoButton(harnessTip, "About harness (Agent = Model + Harness)")}
             </div>
           </div>
           <ul class="cake-chips">
-            ${chipOn(a?.entry === "harness" ? "Pattern 2" : "Pattern 1")}
-            ${a?.nemoclaw ? chipOn("NemoClaw path") : chipOn("BYOA image")}
+            ${chipOn(a?.path === "nemoclaw" ? "NemoClaw path" : "OpenShell path")}
+            ${a?.source === "community" ? chipOn(a.command.replace("openshell sandbox create ", "")) : ""}
+            ${a?.source === "base" ? chipOn("base image") : ""}
+            ${a?.source === "byo" ? chipOn("--from <image>") : ""}
           </ul>
           ${suggestAgentsHtml(uc?.suggestedAgents)}
         </section>

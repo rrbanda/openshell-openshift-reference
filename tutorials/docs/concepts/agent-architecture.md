@@ -163,27 +163,28 @@ Aligned to Red Hat AI field positioning (July 2026): **Kagenti → OpenShell**, 
 
 **Compose:** Kata for kernel boundary ∪ OpenShell for application policy ∪ agent-sandbox for lifecycle. OpenShell does **not** replace OSC or MCP Gateway.
 
-### Entry patterns (Kagenti → OpenShell guide)
+### Entry paths (NVIDIA OpenShell / NemoClaw)
 
-1. **Whole-agent (Pattern 1):** `openshell sandbox create -- claude` — package agent image; no agent code changes. Field guide lists Claude Code, Codex, OpenCode, Gemini CLI.
-2. **Harness-native (Pattern 2):** `harness.use_plugin("openshell")` — OpenClaw shipped; Hermes announced.
+Per [OpenShell Supported Agents](https://docs.nvidia.com/openshell/about/supported-agents) and [NemoClaw ecosystem](https://docs.nvidia.com/nemoclaw/user-guide/openclaw/about/ecosystem):
+
+1. **OpenShell path:** `openshell sandbox create` — base trailing commands (`-- claude`), community `--from` names (`gemini`, `ollama`, `pi`, `openclaw`), or BYO container image / local directory.
+2. **NemoClaw path:** `nemoclaw onboard` (default OpenClaw), `nemohermes onboard`, or `nemo-deepagents onboard` — blueprint-managed reference stack on top of OpenShell.
 
 ### Agents / frameworks
 
-| Product | Category | Default OpenShell policy | Entry | NemoClaw? |
+| Name | Source (NVIDIA matrix) | Default policy | Path | Command |
 |---|---|---|---|---|
-| **Claude Code** | Coding (base image) | **Full** | Pattern 1 | No |
-| **GitHub Copilot CLI** | Coding (base image) | **Full** | Pattern 1 | No |
-| **OpenCode** | Coding (base image) | **Partial** | Pattern 1 | No |
-| **OpenAI Codex CLI** | Coding (base image) | **None** (custom policy) | Pattern 1 | No |
-| **Gemini CLI** | Coding | Validated/custom image (not base matrix yet) | Pattern 1 (field guide) | No |
-| **Ollama** / **Pi** | Community images | **Bundled** | Pattern 1 (`--from`) | No |
-| **OpenClaw** | Assistant | Blueprint-managed | Pattern 2 | **Yes** |
-| **Hermes** | Always-on | Blueprint-managed | Pattern 2 (announced) | **Yes** |
-| **Deep Agents (dcode)** | Coding harness | Blueprint-managed | Pattern 2 / NemoClaw | **Yes** |
-| **ADK / LangGraph / CrewAI / Strands** | BYOA frameworks | Bring-your-image | Pattern 1 | No |
-| **OpenShell** | Runtime | — | — | N/A |
-| **NemoClaw** | NVIDIA packaged stack | Blueprint-managed | — | N/A |
+| **Claude Code** | `base` | Full coverage | OpenShell | `openshell sandbox create -- claude` |
+| **GitHub Copilot CLI** | `base` | Full coverage | OpenShell | `openshell sandbox create -- copilot` |
+| **OpenCode** | `base` | Partial coverage | OpenShell | `openshell sandbox create -- opencode` |
+| **OpenAI Codex CLI** | `base` | No coverage | OpenShell | custom policy + `-- codex` |
+| **Gemini CLI** | Community (`gemini`) | Bundled | OpenShell | `openshell sandbox create --from gemini` |
+| **Ollama** / **Pi** | Community | Bundled | OpenShell | `--from ollama` / `--from pi` |
+| **OpenClaw** | NemoClaw | Blueprint-managed | NemoClaw | `nemoclaw onboard` |
+| **Hermes** | NemoClaw | Blueprint-managed | NemoClaw | `nemohermes onboard` |
+| **Deep Agents Code** | NemoClaw | Blueprint-managed | NemoClaw | `nemo-deepagents onboard` |
+| **ADK / LangGraph / CrewAI / Strands / OpenHands** | Not on matrix | BYO policy | OpenShell BYO | `--from <image>` + policy |
+| **NemoClaw** | Reference stack | — | — | orchestrates OpenShell |
 
 Use the [Interactive Wizard](stack-wizard.html) for isolation profiles and owner-accurate stacks.
 
