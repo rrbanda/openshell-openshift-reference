@@ -4,342 +4,387 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pick Your Agent. See Your Stack. | OpenShell on Red Hat OpenShift AI</title>
+<meta name="description" content="Technically accurate stack wizard: map agents, use cases, and deploy paths to OpenShell runtime capabilities vs OpenShift AI platform add-ons.">
 <style>
+:root {
+  --bg: #0a0e14;
+  --ink: rgba(230, 237, 243, 0.92);
+  --muted: rgba(230, 237, 243, 0.55);
+  --dim: rgba(230, 237, 243, 0.35);
+  --panel: rgba(22, 27, 34, 0.72);
+  --line: rgba(230, 237, 243, 0.1);
+  --nv: #76b900;
+  --nv-dim: rgba(118, 185, 0, 0.15);
+  --rh: #ee0000;
+  --warn: #e6b84d;
+  --warn-bg: rgba(230, 184, 77, 0.1);
+  --addon: #7eb8ff;
+  --radius: 10px;
+  --font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0a0e14;
-  color: rgba(230, 237, 243, 0.9);
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
   min-height: 100vh;
-  padding: 1.2rem 1rem;
+  padding: 1.2rem 1rem 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Subtle background gradient */
 body::before {
-  content: '';
+  content: "";
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(118,185,0,0.03) 0%, transparent 60%);
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(118,185,0,0.045) 0%, transparent 55%);
   pointer-events: none;
   z-index: 0;
 }
 
-.header { text-align: center; margin-bottom: 0.4rem; max-width: 560px; position: relative; z-index: 1; }
-
-.tabs-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
-.tabs-row .top-nav { display: flex; gap: 0.3rem; }
-.top-nav a {
-  font-size: 0.72rem; font-weight: 600; text-decoration: none; padding: 0.3rem 0.7rem;
-  border-radius: 5px; border: 1px solid rgba(230,237,243,0.1);
-  color: rgba(230,237,243,0.5); transition: all 0.2s;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
-.top-nav a:hover { color: #76b900; border-color: rgba(118,185,0,0.3); }
-@media (max-width: 500px) { .tabs-row { flex-direction: column; gap: 0.3rem; align-items: center; } }
+
+.header { text-align: center; margin-bottom: 0.5rem; max-width: 640px; position: relative; z-index: 1; }
 .header h1 {
-  font-size: 1.7rem; font-weight: 800;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-weight: 800;
   background: linear-gradient(135deg, #76b900 0%, #a0e030 50%, #76b900 100%);
   background-size: 200% auto;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   animation: shimmer 3s linear infinite;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.35rem;
 }
 @keyframes shimmer { to { background-position: 200% center; } }
-.header p { opacity: 0.6; font-size: 0.85rem; line-height: 1.4; }
+.header p { opacity: 0.65; font-size: 0.88rem; line-height: 1.45; }
 
-.container { max-width: 960px; width: 100%; position: relative; z-index: 1; }
+.container { max-width: 980px; width: 100%; position: relative; z-index: 1; }
 
-/* Journey tabs */
+.tabs-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.5rem; margin-bottom: 0.55rem; flex-wrap: wrap;
+}
+.top-nav { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.top-nav a {
+  font-size: 0.72rem; font-weight: 600; text-decoration: none;
+  padding: 0.3rem 0.7rem; border-radius: 5px; border: 1px solid var(--line);
+  color: var(--muted); transition: color 0.2s, border-color 0.2s;
+}
+.top-nav a:hover, .top-nav a:focus-visible { color: var(--nv); border-color: rgba(118,185,0,0.35); outline: none; }
+
 .journey-tabs {
-  display: inline-flex; justify-content: center; gap: 0.25rem; margin-bottom: 1rem;
-  backdrop-filter: blur(10px);
-  background: rgba(22, 27, 34, 0.5);
+  display: inline-flex; gap: 0.25rem;
+  background: rgba(22, 27, 34, 0.55);
   border-radius: 8px; padding: 0.25rem;
   border: 1px solid rgba(230,237,243,0.06);
 }
 .jtab {
-  padding: 0.45rem 1.2rem; border-radius: 6px; border: none;
-  font-size: 0.82rem; font-weight: 600; cursor: pointer;
-  background: transparent; color: rgba(230,237,243,0.5);
-  transition: all 0.2s;
+  padding: 0.45rem 0.95rem; border-radius: 6px; border: none;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  background: transparent; color: var(--muted); transition: all 0.2s;
 }
-.jtab:hover { color: rgba(230,237,243,0.8); }
-.jtab.active { background: rgba(118,185,0,0.15); color: #76b900; }
+.jtab:hover { color: rgba(230,237,243,0.85); }
+.jtab:focus-visible { outline: 2px solid var(--nv); outline-offset: 2px; }
+.jtab.active { background: var(--nv-dim); color: var(--nv); }
 
-/* Use case grid */
-.usecase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-@media (max-width: 600px) { .usecase-grid { grid-template-columns: 1fr; } }
-.usecase-card {
-  backdrop-filter: blur(12px);
-  background: rgba(22, 27, 34, 0.6);
+.progress {
+  display: flex; justify-content: center; gap: 0.65rem; margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+.progress-item {
+  display: flex; align-items: center; gap: 0.35rem;
+  font-size: 0.7rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em;
+}
+.progress-item .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(230,237,243,0.15);
+}
+.progress-item.active { color: var(--nv); }
+.progress-item.active .dot { background: var(--nv); box-shadow: 0 0 8px rgba(118,185,0,0.5); transform: scale(1.25); }
+.progress-item.done { color: rgba(118,185,0,0.7); }
+.progress-item.done .dot { background: rgba(118,185,0,0.45); }
+
+.step { display: none; animation: slideIn 0.3s ease; }
+.step.active { display: block; }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.step-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.4px; opacity: 0.5; margin-bottom: 0.3rem; }
+.question { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.65rem; }
+.hint { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.4; }
+
+.agent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+  gap: 0.65rem;
+}
+.usecase-grid, .deploy-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;
+}
+@media (max-width: 640px) {
+  .usecase-grid, .deploy-grid { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--panel);
   border: 1px solid rgba(230, 237, 243, 0.08);
-  border-radius: 10px;
-  padding: 1rem 1.1rem;
+  border-radius: var(--radius);
+  padding: 0.95rem 1rem;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: cardIn 0.3s ease forwards;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  width: 100%;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  animation: cardIn 0.28s ease forwards;
   opacity: 0;
 }
-.usecase-card:nth-child(1) { animation-delay: 0.02s; }
-.usecase-card:nth-child(2) { animation-delay: 0.06s; }
-.usecase-card:nth-child(3) { animation-delay: 0.10s; }
-.usecase-card:nth-child(4) { animation-delay: 0.14s; }
-.usecase-card:hover {
+.card:nth-child(1) { animation-delay: 0.02s; }
+.card:nth-child(2) { animation-delay: 0.04s; }
+.card:nth-child(3) { animation-delay: 0.06s; }
+.card:nth-child(4) { animation-delay: 0.08s; }
+.card:nth-child(5) { animation-delay: 0.1s; }
+.card:nth-child(6) { animation-delay: 0.12s; }
+.card:nth-child(7) { animation-delay: 0.14s; }
+.card:nth-child(8) { animation-delay: 0.16s; }
+.card:nth-child(9) { animation-delay: 0.18s; }
+.card:nth-child(10) { animation-delay: 0.2s; }
+.card:nth-child(11) { animation-delay: 0.22s; }
+.card:nth-child(12) { animation-delay: 0.24s; }
+.card:nth-child(13) { animation-delay: 0.26s; }
+.card:nth-child(14) { animation-delay: 0.28s; }
+.card:nth-child(15) { animation-delay: 0.3s; }
+.card:nth-child(16) { animation-delay: 0.32s; }
+.card:nth-child(17) { animation-delay: 0.34s; }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card:hover {
   border-color: rgba(118, 185, 0, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(118, 185, 0, 0.1), 0 8px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 18px rgba(118, 185, 0, 0.1), 0 8px 22px rgba(0, 0, 0, 0.28);
 }
-.usecase-card:active { transform: scale(0.98); }
-.usecase-card h4 { font-size: 0.95rem; color: #e6edf3; margin-bottom: 0.15rem; font-weight: 600; }
-.usecase-card p { font-size: 0.8rem; opacity: 0.55; line-height: 1.4; }
-.usecase-card .uc-profile {
-  display: inline-block; margin-top: 0.4rem;
-  font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-  color: #76b900; opacity: 0.7;
+.card:focus-visible {
+  outline: 2px solid var(--nv);
+  outline-offset: 2px;
 }
-
-/* Progress dots */
-.progress-dots { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.6rem; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(230,237,243,0.15); transition: all 0.3s; }
-.dot.active { background: #76b900; box-shadow: 0 0 8px rgba(118,185,0,0.5); transform: scale(1.3); }
-.dot.done { background: rgba(118,185,0,0.4); }
-
-/* Steps */
-.step { display: none; animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-.step.active { display: block; }
-@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-
-.step-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.5; margin-bottom: 0.3rem; }
-.question { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.6rem; }
-.selected-agent { font-size: 0.88rem; opacity: 0.5; margin-bottom: 0.5rem; }
-.selected-agent span { color: #76b900; font-weight: 600; }
-
-/* Agent grid */
-.agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 0.7rem; }
-
-.agent-card {
-  backdrop-filter: blur(12px);
-  background: rgba(22, 27, 34, 0.6);
-  border: 1px solid rgba(230, 237, 243, 0.08);
-  border-radius: 10px;
-  padding: 1rem 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  animation: cardIn 0.3s ease forwards;
-  opacity: 0;
+.card.selected {
+  border-color: rgba(118, 185, 0, 0.65);
+  box-shadow: 0 0 0 1px rgba(118,185,0,0.35), 0 8px 24px rgba(0,0,0,0.3);
+  background: rgba(118, 185, 0, 0.08);
 }
+.card h4 { font-size: 0.92rem; font-weight: 600; margin-bottom: 0.15rem; }
+.card p { font-size: 0.78rem; color: var(--muted); line-height: 1.35; }
+.card .meta { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.45rem; }
 
-.agent-card:nth-child(1) { animation-delay: 0.02s; }
-.agent-card:nth-child(2) { animation-delay: 0.04s; }
-.agent-card:nth-child(3) { animation-delay: 0.06s; }
-.agent-card:nth-child(4) { animation-delay: 0.08s; }
-.agent-card:nth-child(5) { animation-delay: 0.10s; }
-.agent-card:nth-child(6) { animation-delay: 0.12s; }
-.agent-card:nth-child(7) { animation-delay: 0.14s; }
-.agent-card:nth-child(8) { animation-delay: 0.16s; }
-.agent-card:nth-child(9) { animation-delay: 0.18s; }
-.agent-card:nth-child(10) { animation-delay: 0.20s; }
-.agent-card:nth-child(11) { animation-delay: 0.22s; }
-.agent-card:nth-child(12) { animation-delay: 0.24s; }
-.agent-card:nth-child(13) { animation-delay: 0.26s; }
-.agent-card:nth-child(14) { animation-delay: 0.28s; }
-.agent-card:nth-child(15) { animation-delay: 0.30s; }
-
-@keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-.agent-card:hover {
-  border-color: rgba(118, 185, 0, 0.4);
-  transform: translateY(-3px);
-  box-shadow: 0 0 20px rgba(118, 185, 0, 0.1), 0 8px 25px rgba(0, 0, 0, 0.3);
+.badge {
+  display: inline-flex; align-items: center;
+  font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 2px 5px; border-radius: 3px; border: 1px solid transparent;
 }
+.badge-nc { background: var(--nv-dim); border-color: rgba(118,185,0,0.35); color: var(--nv); }
+.badge-full { background: rgba(118,185,0,0.12); border-color: rgba(118,185,0,0.3); color: #a0e030; }
+.badge-partial { background: var(--warn-bg); border-color: rgba(230,184,77,0.35); color: var(--warn); }
+.badge-none { background: rgba(239,139,122,0.12); border-color: rgba(239,139,122,0.35); color: #ef8b7a; }
+.badge-blueprint { background: rgba(126,184,255,0.12); border-color: rgba(126,184,255,0.3); color: var(--addon); }
+.badge-bundled { background: rgba(230,237,243,0.06); border-color: var(--line); color: var(--muted); }
+.badge-custom { background: rgba(230,237,243,0.04); border-color: var(--line); color: var(--dim); }
+.badge-owner-os { background: var(--nv-dim); color: var(--nv); border-color: rgba(118,185,0,0.3); }
+.badge-owner-plat { background: rgba(238,0,0,0.1); color: #ff6b6b; border-color: rgba(238,0,0,0.3); }
+.badge-owner-addon { background: rgba(126,184,255,0.1); color: var(--addon); border-color: rgba(126,184,255,0.3); }
 
-.agent-card:active { transform: scale(0.97); }
-
-.agent-card h4 { font-size: 0.95rem; color: #e6edf3; margin-bottom: 0.2rem; font-weight: 600; }
-.agent-card p { font-size: 0.8rem; opacity: 0.5; line-height: 1.3; }
-
-/* NemoClaw badge */
-.agent-card .badge-nc {
-  position: absolute; top: 5px; right: 5px;
-  background: rgba(118, 185, 0, 0.15); border: 1px solid rgba(118, 185, 0, 0.3);
-  color: #76b900; font-size: 0.6rem; font-weight: 700;
-  padding: 1px 5px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;
+.selected-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+  flex-wrap: wrap; margin-bottom: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(118,185,0,0.25);
+  background: rgba(118,185,0,0.06);
+  border-radius: 8px;
 }
+.selected-bar strong { color: var(--nv); }
+.selected-bar button {
+  background: transparent; border: 1px solid var(--line); color: var(--muted);
+  border-radius: 5px; padding: 0.25rem 0.55rem; font-size: 0.72rem; cursor: pointer;
+}
+.selected-bar button:hover, .selected-bar button:focus-visible { color: var(--nv); border-color: rgba(118,185,0,0.4); outline: none; }
 
-.agent-card.nc-supported { border-color: rgba(118, 185, 0, 0.15); }
-.agent-card.nc-supported:hover { border-color: rgba(118, 185, 0, 0.5); box-shadow: 0 0 25px rgba(118, 185, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.3); }
+.cap-legend {
+  display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 0.75rem;
+  font-size: 0.72rem; color: var(--muted);
+}
+.cap-legend span { display: inline-flex; align-items: center; gap: 0.3rem; }
 
-/* Checkboxes */
-.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1.2rem; }
+.checks {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-bottom: 1rem;
+}
+@media (min-width: 900px) { .checks { grid-template-columns: 1fr 1fr 1fr; } }
+@media (max-width: 520px) { .checks { grid-template-columns: 1fr; } }
+
 .check-item {
   display: flex; align-items: flex-start; gap: 0.5rem;
-  padding: 0.7rem 0.9rem;
-  backdrop-filter: blur(10px);
-  background: rgba(22, 27, 34, 0.5);
+  padding: 0.7rem 0.85rem;
+  background: rgba(22, 27, 34, 0.55);
   border-radius: 8px;
   border: 1px solid rgba(230,237,243,0.06);
-  transition: border-color 0.2s;
 }
-.check-item:hover { border-color: rgba(118,185,0,0.2); }
-.check-item input { margin-top: 2px; accent-color: #76b900; width: 16px; height: 16px; flex-shrink: 0; }
-.check-item label { font-size: 0.88rem; cursor: pointer; font-weight: 500; }
-.check-item .check-desc { font-size: 0.75rem; opacity: 0.55; margin-top: 0.1rem; line-height: 1.4; }
+.check-item:hover { border-color: rgba(118,185,0,0.22); }
+.check-item input { margin-top: 2px; accent-color: var(--nv); width: 16px; height: 16px; flex-shrink: 0; }
+.check-item label { font-size: 0.86rem; cursor: pointer; font-weight: 560; display: block; }
+.check-item .check-desc { font-size: 0.73rem; color: var(--muted); margin-top: 0.15rem; line-height: 1.4; }
+.check-item .owner-row { margin-top: 0.35rem; }
 
-@media (min-width: 768px) { .checks { grid-template-columns: 1fr 1fr 1fr; } }
-@media (max-width: 500px) { .checks { grid-template-columns: 1fr; } }
+.actions { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.6rem 1.2rem; border-radius: 6px;
+  font-size: 0.86rem; font-weight: 600; text-decoration: none;
+  cursor: pointer; border: none; transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.btn:focus-visible { outline: 2px solid var(--nv); outline-offset: 2px; }
+.btn-primary { background: var(--nv); color: #0a0e14; }
+.btn-primary:hover { background: #8fcf00; box-shadow: 0 0 14px rgba(118,185,0,0.3); }
+.btn-secondary {
+  background: rgba(230,237,243,0.04); color: rgba(230,237,243,0.75);
+  border: 1px solid rgba(230,237,243,0.12);
+}
+.btn-secondary:hover { border-color: rgba(118,185,0,0.4); color: var(--nv); }
+.actions-sm .btn { padding: 0.35rem 0.75rem; font-size: 0.74rem; }
 
-/* Result */
-.result { display: none; animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.result { display: none; animation: slideIn 0.35s ease; }
 .result.active { display: block; }
 
-/* Result header — title + actions inline */
 .result-header {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;
+  margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;
 }
-.result-title {
-  font-size: 1.25rem; font-weight: 700;
-  color: rgba(230,237,243,0.85);
-}
-.result-title span { color: #76b900; }
+.result-title { font-size: 1.2rem; font-weight: 700; color: rgba(230,237,243,0.88); }
+.result-title span { color: var(--nv); }
 
-/* Result grid — horizontal-first layout */
 .result-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.6rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;
 }
 .result-card {
-  backdrop-filter: blur(16px);
-  border-radius: 10px;
-  border: 1px solid rgba(230,237,243,0.07);
-  padding: 0.85rem 1.1rem;
-  animation: layerIn 0.35s ease forwards;
+  border-radius: var(--radius);
+  border: 1px solid rgba(230,237,243,0.08);
+  padding: 0.9rem 1.05rem;
+  animation: layerIn 0.3s ease forwards;
   opacity: 0; transform: translateY(8px);
 }
-.result-card:nth-child(1) { animation-delay: 0.05s; }
-.result-card:nth-child(2) { animation-delay: 0.10s; }
-.result-card:nth-child(3) { animation-delay: 0.15s; }
-.result-card:nth-child(4) { animation-delay: 0.20s; }
-.result-card:nth-child(5) { animation-delay: 0.25s; }
-.result-card:nth-child(6) { animation-delay: 0.30s; }
+.result-card:nth-child(1) { animation-delay: 0.04s; }
+.result-card:nth-child(2) { animation-delay: 0.08s; }
+.result-card:nth-child(3) { animation-delay: 0.12s; }
+.result-card:nth-child(4) { animation-delay: 0.16s; }
+.result-card:nth-child(5) { animation-delay: 0.2s; }
+.result-card:nth-child(6) { animation-delay: 0.24s; }
 .result-wide { grid-column: 1 / -1; }
-
 @keyframes layerIn { to { opacity: 1; transform: translateY(0); } }
 
-/* Color-coded cards */
 .result-card.model-layer {
-  background: linear-gradient(135deg, rgba(16,20,26,0.8) 0%, rgba(22,27,34,0.6) 100%);
-  border-left: 3px solid rgba(230,237,243,0.12);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, rgba(16,20,26,0.85) 0%, rgba(22,27,34,0.65) 100%);
+  border-left: 3px solid rgba(230,237,243,0.18);
 }
 .result-card.harness-layer {
-  background: linear-gradient(135deg, rgba(18,22,28,0.8) 0%, rgba(26,31,38,0.6) 100%);
-  border-left: 3px solid rgba(230,237,243,0.25);
-  box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+  background: linear-gradient(135deg, rgba(18,22,28,0.85) 0%, rgba(26,31,38,0.65) 100%);
+  border-left: 3px solid rgba(230,237,243,0.3);
 }
 .result-card.runtime-layer {
-  background: linear-gradient(135deg, rgba(118,185,0,0.06) 0%, rgba(16,20,26,0.8) 100%);
-  border-left: 4px solid #76b900;
-  box-shadow: 0 4px 20px rgba(118,185,0,0.08), 0 4px 18px rgba(0,0,0,0.3);
+  background: linear-gradient(135deg, rgba(118,185,0,0.07) 0%, rgba(16,20,26,0.85) 100%);
+  border-left: 4px solid var(--nv);
 }
 .result-card.platform-layer {
-  background: linear-gradient(135deg, rgba(238,0,0,0.04) 0%, rgba(16,20,26,0.8) 100%);
-  border-left: 4px solid #ee0000;
-  box-shadow: 0 4px 20px rgba(238,0,0,0.06), 0 6px 24px rgba(0,0,0,0.3);
+  background: linear-gradient(135deg, rgba(238,0,0,0.05) 0%, rgba(16,20,26,0.85) 100%);
+  border-left: 4px solid var(--rh);
 }
-.result-card.inference-card {
-  background: rgba(22, 27, 34, 0.5);
-  border-color: rgba(238,0,0,0.15);
-  box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+.result-card.next-layer {
+  background: rgba(22, 27, 34, 0.55);
+  border-color: rgba(118,185,0,0.2);
 }
 
-/* Runtime features — 2 columns */
-.stack-features { margin-top: 0.3rem; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.5rem; }
+.stack-section-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.45; }
+.stack-section-header { display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.25rem; }
+.stack-section-product { font-weight: 700; font-size: 1rem; margin-top: 0.1rem; }
+.stack-section-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.45; margin-top: 0.25rem; }
 
-/* Red Hat brand accent for product names */
-.rh-brand { color: #ee0000; }
-.rh-brand-subtle { color: rgba(238,0,0,0.7); }
-.rh-hat { display: inline-block; width: 18px; height: 18px; vertical-align: -2px; margin-right: 2px; border-radius: 3px; object-fit: contain; }
-
-/* Provider icons row */
-.provider-icons { display: flex; gap: 0.6rem; align-items: center; margin-top: 0.4rem; flex-wrap: wrap; }
-.provider-icons img { width: 22px; height: 22px; opacity: 0.8; transition: opacity 0.2s; border-radius: 4px; font-size: 0; }
-.provider-icons img.pi-dark { filter: invert(1) brightness(0.85); }
-.provider-icons img:hover { opacity: 1; }
-.provider-icons .rh-hat { width: 22px; height: 22px; vertical-align: middle; }
-.provider-icons .pi-label { font-size: 0.68rem; opacity: 0.35; margin-left: 0.2rem; }
-
-.stack-section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
-.stack-section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; }
-.stack-section-product { font-weight: 700; font-size: 1rem; }
-.stack-section-desc { font-size: 0.85rem; opacity: 0.6; line-height: 1.45; margin-top: 0.2rem; }
-
-.stack-features li { font-size: 0.82rem; opacity: 0.8; padding: 0.15rem 0; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
-.stack-features li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.stack-features li.enabled::before { background: #76b900; box-shadow: 0 0 4px rgba(118,185,0,0.5); }
+.stack-features {
+  margin-top: 0.4rem; padding: 0;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.5rem;
+}
+.stack-features li {
+  font-size: 0.8rem; padding: 0.18rem 0; list-style: none;
+  display: flex; align-items: flex-start; gap: 0.4rem; line-height: 1.35;
+}
+.stack-features li::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  margin-top: 0.4rem; flex-shrink: 0;
+}
+.stack-features li.enabled::before { background: var(--nv); box-shadow: 0 0 4px rgba(118,185,0,0.5); }
+.stack-features li.disabled { opacity: 0.4; }
 .stack-features li.disabled::before { background: rgba(230,237,243,0.15); }
 
-/* Info icon with frosted tooltip */
+.callout {
+  margin-top: 0.55rem; padding: 0.55rem 0.7rem; border-radius: 7px;
+  font-size: 0.78rem; line-height: 1.4;
+}
+.callout-warn { background: var(--warn-bg); border: 1px solid rgba(230,184,77,0.3); color: #f0d48a; }
+.callout-info { background: rgba(118,185,0,0.08); border: 1px solid rgba(118,185,0,0.25); color: rgba(200,230,150,0.95); }
+.callout-dim { background: rgba(230,237,243,0.03); border: 1px solid var(--line); color: var(--muted); }
+
+.cmd {
+  display: block; margin-top: 0.35rem; padding: 0.5rem 0.65rem;
+  background: rgba(0,0,0,0.35); border: 1px solid var(--line); border-radius: 6px;
+  font-family: var(--mono); font-size: 0.74rem; color: #d7ecc0; overflow-x: auto; white-space: pre-wrap;
+}
+.cmd-list { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.4rem; }
+
+.routes > span { display: block; padding: 0.12rem 0; font-size: 0.8rem; color: var(--muted); }
+.routes > span::before { content: "→ "; color: rgba(238,0,0,0.5); }
+.rh-brand { color: var(--rh); }
+.rh-hat { display: inline-block; width: 18px; height: 18px; vertical-align: -3px; margin-right: 3px; border-radius: 3px; object-fit: contain; }
+
 .info-icon {
   display: inline-flex; align-items: center; justify-content: center;
   width: 18px; height: 18px; border-radius: 50%;
-  background: rgba(118,185,0,0.1); color: #76b900;
-  font-size: 0.65rem; font-weight: 700; cursor: help;
-  position: relative; transition: background 0.2s;
+  background: rgba(118,185,0,0.12); color: var(--nv);
+  font-size: 0.65rem; font-weight: 700; cursor: help; position: relative;
 }
-.info-icon:hover { background: rgba(118,185,0,0.25); }
-
+.info-icon:hover, .info-icon:focus-visible { background: rgba(118,185,0,0.28); outline: none; }
 .info-icon .tooltip {
   display: none; position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
-  backdrop-filter: blur(16px);
-  background: rgba(16, 22, 30, 0.9);
-  border: 1px solid rgba(118,185,0,0.2);
-  border-radius: 8px;
-  padding: 0.6rem 0.75rem; width: 280px;
-  font-size: 0.78rem; font-weight: 400;
-  color: rgba(230,237,243,0.9); line-height: 1.45;
-  z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  background: rgba(16, 22, 30, 0.95); border: 1px solid rgba(118,185,0,0.25);
+  border-radius: 8px; padding: 0.6rem 0.75rem; width: min(300px, 70vw);
+  font-size: 0.76rem; font-weight: 400; color: rgba(230,237,243,0.92); line-height: 1.45;
+  z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4); text-align: left;
 }
-.info-icon:hover .tooltip { display: block; }
+.info-icon:hover .tooltip, .info-icon:focus-visible .tooltip { display: block; }
 
-/* Inference routes */
-.routes > span { display: block; padding: 0.15rem 0; font-size: 0.82rem; opacity: 0.7; white-space: nowrap; }
-.routes > span::before { content: "→ "; color: rgba(238,0,0,0.5); }
-
-/* Buttons */
-.actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.btn {
-  display: inline-block; padding: 0.6rem 1.3rem; border-radius: 6px;
-  font-size: 0.88rem; font-weight: 600; text-decoration: none;
-  cursor: pointer; border: none; transition: all 0.15s;
+.footer-note {
+  margin-top: 0.85rem; font-size: 0.74rem; color: var(--dim); line-height: 1.45;
+  text-align: center; max-width: 720px; margin-left: auto; margin-right: auto;
 }
-.actions-sm .btn { padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 5px; }
-.btn:active { transform: scale(0.97); }
-.btn-primary { background: #76b900; color: #0a0e14; }
-.btn-primary:hover { background: #8fcf00; box-shadow: 0 0 15px rgba(118,185,0,0.3); }
-.btn-secondary { background: rgba(230,237,243,0.04); color: rgba(230,237,243,0.7); border: 1px solid rgba(230,237,243,0.12); }
-.btn-secondary:hover { border-color: rgba(118,185,0,0.4); color: #76b900; }
-
-.back-link { display: inline-block; margin-top: 1.5rem; color: rgba(230,237,243,0.3); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
-.back-link:hover { color: #76b900; }
+.back-link {
+  display: inline-block; margin-top: 1.4rem; color: var(--dim);
+  text-decoration: none; font-size: 0.82rem;
+}
+.back-link:hover, .back-link:focus-visible { color: var(--nv); outline: none; }
 
 @media (max-width: 768px) {
   .result-grid { grid-template-columns: 1fr; }
   .result-wide { grid-column: 1; }
   .stack-features { grid-template-columns: 1fr; }
-  .usecase-grid { gap: 0.5rem; }
-}
-@media (max-width: 500px) {
-  .agent-grid { grid-template-columns: repeat(2, 1fr); }
-  .info-icon .tooltip { width: 200px; left: -80px; transform: none; }
-  .header h1 { font-size: 1.3rem; }
 }
 </style>
 </head>
@@ -347,126 +392,517 @@ body::before {
 
 <div class="header">
   <h1>Pick Your Agent. See Your Stack.</h1>
-  <p>OpenShell is the security runtime beneath every option. Select your agent to see how the pieces fit together on Red Hat OpenShift AI.</p>
+  <p>BYOA on Red Hat AI: you bring the agent; the platform operationalizes it. This wizard composes <strong>OpenShell</strong> (application sandbox) with <strong>OpenShift / OpenShift AI</strong> layers (Kata, MCP Gateway, ogx, MLflow, SPIFFE) — never conflating them. Aligned to July 2026 field guides (Kagenti→OpenShell, Agentic Strategy, Sandboxing for Agents).</p>
 </div>
 
 <div class="container">
-
   <div class="tabs-row">
-    <div class="journey-tabs">
-      <button class="jtab active" id="jtab-agent" onclick="setJourney('agent')">By Agent</button>
-      <button class="jtab" id="jtab-usecase" onclick="setJourney('usecase')">By Use Case</button>
+    <div class="journey-tabs" role="tablist" aria-label="Journey type">
+      <button type="button" class="jtab active" id="jtab-agent" role="tab" aria-selected="true" onclick="setJourney('agent')">By Agent</button>
+      <button type="button" class="jtab" id="jtab-usecase" role="tab" aria-selected="false" onclick="setJourney('usecase')">By Use Case</button>
+      <button type="button" class="jtab" id="jtab-deploy" role="tab" aria-selected="false" onclick="setJourney('deploy')">By Deploy Path</button>
     </div>
     <div class="top-nav">
       <a href="../quickstart/">Quickstart</a>
       <a href="agent-architecture/">Concepts</a>
+      <a href="../agent-stack-decision-guide/">Decision Guide</a>
     </div>
   </div>
 
-  <div class="progress-dots" id="progress">
-    <div class="dot active" id="dot1"></div>
-    <div class="dot" id="dot2"></div>
-    <div class="dot" id="dot3"></div>
+  <div class="progress" id="progress" aria-label="Wizard progress">
+    <div class="progress-item active" id="prog1"><span class="dot"></span><span>Choose</span></div>
+    <div class="progress-item" id="prog2"><span class="dot"></span><span>Configure</span></div>
+    <div class="progress-item" id="prog3"><span class="dot"></span><span>Stack</span></div>
   </div>
 
   <!-- STEP 1: By Agent -->
-  <div class="step active" id="step1">
+  <div class="step active" id="step1" role="tabpanel">
     <div class="step-label">Step 1 — Choose your agent</div>
     <div class="question">I'm using (or plan to use)...</div>
-    <div class="agent-grid">
-      <div class="agent-card" onclick="selectAgent('claude')"><h4>Claude Code</h4><p>Anthropic</p></div>
-      <div class="agent-card" onclick="selectAgent('codex')"><h4>Codex CLI</h4><p>OpenAI</p></div>
-      <div class="agent-card" onclick="selectAgent('copilot')"><h4>Copilot CLI</h4><p>GitHub</p></div>
-      <div class="agent-card" onclick="selectAgent('gemini')"><h4>Gemini CLI</h4><p>Google</p></div>
-      <div class="agent-card" onclick="selectAgent('opencode')"><h4>OpenCode</h4><p>Open-source</p></div>
-      <div class="agent-card" onclick="selectAgent('openhands')"><h4>OpenHands</h4><p>Open-source</p></div>
-      <div class="agent-card" onclick="selectAgent('adk')"><h4>Google ADK</h4><p>Enterprise workflows</p></div>
-      <div class="agent-card" onclick="selectAgent('langgraph')"><h4>LangGraph</h4><p>LangChain</p></div>
-      <div class="agent-card" onclick="selectAgent('crewai')"><h4>CrewAI</h4><p>Multi-agent</p></div>
-      <div class="agent-card" onclick="selectAgent('strands')"><h4>Strands</h4><p>AWS (open-source)</p></div>
-      <div class="agent-card" onclick="selectAgent('watsonx')"><h4>watsonx Orchestrate</h4><p>IBM</p></div>
-      <div class="agent-card nc-supported" onclick="selectAgent('openclaw')"><h4>OpenClaw</h4><p>Assistant</p><span class="badge-nc">NemoClaw</span></div>
-      <div class="agent-card nc-supported" onclick="selectAgent('hermes')"><h4>Hermes</h4><p>Nous Research</p><span class="badge-nc">NemoClaw</span></div>
-      <div class="agent-card nc-supported" onclick="selectAgent('deepagents')"><h4>Deep Agents</h4><p>LangChain</p><span class="badge-nc">NemoClaw</span></div>
-      <div class="agent-card" onclick="selectAgent('custom')"><h4>Custom / Other</h4><p>My own agent</p></div>
-    </div>
+    <p class="hint">Pattern 1 = whole-agent (<code>openshell sandbox create</code>). Pattern 2 = harness-native (<code>harness.use_plugin("openshell")</code> — OpenClaw shipped, Hermes announced). Policy badges follow the OpenShell supported-agents matrix; Gemini is Pattern 1 via validated/custom image (not base matrix yet).</p>
+    <div class="agent-grid" id="agentGrid"></div>
   </div>
 
   <!-- STEP 1: By Use Case -->
-  <div class="step" id="step1uc">
+  <div class="step" id="step1uc" role="tabpanel">
     <div class="step-label">Step 1 — Choose your use case</div>
     <div class="question">What are you building?</div>
-    <div class="usecase-grid">
-      <div class="usecase-card" onclick="selectUseCase('private_chatbot')"><h4>Private-Data Chatbot</h4><p>Chatbot with access to private data, MCP servers, and Agent Skills. Needs privilege scoping and kernel isolation.</p><span class="uc-profile">OpenShell + Kata</span></div>
-      <div class="usecase-card" onclick="selectUseCase('email_agent')"><h4>Email / Messaging Agent</h4><p>Reads untrusted input (email, chat) and writes to untrusted destinations. Full isolation required.</p><span class="uc-profile">OpenShell + Kata</span></div>
-      <div class="usecase-card" onclick="selectUseCase('coding_laptop')"><h4>Coding Agent on Laptop</h4><p>Claude Code, dcode, or similar on your workstation. OpenShell sandbox protects the host machine.</p><span class="uc-profile">OpenShell + Podman</span></div>
-      <div class="usecase-card" onclick="selectUseCase('coding_cluster')"><h4>Coding Agent in Cluster</h4><p>Coding assistant deployed on OpenShift — for policy enforcement, shared compute, or always-on access.</p><span class="uc-profile">OpenShell + OpenShift</span></div>
-    </div>
+    <p class="hint">Rows follow the Red Hat AI Sandboxing use-case mapping table and isolation profiles (Permissive → OpenShell Typical → OpenShell+Kata → Confidential). Trusted chatbots may not need OpenShell or Kata.</p>
+    <div class="usecase-grid" id="usecaseGrid"></div>
+  </div>
+
+  <!-- STEP 1: By Deploy Path -->
+  <div class="step" id="step1deploy" role="tabpanel">
+    <div class="step-label">Step 1 — Choose your deploy path</div>
+    <div class="question">Where will OpenShell run?</div>
+    <p class="hint">Laptop = OpenShell + Podman + Kaiden. Eval = Helm alpha with relaxed auth. Production = compose OpenShell + Agent Ops + optional OSC/MCP Gateway/ogx/MLflow (OIDC/TLS/Postgres/GitOps).</p>
+    <div class="deploy-grid" id="deployGrid"></div>
   </div>
 
   <!-- STEP 2 -->
-  <div class="step" id="step2">
-    <div class="step-label">Step 2 — Runtime features</div>
-    <div class="selected-agent" id="selectedLabel">For: <span></span></div>
-    <div class="question">What do you need from the runtime?</div>
-    <div class="checks">
-      <div class="check-item"><input type="checkbox" id="chk-network" checked><div><label for="chk-network">Network policy</label><div class="check-desc">Per-binary, per-host, per-HTTP-method egress control via OPA/Rego</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-creds" checked><div><label for="chk-creds">Credential masking</label><div class="check-desc">Agent calls inference.local — never sees real API keys</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-audit" checked><div><label for="chk-audit">Audit + tracing</label><div class="check-desc">OCSF audit logs + MLflow tracing (via Red Hat OpenShift AI) + OpenTelemetry</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-fs" checked><div><label for="chk-fs">Filesystem + process isolation</label><div class="check-desc">Landlock LSM + seccomp syscall filtering + network namespace</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-identity" checked><div><label for="chk-identity">Agent identity (SPIFFE/SPIRE)</label><div class="check-desc">Cryptographic workload identity — no hardcoded keys, short-lived scoped tokens</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-mcp" checked><div><label for="chk-mcp">Tool governance (MCP Gateway)</label><div class="check-desc">OAuth2 token exchange for tool access, identity-based filtering, no prompt-based auth</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-guardrails"><div><label for="chk-guardrails">Safety guardrails</label><div class="check-desc">NeMo Guardrails + Guardrails Orchestrator at inference boundary</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-kata"><div><label for="chk-kata">Hardware isolation (Kata Containers)</label><div class="check-desc">Kernel-level VM isolation via OpenShift Sandboxed Containers</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-multi"><div><label for="chk-multi">Multi-user / team isolation</label><div class="check-desc">OIDC + RBAC + namespace isolation + workspaces</div></div></div>
+  <div class="step" id="step2" role="tabpanel">
+    <div class="step-label">Step 2 — Capabilities</div>
+    <div class="selected-bar" id="selectedBar">
+      <div>Selected: <strong id="selectedName"></strong> <span id="selectedMeta" style="color:var(--muted);font-size:0.8rem"></span></div>
+      <button type="button" onclick="goBack()">Change selection</button>
     </div>
+    <div class="question">What do you need? (owner badges = who provides it)</div>
+    <div class="cap-legend">
+      <span><span class="badge badge-owner-os">OpenShell</span> app sandbox (Mode 1)</span>
+      <span><span class="badge badge-owner-plat">Platform</span> Kata · MCP Gateway · ogx · MLflow</span>
+      <span><span class="badge badge-owner-addon">Safety</span> NeMo · Garak · EvalHub</span>
+    </div>
+    <div class="checks" id="capChecks"></div>
     <div class="actions">
-      <button class="btn btn-primary" onclick="showResult()">Show my architecture</button>
-      <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+      <button type="button" class="btn btn-primary" onclick="showResult()">Show my architecture</button>
+      <button type="button" class="btn btn-secondary" onclick="goBack()">← Back</button>
     </div>
   </div>
 
   <!-- RESULT -->
-  <div class="result" id="result"></div>
+  <div class="result" id="result" aria-live="polite"></div>
 </div>
 
 <a class="back-link" href="agent-architecture/">← Back to Agent Architecture concepts</a>
 
 <script>
+/**
+ * Accuracy sources (July 2026 field enablement — keep in sync):
+ * - From Kagenti to OpenShell (Field Positioning Guide)
+ * - Red Hat AI — Agentic AI Product Strategy 2026
+ * - Red Hat AI Sandboxing for Agents (July 2026)
+ * - OpenShell upstream supported-agents + architecture
+ *
+ * Layering (compose, do not conflate):
+ *   Kata / OSC     = hardware / dedicated-kernel isolation (GA layered product)
+ *   OpenShell      = in-sandbox policy: Landlock, seccomp, netns, OPA L4/L7,
+ *                    inference.local cred injection, OCSF audit
+ *   agent-sandbox  = Sandbox CRD lifecycle (kubernetes-sigs; ships with OSC path)
+ *   MCP Gateway    = Red Hat AI tool governance (Envoy + Kuadrant AuthPolicy + Authorino)
+ *   ogx            = Open Responses / Mode-2 platform API surface (not OpenShell core)
+ *   MLflow/OTEL    = OpenShift AI Agent Ops tracing/eval (not OpenShell OCSF)
+ *
+ * Identity: Kagenti had full SPIRE via AuthBridge (Dev Preview, converged away).
+ * OpenShell closes the gap with JWT-SVID grants / exchange; Red Hat contributes
+ * OIDC + SPIFFE identity drivers. Subjects are SPIFFE-shaped today.
+ *
+ * Maturity: OpenShell is alpha / single-player-first; RHOAI Dev/Tech Preview
+ * targeted 3.5/3.6 (H2 CY2026) per field guide.
+ */
+
+const POLICY_BADGES = {
+  full: { cls: "badge-full", text: "Policy: full" },
+  partial: { cls: "badge-partial", text: "Policy: partial" },
+  none: { cls: "badge-none", text: "Policy: none" },
+  blueprint: { cls: "badge-blueprint", text: "NemoClaw blueprint" },
+  bundled: { cls: "badge-bundled", text: "Community image" },
+  custom: { cls: "badge-custom", text: "Custom / validated image" },
+  framework: { cls: "badge-custom", text: "BYOA image" },
+};
+
+const ENTRY_PATTERNS = {
+  whole: "Pattern 1 — Whole-agent sandboxing (openshell sandbox create)",
+  harness: "Pattern 2 — Harness-native (harness.use_plugin(\"openshell\"))",
+};
+
+/** Isolation profiles from Red Hat AI Sandboxing for Agents (July 2026). */
+const ISOLATION_PROFILES = {
+  permissive: {
+    name: "Permissive",
+    layers: "L2–L3",
+    blurb: "Low-risk / traditional workloads. Not the OpenShell default for autonomous coding agents.",
+  },
+  openshell_min: {
+    name: "OpenShell, Minimally Restrictive",
+    layers: "L1–L4",
+    blurb: "Trusted internal agents. OpenShell: no unproxied egress, credential protection, security audit. Platform network controls still required.",
+  },
+  openshell_typical: {
+    name: "OpenShell, Typical Configuration",
+    layers: "L1–L4",
+    blurb: "Pre-approved agents that may generate/run code. Landlock + seccomp + netns + OPA egress + inference.local. Tuned binary/host policy.",
+  },
+  openshell_kata: {
+    name: "OpenShell with Kata or VM",
+    layers: "L1–L5",
+    blurb: "Broader/less-defined scope or sensitive data. Compose OSC/Kata (or OpenShell VM/libkrun) under OpenShell policy — hardware + application isolation.",
+  },
+  confidential: {
+    name: "Confidential Containers",
+    layers: "L1–L5 (Kata-CC)",
+    blurb: "Regulated / multi-tenant needing hardware confidentiality (SEV/TDX path). Beyond typical OpenShell+Kata.",
+  },
+};
+
 const agents = {
-  claude: { name: 'Claude Code', by: 'Anthropic', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness: planning, tools, memory, verification, git, context compaction, agentic loops (/goal, /loop). OpenShell: full policy coverage.' },
-  codex: { name: 'OpenAI Codex CLI', by: 'OpenAI', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness with sandboxed code execution, tool dispatch, and verification. OpenShell: requires custom policy for OpenAI endpoints.' },
-  copilot: { name: 'GitHub Copilot CLI', by: 'GitHub', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Pre-installed in OpenShell base image. Works out of the box with GITHUB_TOKEN or COPILOT_GITHUB_TOKEN. OpenShell: full policy coverage.' },
-  gemini: { name: 'Gemini CLI', by: 'Google', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Terminal coding agent with built-in code execution sandbox and Gemini models. Not yet in OpenShell supported agents — use custom image.' },
-  opencode: { name: 'OpenCode', by: 'Open-source', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Model-agnostic coding agent — terminal, desktop, IDE. 75+ LLM providers. OpenShell: partial policy coverage, add opencode.ai endpoint.' },
-  openhands: { name: 'OpenHands', by: 'Open-source', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full AI software engineering platform with Docker sandbox, multi-agent SDK, and Agent Canvas' },
-  adk: { name: 'Google ADK', by: 'Google', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Full framework: Runner, Sessions, Workflows, Memory, Ambient Agents. No built-in sandbox.' },
-  langgraph: { name: 'LangGraph', by: 'LangChain', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Graph-based agent orchestration with durable execution, checkpointing, and state management' },
-  crewai: { name: 'CrewAI', by: 'CrewAI', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Role-based multi-agent framework with task delegation, tool sharing, and parallel execution' },
-  strands: { name: 'Strands', by: 'AWS (open-source)', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'AWS open-source agent SDK with model-driven orchestration, tools, and sessions' },
-  watsonx: { name: 'watsonx Orchestrate', by: 'IBM', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Enterprise agent harness + control plane: ADK, ReAct Core reasoning, AgentOps (eval + red teaming), built-in security enforcement (IDP, vault, credentials), agent catalog, and MCP governance.' },
-  openclaw: { name: 'OpenClaw', by: 'Community', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Always-on personal assistant with multi-channel messaging, persistent memory, and heartbeat' },
-  hermes: { name: 'Hermes', by: 'Nous Research', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Self-improving agent with learning loop, persistent skills, and cross-session memory' },
-  deepagents: { name: 'LangChain Deep Agents Code', by: 'LangChain', type: 'coding', hasOwnSandbox: false, nemoclaw: true, desc: 'Terminal coding agent (dcode) with persistent memory, custom skills, remote sandboxes, and human-in-the-loop controls' },
-  custom: { name: 'Custom Agent', by: 'You', type: 'any', hasOwnSandbox: false, nemoclaw: false, desc: 'Your own harness: custom tool registry, orchestration loop, memory, and context management — packaged as a container image in any language or framework.' }
+  claude: {
+    name: "Claude Code", by: "Anthropic", type: "coding",
+    hasOwnSandbox: true, nemoclaw: false, source: "base", policy: "full",
+    entry: "whole",
+    command: "openshell sandbox create -- claude",
+    desc: "Whole-agent Pattern 1. Built-in harness. OpenShell default policy: full coverage. ANTHROPIC_API_KEY or inference.local + provider.",
+  },
+  copilot: {
+    name: "GitHub Copilot CLI", by: "GitHub", type: "coding",
+    hasOwnSandbox: false, nemoclaw: false, source: "base", policy: "full",
+    entry: "whole",
+    command: "openshell sandbox create -- copilot",
+    desc: "Whole-agent Pattern 1. Base image. Default policy: full. GITHUB_TOKEN or COPILOT_GITHUB_TOKEN.",
+  },
+  opencode: {
+    name: "OpenCode", by: "Open-source", type: "coding",
+    hasOwnSandbox: false, nemoclaw: false, source: "base", policy: "partial",
+    entry: "whole",
+    command: "openshell sandbox create -- opencode",
+    desc: "Whole-agent Pattern 1. Default policy: partial — add opencode.ai + binary paths for full function. Often pairs with inference.local.",
+  },
+  codex: {
+    name: "Codex CLI", by: "OpenAI", type: "coding",
+    hasOwnSandbox: true, nemoclaw: false, source: "base", policy: "none",
+    entry: "whole",
+    command: "openshell sandbox create --policy ./codex-policy.yaml -- codex",
+    desc: "Whole-agent Pattern 1. Default policy: none — custom OpenAI endpoints + Codex binary paths required.",
+  },
+  gemini: {
+    name: "Gemini CLI", by: "Google", type: "coding",
+    hasOwnSandbox: true, nemoclaw: false, source: "custom", policy: "custom",
+    entry: "whole",
+    command: "openshell sandbox create --from <validated-image> --policy ./gemini-policy.yaml -- gemini",
+    desc: "Field guide lists Gemini CLI under whole-agent Pattern 1 (package image + OpenShell policy). Not in the OpenShell base-image supported-agents matrix yet — use a validated/custom image (RHAISTRAT-1349 tracks Red Hat validated images).",
+  },
+  ollama: {
+    name: "Ollama sandbox", by: "Community", type: "coding",
+    hasOwnSandbox: false, nemoclaw: false, source: "community", policy: "bundled",
+    entry: "whole",
+    command: "openshell sandbox create --from ollama",
+    desc: "Community image with bundled policy. Separate from host Ollama.",
+  },
+  pi: {
+    name: "Pi", by: "Community", type: "coding",
+    hasOwnSandbox: false, nemoclaw: false, source: "community", policy: "bundled",
+    entry: "whole",
+    command: "openshell sandbox create --from pi",
+    desc: "Community image with Pi pre-installed.",
+  },
+  openclaw: {
+    name: "OpenClaw", by: "Community", type: "assistant",
+    hasOwnSandbox: false, nemoclaw: true, source: "nemoclaw", policy: "blueprint",
+    entry: "harness",
+    command: "nemoclaw onboard   # or harness.use_plugin(\"openshell\")",
+    desc: "Harness-native Pattern 2 (shipped for OpenClaw). Prefer NemoClaw onboard / plugin path so blueprint policy + managed inference stay consistent. BYOA: OpenClaw is a first-class Red Hat AI target runtime.",
+  },
+  hermes: {
+    name: "Hermes", by: "Nous Research", type: "assistant",
+    hasOwnSandbox: false, nemoclaw: true, source: "nemoclaw", policy: "blueprint",
+    entry: "harness",
+    command: "nemoclaw onboard --agent hermes",
+    desc: "Harness-native Pattern 2 (announced). NemoClaw packaging for OpenShell — not a base-image trailing command.",
+  },
+  deepagents: {
+    name: "Deep Agents (dcode)", by: "LangChain", type: "coding",
+    hasOwnSandbox: false, nemoclaw: true, source: "nemoclaw", policy: "blueprint",
+    entry: "harness",
+    command: "nemoclaw onboard --agent langchain-deepagents-code",
+    desc: "LangChain coding harness. NemoClaw packaging path. LangChain is an active Red Hat co-sell / validated-architecture partner on OpenShift + NVIDIA.",
+  },
+  openhands: {
+    name: "OpenHands", by: "Open-source", type: "coding",
+    hasOwnSandbox: true, nemoclaw: false, source: "custom", policy: "custom",
+    entry: "whole",
+    command: "openshell sandbox create --from <openhands-image> --policy ./policy.yaml",
+    desc: "Own sandbox notions + whole-agent Pattern 1 on OpenShell when packaged as an OCI image with policy.",
+  },
+  adk: {
+    name: "Google ADK", by: "Google", type: "workflow",
+    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
+    entry: "whole",
+    command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
+    desc: "BYOA framework target. Red Hat positions as complement to Vertex/Agent Engine: same ADK agent on OpenShift AI / air-gap with OpenShell + platform identity — not a Vertex lock-in.",
+  },
+  langgraph: {
+    name: "LangGraph", by: "LangChain", type: "workflow",
+    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
+    entry: "whole",
+    command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
+    desc: "BYOA framework. Active LangChain partnership: framework + Red Hat platform + NVIDIA inference.",
+  },
+  crewai: {
+    name: "CrewAI", by: "CrewAI", type: "workflow",
+    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
+    entry: "whole",
+    command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
+    desc: "BYOA multi-agent framework. Starter-kit target in Red Hat AI onboarding theme.",
+  },
+  strands: {
+    name: "Strands", by: "AWS (open-source)", type: "workflow",
+    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
+    entry: "whole",
+    command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
+    desc: "BYOA SDK (Apache 2.0). Compete with AgentCore on portability: same agent on OpenShift AI anywhere, OpenShell for process sandboxing.",
+  },
+  watsonx: {
+    name: "watsonx Orchestrate", by: "IBM", type: "workflow",
+    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
+    entry: "whole",
+    command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
+    desc: "Enterprise harness/control plane. Watson.x also appears as a multi-provider inference backend in Red Hat AI strategy. OpenShell is still the sandbox runtime when workloads run in OpenShell; watsonx control-plane ≠ OpenShell.",
+  },
+  custom: {
+    name: "Custom / Other", by: "You", type: "any",
+    hasOwnSandbox: false, nemoclaw: false, source: "framework", policy: "framework",
+    entry: "whole",
+    command: "openshell sandbox create --from <your-image> --policy ./policy.yaml -- <entrypoint>",
+    desc: "BYOA: Red Hat does not pick framework winners. Package as OCI; OpenShell enforces allow/deny at the runtime boundary.",
+  },
 };
 
+/**
+ * Use cases from Red Hat AI Sandboxing for Agents — Use-case Mapping Table.
+ * Profiles align with Isolation Profiles slide.
+ */
 const usecases = {
-  private_chatbot: { name: 'Private-Data Chatbot', profile: 'OpenShell with Kata or VM', platform: 'Red Hat OpenShift AI', desc: 'Chatbot with access to private data, MCP servers, and Agent Skills — needs privilege scoping and kernel isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: true, kata: true, multi: false } },
-  email_agent: { name: 'Email / Messaging Agent', profile: 'OpenShell with Kata or VM', platform: 'Red Hat OpenShift AI', desc: 'Reads untrusted input (email, chat), writes to untrusted destinations — needs full isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: false, guardrails: true, kata: true, multi: false } },
-  coding_laptop: { name: 'Coding Agent on Laptop', profile: 'OpenShell, Typical Configuration', platform: 'Podman (local workstation)', desc: 'Coding assistant on your workstation — OpenShell sandbox protects the host from the agent', harness: 'Claude Code, dcode, OpenCode, or similar', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: false, kata: false, multi: false } },
-  coding_cluster: { name: 'Coding Agent in Cluster', profile: 'OpenShell, Typical Configuration', platform: 'Red Hat OpenShift AI', desc: 'Coding assistant on Red Hat OpenShift AI — for policy enforcement, shared compute, or always-on access', harness: 'Claude Code, dcode, OpenCode, or similar', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: false, kata: false, multi: true } }
+  trusted_chatbot: {
+    name: "Trusted read-only chatbot (public/RAG)",
+    profileKey: "permissive",
+    platform: "OpenShift AI Agent Ops",
+    compute: "RHOAI Agent Ops Operator AgentRuntime on a normal Deployment/StatefulSet (container isolation). Controlled NetworkPolicy egress. OpenShell optional if you still want in-process policy.",
+    desc: "Long-running shared service, trusted source, no private data. Guardrails on I/O. Kernel isolation usually not required.",
+    harnessSuggest: "Your chatbot / RAG agent image",
+    suggestedAgents: ["adk", "langgraph", "custom"],
+    needsOpenShell: false,
+    defaults: { network: true, creds: false, audit: false, fs: false, identity: true, oidc: true, mcp: false, guardrails: true, kata: false, multi: true, ogx: false, mlflow: true },
+  },
+  nightly_trusted: {
+    name: "Trusted nightly summary job",
+    profileKey: "openshell_min",
+    platform: "OpenShift AI Agent Ops",
+    compute: "AgentRuntime as a Kubernetes Job with normal containers + controlled ingress/egress. Workload identity needed.",
+    desc: "Scheduled, read-only data, hardcoded private output. Bounded behavior — container isolation often enough; add OpenShell when you want per-binary egress + cred masking.",
+    harnessSuggest: "Batch/workflow agent",
+    suggestedAgents: ["adk", "langgraph", "custom"],
+    needsOpenShell: false,
+    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: false, guardrails: true, kata: false, multi: false, ogx: false, mlflow: true },
+  },
+  private_chatbot: {
+    name: "Private-data chatbot + MCP/Skills",
+    profileKey: "openshell_kata",
+    platform: "OpenShift AI Agent Ops + OSC",
+    compute: "AgentRuntime Deployment/StatefulSet on OpenShift Sandboxed Containers (Kata) + controlled network. Compose OpenShell inside for Landlock/OPA/inference.local when agents are autonomous.",
+    desc: "Private data, capable MCP servers, Agent Skills — privilege scoping + network + kernel isolation per field mapping table.",
+    harnessSuggest: "Framework agent in your image",
+    suggestedAgents: ["adk", "langgraph", "custom"],
+    needsOpenShell: true,
+    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: true, guardrails: true, kata: true, multi: true, ogx: false, mlflow: true },
+  },
+  email_agent: {
+    name: "Email / messaging agent (untrusted I/O)",
+    profileKey: "openshell_kata",
+    platform: "OpenShift AI Agent Ops + OSC",
+    compute: "AgentRuntime Job on OpenShift Sandboxed Containers + controlled network. User + workload identities. OpenShell for deny-by-default egress and cred masking.",
+    desc: "Reads untrusted email/chat and writes back — field guide requires OSC-class isolation.",
+    harnessSuggest: "Always-on or scheduled harness",
+    suggestedAgents: ["openclaw", "hermes", "custom"],
+    needsOpenShell: true,
+    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: false, guardrails: true, kata: true, multi: false, ogx: false, mlflow: true },
+  },
+  coding_laptop: {
+    name: "Coding / claw agent on laptop",
+    profileKey: "openshell_typical",
+    platform: "Podman + Kaiden (local)",
+    compute: "OpenShell sandbox with Podman driver + Kaiden local agent dev environment. No cluster login / CRs required.",
+    desc: "Single user, untrusted generated code, CLIs. Isolate from the workstation. Field mapping: OpenShell + Podman + Kaiden.",
+    harnessSuggest: "Claude Code, Copilot, OpenCode, Codex, OpenClaw",
+    suggestedAgents: ["claude", "copilot", "opencode", "codex", "openclaw"],
+    needsOpenShell: true,
+    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: false, mcp: false, guardrails: false, kata: false, multi: false, ogx: false, mlflow: false },
+  },
+  coding_cluster: {
+    name: "Coding / claw agent in cluster",
+    profileKey: "openshell_typical",
+    platform: "OpenShift (+ optional OpenShift AI)",
+    compute: "OpenShell sandbox with OpenShift/Kubernetes compute driver + agent-sandbox CRD lifecycle. Privileged SCC on openshell-sandbox SA for netns. Controlled egress.",
+    desc: "Policy, shared compute, or always-on when laptop is off. Field mapping: OpenShell on OpenShift.",
+    harnessSuggest: "Base-image coding agents or claw via NemoClaw",
+    suggestedAgents: ["claude", "copilot", "opencode", "openclaw"],
+    needsOpenShell: true,
+    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: false, guardrails: false, kata: false, multi: true, ogx: false, mlflow: true },
+  },
+  mode2_exec: {
+    name: "Sandbox execution via platform APIs (Mode 2)",
+    profileKey: "openshell_typical",
+    platform: "Red Hat AI (ogx) + ephemeral exec sandboxes",
+    compute: "Agent stays outside; code execution goes to disposable Firecracker/Kata/gVisor-class sandboxes via platform APIs. OpenShell+RHOAI cover Mode 2 via Responses API / ogx (open source).",
+    desc: "Separate failure domains — agent process survives exec failure. Distinct from whole-agent Mode 1.",
+    harnessSuggest: "Agents using OpenAI Responses / Open Responses",
+    suggestedAgents: ["custom", "adk", "langgraph"],
+    needsOpenShell: true,
+    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: false, guardrails: true, kata: true, multi: false, ogx: true, mlflow: true },
+  },
 };
 
-const rhHat = `<img class="rh-hat" src="redhat-hat.png" alt="Red Hat">`;
+const deploys = {
+  laptop: {
+    name: "Laptop / workstation",
+    profileKey: "openshell_typical",
+    platform: "Podman or Docker + Kaiden",
+    compute: "Local OpenShell gateway + Podman/Docker compute driver. Kaiden for local agent DX. No Agent Sandbox CRDs / privileged SCC.",
+    desc: "Alpha single-player path. Matches field guide laptop coding/claw row.",
+    authNote: "Local mTLS user auth is the default for Docker/Podman/VM gateways.",
+    harnessSuggest: "Base-image agents or OpenClaw via NemoClaw",
+    suggestedAgents: ["claude", "copilot", "opencode", "openclaw"],
+    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: false, mcp: false, guardrails: false, kata: false, multi: false, ogx: false, mlflow: false },
+    nextCommands: [
+      "curl -LsSf https://raw.githubusercontent.com/NVIDIA/OpenShell/main/install.sh | sh",
+      "openshell sandbox create -- claude",
+      "# Optional local DX: Kaiden (Red Hat local agent dev environment)",
+    ],
+  },
+  openshift_eval: {
+    name: "OpenShift evaluation",
+    profileKey: "openshell_typical",
+    platform: "Red Hat OpenShift",
+    compute: "Helm OpenShell + kubernetes-sigs/agent-sandbox CRDs; privileged SCC on openshell-sandbox SA. Eval-only: disableTls + allowUnauthenticatedUsers.",
+    desc: "Reference-architecture quickstart / GitOps overlay. OpenShell alpha; RHOAI DP/TP targeted 3.5/3.6 H2 CY2026.",
+    authNote: "Eval-only auth. Never leave allowUnauthenticatedUsers on shared clusters.",
+    harnessSuggest: "Base-image coding agents via CLI port-forward",
+    suggestedAgents: ["claude", "copilot", "opencode"],
+    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: false, mcp: false, guardrails: false, kata: false, multi: false, ogx: false, mlflow: false },
+    nextCommands: [
+      "oc apply -f https://github.com/kubernetes-sigs/agent-sandbox/releases/latest/download/manifest.yaml",
+      "oc create ns openshell && oc adm policy add-scc-to-user privileged -z openshell-sandbox -n openshell",
+      "helm install openshell oci://ghcr.io/nvidia/openshell/helm-chart --version 0.0.80 -n openshell --set server.disableTls=true --set server.auth.allowUnauthenticatedUsers=true --set podSecurityContext.fsGroup=null --set securityContext.runAsUser=null",
+    ],
+  },
+  openshift_prod: {
+    name: "OpenShift production-oriented",
+    profileKey: "openshell_typical",
+    platform: "OpenShift + OpenShift AI Agent Ops",
+    compute: "OpenShell + agent-sandbox lifecycle; optional OSC/Kata for L5; MCP Gateway + SPIFFE platform identity; OIDC/TLS/Postgres; GitOps (ArgoCD + Vault/ESO for JWT keys in reference repo).",
+    desc: "BYOA production gap: identity, sandboxing, tool governance, tracing, guardrails. Compose layers — do not treat OpenShell as a replacement for Kata or MCP Gateway.",
+    authNote: "OIDC (or trusted edge) + TLS. allowUnauthenticatedUsers=false. Vault dev mode in the GitOps reference is learning-only.",
+    harnessSuggest: "Approved BYOA images under OIDC-gated gateway",
+    suggestedAgents: ["claude", "openclaw", "adk", "custom"],
+    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: true, guardrails: true, kata: false, multi: true, ogx: true, mlflow: true },
+    nextCommands: [
+      "Tutorials: production/expose-route.md → oidc-auth.md → postgresql.md",
+      "Optional GitOps: oc apply -f app-of-apps.yaml (Vault → vault-config → OpenShell+ESO)",
+      "Platform: enable OSC if profile needs Kata; wire MCP Gateway + MLflow via OpenShift AI Agent Ops",
+    ],
+  },
+};
 
-let currentJourney = 'agent';
+/**
+ * Capability catalog with correct owners per field guides.
+ * OpenShell ≠ MCP Gateway ≠ Kata ≠ ogx ≠ MLflow.
+ */
+const capabilities = [
+  {
+    id: "network",
+    owner: "openshell",
+    label: "Network policy (OPA L4 + optional L7 / MCP-aware)",
+    desc: "In-process OPA via CONNECT proxy: per-binary, host/port, optional HTTP method/path. Hot-reloadable. Stronger than Kagenti sidecar+iptables; no NET_ADMIN required for OpenShell's model.",
+  },
+  {
+    id: "creds",
+    owner: "openshell",
+    label: "Credential masking (inference.local)",
+    desc: "Privacy router: agent calls https://inference.local; proxy strips caller creds and injects provider credentials. Never log secrets in OCSF.",
+  },
+  {
+    id: "audit",
+    owner: "openshell",
+    label: "OCSF security audit (v1.7.0)",
+    desc: "Structured OCSF for network/HTTP/SSH/process/config/findings — SIEM-ready. Distinct from MLflow/OTEL product tracing in OpenShift AI Agent Ops.",
+  },
+  {
+    id: "fs",
+    owner: "openshell",
+    label: "Landlock + seccomp + netns",
+    desc: "Kernel/userspace controls inside the sandbox: filesystem scoping, syscall filter, network namespace forcing proxy. Applied at create — recreate to change FS/process policy.",
+  },
+  {
+    id: "identity",
+    owner: "openshell",
+    label: "Sandbox JWT / JWT-SVID identity",
+    desc: "Gateway-minted sandbox JWTs authenticate supervisor RPCs (SPIFFE-shaped subjects). Kagenti's full SPIRE AuthBridge was Dev Preview and converged away; OpenShell is closing the SPIFFE gap (JWT-SVID grants/exchange). Red Hat contributes OIDC + SPIFFE identity drivers. Platform SPIFFE/SPIRE (OpenShift 4.20+) layers on for cluster zero-trust.",
+  },
+  {
+    id: "oidc",
+    owner: "openshell",
+    label: "OIDC user authentication (gateway)",
+    desc: "Control-plane user auth for CLI/API. Required on shared clusters. Eval overlays with allowUnauthenticatedUsers are trusted-network only.",
+  },
+  {
+    id: "kata",
+    owner: "platform",
+    label: "Kata / OpenShift Sandboxed Containers (L5)",
+    desc: "Hardware/dedicated-kernel isolation (OSC, GA layered product). Composes under OpenShell: Kata = kernel boundary; OpenShell = policy inside. Needs eligible nodes (RHCOS, virt, NFD kata label). Not every agent needs Kata — see isolation decision tree.",
+  },
+  {
+    id: "multi",
+    owner: "platform",
+    label: "Multitenancy (projects / NetworkPolicy / UDN)",
+    desc: "OpenShift namespace RBAC, NetworkPolicy, optional UDN, ResourceQuota. Complements OpenShell egress proxy. Cryptographic identity still needs SPIFFE/mesh — labels alone are weaker.",
+  },
+  {
+    id: "mcp",
+    owner: "platform",
+    label: "MCP Gateway (tool governance)",
+    desc: "Red Hat AI Envoy-based gateway: OAuth2 token exchange, identity-based tool filtering via Kuadrant AuthPolicy + Authorino. Authorization from token claims — not the prompt. Not an OpenShell core subsystem (Kagenti AuthBridge concepts inform the platform story).",
+  },
+  {
+    id: "ogx",
+    owner: "platform",
+    label: "ogx / Open Responses (Mode 2 APIs)",
+    desc: "Open Responses (ogx) — multi-protocol agentic API surface (Responses API, etc.). Enables Mode 2: sandbox execution via platform APIs. Not OpenShell's Mode 1 whole-agent runtime.",
+  },
+  {
+    id: "mlflow",
+    owner: "platform",
+    label: "MLflow tracing + OpenTelemetry",
+    desc: "OpenShift AI Agent Ops observability: prompts, tool calls, LLM requests. EvalHub for online eval. Complements — does not replace — OpenShell OCSF security audit.",
+  },
+  {
+    id: "guardrails",
+    owner: "addon",
+    label: "Safety guardrails + red teaming",
+    desc: "Portfolio: NeMo Guardrails / Guardrails Orchestrator (runtime), Garak (pre-prod adversarial), EvalHub. TrustyAI operator orchestration. Complements OpenShell egress policy; does not replace it.",
+  },
+];
+
+const OWNER_BADGE = {
+  openshell: { cls: "badge-owner-os", text: "OpenShell" },
+  platform: { cls: "badge-owner-plat", text: "OpenShift AI / Platform" },
+  addon: { cls: "badge-owner-addon", text: "Safety add-on" },
+};
+
+const rhHat = `<img class="rh-hat" src="redhat-hat.png" alt="">`;
+
+let currentJourney = "agent";
 let selectedAgent = null;
 let selectedUseCase = null;
+let selectedDeploy = null;
 
-function updateDots(step) {
-  document.querySelectorAll('.dot').forEach((d, i) => {
-    d.className = 'dot' + (i < step ? ' done' : '') + (i === step ? ' active' : '');
+function ownerBadge(owner) {
+  const b = OWNER_BADGE[owner];
+  return `<span class="badge ${b.cls}">${b.text}</span>`;
+}
+
+function policyBadge(policy) {
+  const b = POLICY_BADGES[policy] || POLICY_BADGES.custom;
+  return `<span class="badge ${b.cls}">${b.text}</span>`;
+}
+
+function profileBadge(profileKey) {
+  const p = ISOLATION_PROFILES[profileKey];
+  if (!p) return "";
+  return `<span class="badge badge-owner-os">${p.name} · ${p.layers}</span>`;
+}
+
+function updateProgress(step) {
+  ["prog1", "prog2", "prog3"].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = "progress-item" + (i < step ? " done" : "") + (i === step ? " active" : "");
   });
 }
 
@@ -474,172 +910,397 @@ function setJourney(type) {
   currentJourney = type;
   selectedAgent = null;
   selectedUseCase = null;
-  document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
-  document.getElementById('result').innerHTML = '';
-  document.getElementById('jtab-agent').classList.toggle('active', type === 'agent');
-  document.getElementById('jtab-usecase').classList.toggle('active', type === 'usecase');
-  document.getElementById(type === 'agent' ? 'step1' : 'step1uc').classList.add('active');
-  updateDots(0);
+  selectedDeploy = null;
+  document.querySelectorAll(".step, .result").forEach((s) => s.classList.remove("active"));
+  document.getElementById("result").innerHTML = "";
+  ["agent", "usecase", "deploy"].forEach((t) => {
+    const tab = document.getElementById(`jtab-${t}`);
+    const on = t === type;
+    tab.classList.toggle("active", on);
+    tab.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  const stepId = type === "agent" ? "step1" : type === "usecase" ? "step1uc" : "step1deploy";
+  document.getElementById(stepId).classList.add("active");
+  updateProgress(0);
+}
+
+function renderAgentGrid() {
+  const grid = document.getElementById("agentGrid");
+  grid.innerHTML = Object.entries(agents).map(([id, a]) => `
+    <button type="button" class="card${selectedAgent === id ? " selected" : ""}" data-id="${id}"
+      aria-pressed="${selectedAgent === id}" onclick="selectAgent('${id}')">
+      <h4>${a.name}</h4>
+      <p>${a.by}</p>
+      <div class="meta">
+        ${policyBadge(a.policy)}
+        ${a.nemoclaw ? `<span class="badge badge-nc">NemoClaw</span>` : ""}
+        <span class="badge badge-bundled">${a.entry === "harness" ? "Pattern 2" : "Pattern 1"}</span>
+      </div>
+    </button>
+  `).join("");
+}
+
+function renderUseCaseGrid() {
+  const grid = document.getElementById("usecaseGrid");
+  grid.innerHTML = Object.entries(usecases).map(([id, u]) => `
+    <button type="button" class="card${selectedUseCase === id ? " selected" : ""}" onclick="selectUseCase('${id}')">
+      <h4>${u.name}</h4>
+      <p>${u.desc}</p>
+      <div class="meta">${profileBadge(u.profileKey)}</div>
+    </button>
+  `).join("");
+}
+
+function renderDeployGrid() {
+  const grid = document.getElementById("deployGrid");
+  grid.innerHTML = Object.entries(deploys).map(([id, d]) => `
+    <button type="button" class="card${selectedDeploy === id ? " selected" : ""}" onclick="selectDeploy('${id}')">
+      <h4>${d.name}</h4>
+      <p>${d.desc}</p>
+      <div class="meta">${profileBadge(d.profileKey)} <span class="badge badge-owner-plat">${d.platform}</span></div>
+    </button>
+  `).join("");
+}
+
+function renderCapChecks(defaults) {
+  const box = document.getElementById("capChecks");
+  box.innerHTML = capabilities.map((c) => {
+    const checked = defaults[c.id] ? "checked" : "";
+    return `
+      <div class="check-item">
+        <input type="checkbox" id="chk-${c.id}" ${checked}>
+        <div>
+          <label for="chk-${c.id}">${c.label}</label>
+          <div class="check-desc">${c.desc}</div>
+          <div class="owner-row">${ownerBadge(c.owner)}</div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function defaultCapsForAgent() {
+  return {
+    network: true, creds: true, audit: true, fs: true, identity: true,
+    oidc: false, mcp: false, guardrails: false, kata: false, multi: false,
+    ogx: false, mlflow: false,
+  };
+}
+
+function enterStep2(name, meta, defaults) {
+  document.getElementById("selectedName").textContent = name;
+  document.getElementById("selectedMeta").textContent = meta || "";
+  renderCapChecks(defaults);
+  document.querySelectorAll(".step, .result").forEach((s) => s.classList.remove("active"));
+  document.getElementById("step2").classList.add("active");
+  updateProgress(1);
 }
 
 function selectAgent(id) {
   selectedAgent = id;
   selectedUseCase = null;
-  document.getElementById('selectedLabel').querySelector('span').textContent = agents[id].name;
-  document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
-  document.getElementById('step2').classList.add('active');
-  updateDots(1);
+  selectedDeploy = null;
+  renderAgentGrid();
+  const a = agents[id];
+  enterStep2(a.name, `· ${a.by} · ${a.entry === "harness" ? "Pattern 2" : "Pattern 1"}`, defaultCapsForAgent());
 }
 
 function selectUseCase(id) {
   selectedUseCase = id;
   selectedAgent = null;
-  const uc = usecases[id];
-  document.getElementById('selectedLabel').querySelector('span').textContent = uc.name;
-  const d = uc.defaults;
-  document.getElementById('chk-network').checked = d.network;
-  document.getElementById('chk-creds').checked = d.creds;
-  document.getElementById('chk-audit').checked = d.audit;
-  document.getElementById('chk-fs').checked = d.fs;
-  document.getElementById('chk-identity').checked = d.identity;
-  document.getElementById('chk-mcp').checked = d.mcp;
-  document.getElementById('chk-guardrails').checked = d.guardrails;
-  document.getElementById('chk-kata').checked = d.kata;
-  document.getElementById('chk-multi').checked = d.multi;
-  document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
-  document.getElementById('step2').classList.add('active');
-  updateDots(1);
+  selectedDeploy = null;
+  renderUseCaseGrid();
+  const u = usecases[id];
+  const p = ISOLATION_PROFILES[u.profileKey];
+  enterStep2(u.name, `· ${p.name}`, u.defaults);
+}
+
+function selectDeploy(id) {
+  selectedDeploy = id;
+  selectedAgent = null;
+  selectedUseCase = null;
+  renderDeployGrid();
+  const d = deploys[id];
+  enterStep2(d.name, `· ${d.platform}`, d.defaults);
 }
 
 function goBack() {
-  document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
-  document.getElementById(currentJourney === 'agent' ? 'step1' : 'step1uc').classList.add('active');
-  updateDots(0);
+  document.querySelectorAll(".step, .result").forEach((s) => s.classList.remove("active"));
+  const stepId = currentJourney === "agent" ? "step1" : currentJourney === "usecase" ? "step1uc" : "step1deploy";
+  document.getElementById(stepId).classList.add("active");
+  updateProgress(0);
+}
+
+function readCaps() {
+  const out = {};
+  capabilities.forEach((c) => {
+    out[c.id] = !!document.getElementById(`chk-${c.id}`)?.checked;
+  });
+  return out;
+}
+
+function policyCallout(a) {
+  if (!a) return "";
+  if (a.policy === "none") {
+    return `<div class="callout callout-warn"><strong>Policy gap:</strong> Codex has <em>no</em> default OpenShell policy coverage. Ship custom endpoints + binary paths before relying on deny-by-default egress.</div>`;
+  }
+  if (a.policy === "partial") {
+    return `<div class="callout callout-warn"><strong>Partial policy:</strong> OpenCode needs extra endpoints/binaries (e.g. opencode.ai). See OpenShell supported-agents.</div>`;
+  }
+  if (a.policy === "custom" && a.name.includes("Gemini")) {
+    return `<div class="callout callout-info"><strong>Whole-agent Pattern 1:</strong> Field guide lists Gemini CLI as package-image + OpenShell. Not yet in the base-image matrix — use a validated/custom image (Red Hat validated images tracked under RHAISTRAT-1349).</div>`;
+  }
+  if (a.policy === "custom") {
+    return `<div class="callout callout-warn"><strong>Custom image:</strong> Author network/binary policy for your container.</div>`;
+  }
+  if (a.policy === "framework") {
+    return `<div class="callout callout-info"><strong>BYOA:</strong> Red Hat does not pick framework winners. Package as OCI; OpenShell + platform layers make it production-ready.</div>`;
+  }
+  if (a.policy === "blueprint") {
+    return `<div class="callout callout-info"><strong>Harness-native Pattern 2:</strong> Prefer NemoClaw / <code>harness.use_plugin("openshell")</code> so blueprint policy and inference wiring stay consistent. OpenClaw shipped; Hermes announced.</div>`;
+  }
+  return "";
+}
+
+function suggestAgentsHtml(ids) {
+  if (!ids?.length) return "";
+  const chips = ids.map((id) => {
+    const a = agents[id];
+    if (!a) return "";
+    return `<button type="button" class="btn btn-secondary" style="margin:0.15rem 0.15rem 0 0" onclick="setJourney('agent');selectAgent('${id}')">${a.name}</button>`;
+  }).join("");
+  return `<div style="margin-top:0.45rem"><div class="stack-section-label">Suggested agents</div><div>${chips}</div></div>`;
+}
+
+function syncUrl(caps) {
+  const params = new URLSearchParams();
+  params.set("journey", currentJourney);
+  params.set("show", "1");
+  if (selectedAgent) params.set("agent", selectedAgent);
+  if (selectedUseCase) params.set("usecase", selectedUseCase);
+  if (selectedDeploy) params.set("deploy", selectedDeploy);
+  capabilities.forEach((c) => params.set(c.id, caps[c.id] ? "1" : "0"));
+  history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
+}
+
+function copyShareLink() {
+  navigator.clipboard?.writeText(location.href).then(() => {
+    const btn = document.getElementById("shareBtn");
+    if (btn) {
+      const prev = btn.textContent;
+      btn.textContent = "Copied";
+      setTimeout(() => { btn.textContent = prev; }, 1200);
+    }
+  });
 }
 
 function showResult() {
-  const isUC = currentJourney === 'usecase';
-  const a = isUC ? null : agents[selectedAgent];
+  const caps = readCaps();
+  const isUC = currentJourney === "usecase";
+  const isDeploy = currentJourney === "deploy";
+  const a = (!isUC && !isDeploy) ? agents[selectedAgent] : null;
   const uc = isUC ? usecases[selectedUseCase] : null;
-  const chkNetwork = document.getElementById('chk-network').checked;
-  const chkCreds = document.getElementById('chk-creds').checked;
-  const chkAudit = document.getElementById('chk-audit').checked;
-  const chkFs = document.getElementById('chk-fs').checked;
-  const chkIdentity = document.getElementById('chk-identity').checked;
-  const chkMcp = document.getElementById('chk-mcp').checked;
-  const chkGuardrails = document.getElementById('chk-guardrails').checked;
-  const chkKata = document.getElementById('chk-kata').checked;
-  const chkMulti = document.getElementById('chk-multi').checked;
+  const dep = isDeploy ? deploys[selectedDeploy] : null;
 
-  const features = [
-    { label: 'Network policy (per-binary, per-host, L7)', enabled: chkNetwork },
-    { label: 'Credential masking (inference.local)', enabled: chkCreds },
-    { label: 'Landlock + seccomp + network namespace', enabled: chkFs },
-    { label: 'SPIFFE/SPIRE agent identity', enabled: chkIdentity },
-    { label: 'OCSF audit logging (SIEM-ready)', enabled: chkAudit },
-    { label: 'Multi-user (OIDC + RBAC + workspaces)', enabled: chkMulti }
-  ];
+  const profileKey = uc?.profileKey || dep?.profileKey || (caps.kata ? "openshell_kata" : "openshell_typical");
+  const profile = ISOLATION_PROFILES[profileKey];
 
-  const governanceItems = [];
-  if (a && a.nemoclaw) governanceItems.push('NemoClaw onboarding (nemoclaw onboard)');
-  if (chkMcp) governanceItems.push('MCP Gateway — OAuth2 token exchange, identity-based tool filtering');
-  if (chkGuardrails) {
-    governanceItems.push('NeMo Guardrails + Garak — inline prompt injection defense, content moderation');
-    governanceItems.push('watsonx.governance — GRC lifecycle, guardrail manager, agentic monitoring, eval metrics');
+  const openshellFeatures = capabilities
+    .filter((c) => c.owner === "openshell")
+    .map((c) => ({ label: c.label, enabled: caps[c.id], tip: c.desc }));
+
+  const platformFeatures = capabilities
+    .filter((c) => c.owner === "platform")
+    .map((c) => ({ label: c.label, enabled: caps[c.id] }));
+
+  const addonItems = [];
+  if (caps.guardrails) {
+    addonItems.push("NeMo Guardrails / Guardrails Orchestrator — runtime conversation rails");
+    addonItems.push("Garak — pre-production adversarial scanning (TrustyAI / EvalHub path)");
+    addonItems.push("EvalHub — online LLM-as-judge / regression datasets (RHOAI Agent Ops)");
   }
-  const governanceSection = governanceItems.length ? `
-          <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(230,237,243,0.06)">
-            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#76b900;margin-bottom:0.25rem;font-weight:600">Governance</div>
-            ${governanceItems.map(g => `<div style="font-size:0.78rem;opacity:0.65;padding:0.1rem 0">● ${g}</div>`).join('')}
-          </div>` : '';
+  if (a?.nemoclaw) addonItems.push(`NemoClaw / Pattern 2: <code>${a.command}</code>`);
 
-  let setupPathShort;
-  if (isUC) {
-    setupPathShort = `Deploy using <strong>${uc.profile}</strong> profile. ${uc.desc}`;
-  } else if (a.nemoclaw) {
-    setupPathShort = `<code style="font-size:0.75rem">nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code> or deploy OpenShell via Helm`;
-  } else {
-    setupPathShort = a.hasOwnSandbox
-      ? `Deploy via Helm. ${a.name} has its own sandbox — OpenShell adds network policy and credential masking on top.`
-      : `Deploy OpenShell via Helm chart. Package your agent as a container.`;
+  const resultName = a?.name || uc?.name || dep?.name || "Stack";
+  const harnessName = a?.name || uc?.harnessSuggest || dep?.harnessSuggest || "Your harness";
+  const harnessDesc = a?.desc || uc?.desc || dep?.desc || "";
+  const platformName = dep?.platform || uc?.platform || "Red Hat OpenShift AI";
+  const computeLine = dep?.compute || uc?.compute ||
+    "Compose: kubernetes-sigs/agent-sandbox (lifecycle) + OpenShell (policy) + optional OSC/Kata (L5).";
+
+  let commands = a ? [a.command] : [];
+  if (dep?.nextCommands) commands = dep.nextCommands;
+  if (uc && !a) {
+    commands = uc.needsOpenShell === false
+      ? [
+          "# Field mapping: AgentRuntime on normal containers may suffice",
+          "# Add OpenShell when you need per-binary egress, Landlock, or inference.local",
+          "Follow OpenShift AI Agent Ops Operator docs for AgentRuntime",
+        ]
+      : [
+          "openshell sandbox create --from <image> --policy ./policy.yaml",
+          "# Cluster: Agent Sandbox CRDs + privileged SCC + Helm (see Quickstart)",
+        ];
   }
 
-  const resultName = isUC ? uc.name : a.name;
-  const harnessName = isUC ? uc.harness : a.name;
-  const harnessDesc = isUC ? uc.desc : a.desc;
-  const platformName = isUC ? uc.platform : 'Red Hat OpenShift AI';
+  const authNote = dep?.authNote || (caps.oidc
+    ? "OIDC planned in this stack — keep allowUnauthenticatedUsers=false on shared clusters."
+    : "OpenShift eval overlays (disableTls + allowUnauthenticatedUsers) are trusted-network only.");
+
+  const entryLine = a
+    ? ENTRY_PATTERNS[a.entry]
+    : (uc?.name?.includes("Mode 2") || caps.ogx
+      ? "Mode 2 — Sandbox execution via platform APIs (ogx / Responses)"
+      : "Mode 1 — Sandbox the whole agent (typical OpenShell path)");
+
+  syncUrl(caps);
 
   const html = `
     <div class="result-header">
       <div class="result-title">Your stack for: <span>${resultName}</span></div>
       <div class="actions actions-sm">
-        <button class="btn btn-secondary" onclick="restart()">Restart</button>
+        <button type="button" class="btn btn-secondary" id="shareBtn" onclick="copyShareLink()">Copy link</button>
+        <button type="button" class="btn btn-secondary" onclick="restart()">Restart</button>
       </div>
     </div>
     <div class="result-grid">
       <div class="result-card model-layer">
-        <div class="stack-section-label">Model</div>
-        <div class="stack-section-product">Your chosen LLM</div>
-        <div class="provider-icons">
-          <img class="pi-dark" src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/anthropic.svg" alt="Anthropic" title="Claude">
-          <img class="pi-dark" src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openai.svg" alt="OpenAI" title="GPT">
-          <img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/gemini-color.svg" alt="Google" title="Gemini">
-          <img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/nvidia-color.svg" alt="NVIDIA" title="Nemotron">
-          <img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/meta-color.svg" alt="Meta" title="Llama">
-          <img class="pi-dark" src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/ibm.svg" alt="IBM" title="Granite">
-          ${rhHat}
-          <span class="pi-label">via inference.local</span>
-        </div>
+        <div class="stack-section-label">Model & APIs</div>
+        <div class="stack-section-product">BYOM — frontier or self-hosted</div>
+        <div class="stack-section-desc">Inference via <code>inference.local</code> (OpenShell cred masking) and/or platform gateways. Red Hat AI captures Completions, Responses/<strong>ogx</strong>, planned Anthropic Messages & Google Interactions so agents move to vLLM/llm-d without rewrites. Direct provider hosts still need explicit OpenShell network allows.</div>
+        ${caps.ogx ? `<div class="callout callout-info"><strong>ogx selected:</strong> Mode 2 platform API path enabled — distinct from Mode 1 whole-agent OpenShell.</div>` : ""}
       </div>
       <div class="result-card harness-layer">
-        <div class="stack-section-label">Harness</div>
+        <div class="stack-section-label">Harness (BYOA)</div>
         <div class="stack-section-product">${harnessName}</div>
         <div class="stack-section-desc">${harnessDesc}</div>
+        <div class="callout callout-dim" style="margin-top:0.4rem">${entryLine}</div>
+        ${a ? `<div class="meta" style="margin-top:0.45rem">${policyBadge(a.policy)}${a.nemoclaw ? ' <span class="badge badge-nc">NemoClaw</span>' : ""}</div>` : ""}
+        ${policyCallout(a)}
+        ${suggestAgentsHtml(uc?.suggestedAgents || dep?.suggestedAgents)}
       </div>
       <div class="result-card runtime-layer result-wide">
         <div class="stack-section-header">
-          <span class="stack-section-label">Runtime — OpenShell</span>
-          <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. Network isolation, credential masking, filesystem restrictions, and audit logging — regardless of which harness you use. Agents using the Responses API via OGX can get OpenShell isolation automatically.</span></span>
+          <span class="stack-section-label">Runtime — NVIDIA OpenShell</span>
+          <span class="info-icon" tabindex="0" role="img" aria-label="About OpenShell">i
+            <span class="tooltip">OpenShell is the application-level sandbox (Mode 1 whole-agent, and composes with Mode 2). It enforces Landlock, seccomp, netns, OPA L4/L7 (MCP-aware), inference.local credential injection, and OCSF audit. It does not replace Kata, MCP Gateway, or MLflow. Kagenti (SPIRE AuthBridge, AgentCard) was Dev Preview and converged here — story unchanged, infrastructure upgraded.</span>
+          </span>
         </div>
-        <div class="stack-section-product"><span style="color:#76b900">NVIDIA</span> OpenShell</div>
+        <div class="stack-section-product"><span style="color:var(--nv)">NVIDIA</span> OpenShell <span style="font-size:0.75rem;opacity:0.5;font-weight:500">alpha · RHOAI DP/TP target 3.5/3.6</span></div>
+        <div class="callout callout-info" style="margin-top:0.35rem"><strong>Isolation profile:</strong> ${profile.name} (${profile.layers}) — ${profile.blurb}</div>
         <ul class="stack-features">
-          ${features.map(f => `<li class="${f.enabled ? 'enabled' : 'disabled'}">${f.label}</li>`).join('')}
+          ${openshellFeatures.map((f) => `<li class="${f.enabled ? "enabled" : "disabled"}" title="${f.tip}">${f.label}</li>`).join("")}
         </ul>
+        <div class="callout callout-dim"><strong>Hot-reload vs recreate:</strong> network + inference can update live (<code>openshell policy set</code>). Landlock/seccomp/process identity require a new sandbox. <strong>Compose:</strong> Kata (L5) ∪ OpenShell (L1 policy) ∪ agent-sandbox (lifecycle).</div>
       </div>
       <div class="result-card platform-layer">
-        <div class="stack-section-label">Platform</div>
-        <div class="stack-section-product">${platformName.includes('Red Hat') ? platformName.replace('Red Hat', rhHat + '<span class="rh-brand">Red Hat</span>') : platformName}</div>
-        <div class="stack-section-desc" style="font-size:0.7rem;opacity:0.4;margin-top:0.1rem">Model serving (vLLM + llm-d, KServe), MLflow tracing + OTEL, EvalHub, agent-sandbox</div>
-        <div class="stack-section-desc" style="font-size:0.75rem;opacity:0.5;margin-top:0.15rem">${setupPathShort}</div>
+        <div class="stack-section-label">Platform — OpenShift / OpenShift AI</div>
+        <div class="stack-section-product">${String(platformName).includes("Red Hat") || String(platformName).includes("OpenShift") ? rhHat + `<span class="rh-brand">${platformName}</span>` : platformName}</div>
+        <div class="stack-section-desc">${computeLine}</div>
+        <ul class="stack-features" style="margin-top:0.45rem">
+          ${platformFeatures.map((f) => `<li class="${f.enabled ? "enabled" : "disabled"}">${f.label}</li>`).join("")}
+          <li class="${caps.kata ? "enabled" : "disabled"}">OSC node eligibility: RHCOS workers, virt/NFD kata label, nested virt caveats</li>
+          <li class="enabled">vLLM / llm-d inference for agentic tool-calling (Theme 4)</li>
+        </ul>
+        <div class="routes" style="margin-top:0.4rem">
+          <span>NetworkPolicy + optional UDN + egress proxy (composable with OpenShell proxy)</span>
+          <span>SPIFFE/SPIRE on OpenShift for cluster workload identity (layers with sandbox JWT)</span>
+        </div>
       </div>
-      <div class="result-card inference-card">
-        <div class="stack-section-label">Inference & Governance</div>
-        <div style="font-size:0.85rem;opacity:0.7;margin:0.2rem 0">inference.local → flexible backend</div>
-        <div class="routes">
-          <span><span class="rh-brand-subtle">OpenShift AI</span> (vLLM + llm-d, NIM)</span>
-          <span>Cloud (Vertex, Anthropic, OpenAI)</span>
-          <span>Local (Ollama, vLLM)</span>
-        </div>${governanceSection}
+      <div class="result-card platform-layer">
+        <div class="stack-section-label">Safety & Agent Ops add-ons</div>
+        <div class="stack-section-desc">${addonItems.length ? addonItems.map((g) => `● ${g}`).join("<br>") : "None selected — OpenShell OCSF + OPA remain the security baseline. Add MLflow/EvalHub/Garak via OpenShift AI Agent Ops when you need product tracing and eval."}</div>
+      </div>
+      <div class="result-card next-layer result-wide">
+        <div class="stack-section-label">Next steps</div>
+        <div class="cmd-list">
+          ${commands.map((c) => `<code class="cmd">${c}</code>`).join("")}
+        </div>
+        <div class="callout callout-warn" style="margin-top:0.55rem"><strong>Auth / maturity:</strong> ${authNote} OpenShell is alpha (single-player-first). Privileged SCC for sandbox netns is intentionally powerful.</div>
+        <div class="actions actions-sm" style="margin-top:0.65rem">
+          <a class="btn btn-primary" href="../quickstart/">Open Quickstart</a>
+          <a class="btn btn-secondary" href="../sandboxes/network-policies/">Network policies</a>
+          <a class="btn btn-secondary" href="../agent-stack-decision-guide/">Decision Guide</a>
+          <a class="btn btn-secondary" href="https://docs.nvidia.com/openshell/latest/about/supported-agents.html" target="_blank" rel="noopener">Supported agents</a>
+        </div>
       </div>
     </div>
+    <p class="footer-note">Field positioning: <em>Kagenti → OpenShell</em> — BYOA unchanged; infrastructure is OpenShell + OpenShift AI platform layers (Kata, MCP Gateway, ogx, MLflow, SPIFFE). Do not market OpenShell as replacing OSC or MCP Gateway. Vault <em>dev mode</em> and eval TLS/unauth flags in this reference repo are for learning only.</p>
   `;
 
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  const resultEl = document.getElementById('result');
+  document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));
+  const resultEl = document.getElementById("result");
   resultEl.innerHTML = html;
-  resultEl.classList.add('active');
-  updateDots(2);
+  resultEl.classList.add("active");
+  updateProgress(2);
 }
 
 function restart() {
-  document.getElementById('result').classList.remove('active');
-  document.getElementById('result').innerHTML = '';
+  document.getElementById("result").classList.remove("active");
+  document.getElementById("result").innerHTML = "";
   selectedAgent = null;
   selectedUseCase = null;
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  document.getElementById(currentJourney === 'agent' ? 'step1' : 'step1uc').classList.add('active');
-  updateDots(0);
+  selectedDeploy = null;
+  renderAgentGrid();
+  renderUseCaseGrid();
+  renderDeployGrid();
+  document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));
+  const stepId = currentJourney === "agent" ? "step1" : currentJourney === "usecase" ? "step1uc" : "step1deploy";
+  document.getElementById(stepId).classList.add("active");
+  updateProgress(0);
+  history.replaceState(null, "", location.pathname);
 }
+
+function hydrateFromUrl() {
+  const params = new URLSearchParams(location.search);
+  const journey = params.get("journey");
+  if (journey === "agent" || journey === "usecase" || journey === "deploy") {
+    currentJourney = journey;
+    ["agent", "usecase", "deploy"].forEach((t) => {
+      const tab = document.getElementById(`jtab-${t}`);
+      const on = t === journey;
+      tab.classList.toggle("active", on);
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+    });
+  }
+  const agent = params.get("agent");
+  const usecase = params.get("usecase");
+  const deploy = params.get("deploy");
+  const defaults = {};
+  capabilities.forEach((c) => {
+    if (params.has(c.id)) defaults[c.id] = params.get(c.id) === "1";
+  });
+  const hasCaps = capabilities.some((c) => params.has(c.id));
+
+  if (agent && agents[agent]) {
+    setJourney("agent");
+    selectedAgent = agent;
+    renderAgentGrid();
+    enterStep2(agents[agent].name, `· ${agents[agent].by}`, hasCaps ? { ...defaultCapsForAgent(), ...defaults } : defaultCapsForAgent());
+    if (params.get("show") === "1" || hasCaps) showResult();
+    return;
+  }
+  if (usecase && usecases[usecase]) {
+    setJourney("usecase");
+    selectedUseCase = usecase;
+    renderUseCaseGrid();
+    enterStep2(usecases[usecase].name, `· ${ISOLATION_PROFILES[usecases[usecase].profileKey].name}`, hasCaps ? { ...usecases[usecase].defaults, ...defaults } : usecases[usecase].defaults);
+    if (params.get("show") === "1" || hasCaps) showResult();
+    return;
+  }
+  if (deploy && deploys[deploy]) {
+    setJourney("deploy");
+    selectedDeploy = deploy;
+    renderDeployGrid();
+    enterStep2(deploys[deploy].name, `· ${deploys[deploy].platform}`, hasCaps ? { ...deploys[deploy].defaults, ...defaults } : deploys[deploy].defaults);
+    if (params.get("show") === "1" || hasCaps) showResult();
+  }
+}
+
+renderAgentGrid();
+renderUseCaseGrid();
+renderDeployGrid();
+hydrateFromUrl();
+
 </script>
 </body>
 </html>

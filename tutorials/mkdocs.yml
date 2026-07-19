@@ -113,6 +113,8 @@ nav:
   - Quickstart: quickstart.md
   - Concepts:
       - Agent Architecture: concepts/agent-architecture.md
+      - Stack Wizard: concepts/stack-wizard.html
+      - Decision Guide: agent-stack-decision-guide/index.html
   - Getting Started:
       - getting-started/index.md
       - Prerequisites: getting-started/prerequisites.md

@@ -148,21 +148,50 @@ flowchart TB
 
 ## Product Mapping
 
-How real products map to these layers:
+Aligned to Red Hat AI field positioning (July 2026): **Kagenti → OpenShell**, BYOA, and the Sandboxing for Agents use-case table. **Default policy** also matches the upstream [Supported Agents](https://docs.nvidia.com/openshell/latest/about/supported-agents.html) matrix where applicable.
 
-| Product | Category | Harness | Runtime / Sandbox | NemoClaw supported? |
+### How layers compose (do not conflate)
+
+| Layer | What it is | Owner |
+|---|---|---|
+| **OpenShift Sandboxed Containers (Kata)** | Hardware / dedicated-kernel isolation (L5) | OpenShift (GA layered product) |
+| **OpenShell** | In-sandbox policy: Landlock, seccomp, netns, OPA L4/L7, `inference.local`, OCSF | NVIDIA OpenShell (+ Red Hat drivers) |
+| **kubernetes-sigs/agent-sandbox** | Sandbox CRD lifecycle | OpenShift / OSC path |
+| **MCP Gateway** | Tool OAuth2 exchange, claim-based auth (Kuadrant/Authorino) | Red Hat AI |
+| **ogx / Open Responses** | Mode 2 agentic API surface | Red Hat AI |
+| **MLflow + OTEL / EvalHub** | Product tracing & evaluation | OpenShift AI Agent Ops |
+
+**Compose:** Kata for kernel boundary ∪ OpenShell for application policy ∪ agent-sandbox for lifecycle. OpenShell does **not** replace OSC or MCP Gateway.
+
+### Entry patterns (Kagenti → OpenShell guide)
+
+1. **Whole-agent (Pattern 1):** `openshell sandbox create -- claude` — package agent image; no agent code changes. Field guide lists Claude Code, Codex, OpenCode, Gemini CLI.
+2. **Harness-native (Pattern 2):** `harness.use_plugin("openshell")` — OpenClaw shipped; Hermes announced.
+
+### Agents / frameworks
+
+| Product | Category | Default OpenShell policy | Entry | NemoClaw? |
 |---|---|---|---|---|
-| **Claude Code** | Coding agent | Built-in (full) | OpenShell (add policy layer) | No — use OpenShell directly |
-| **OpenAI Codex CLI** | Coding agent | Built-in (full) | OpenShell (add policy layer) | No — use OpenShell directly |
-| **Gemini CLI** | Coding agent | Built-in | OpenShell (add policy layer) | No — use OpenShell directly |
-| **OpenCode** | Coding agent | Built-in (full, model-agnostic) | OpenShell (add policy layer) | No — use OpenShell directly |
-| **OpenHands** | Coding platform | Built-in (full + own sandbox) | OpenShell (add policy layer) | No — use OpenShell directly |
-| **LangChain Deep Agents** | Coding harness | `dcode` (full) | OpenShell via NemoClaw | **Yes** |
-| **Hermes** | Always-on agent | Built-in (learning loop + skills) | OpenShell via NemoClaw | **Yes** |
-| **OpenClaw** | Personal assistant | Built-in (gateway + heartbeat + memory) | OpenShell via NemoClaw | **Yes** (default) |
-| **Google ADK** | Framework | Partial (Runner + Sessions + Workflows) | OpenShell (add sandbox) | No — use OpenShell directly |
-| **OpenShell** | Runtime | — | **This IS the runtime** | N/A (NemoClaw uses it) |
-| **NemoClaw** | Packaged stack | Bundles 3 supported harnesses | OpenShell (bundled) | N/A (this IS NemoClaw) |
+| **Claude Code** | Coding (base image) | **Full** | Pattern 1 | No |
+| **GitHub Copilot CLI** | Coding (base image) | **Full** | Pattern 1 | No |
+| **OpenCode** | Coding (base image) | **Partial** | Pattern 1 | No |
+| **OpenAI Codex CLI** | Coding (base image) | **None** (custom policy) | Pattern 1 | No |
+| **Gemini CLI** | Coding | Validated/custom image (not base matrix yet) | Pattern 1 (field guide) | No |
+| **Ollama** / **Pi** | Community images | **Bundled** | Pattern 1 (`--from`) | No |
+| **OpenClaw** | Assistant | Blueprint-managed | Pattern 2 | **Yes** |
+| **Hermes** | Always-on | Blueprint-managed | Pattern 2 (announced) | **Yes** |
+| **Deep Agents (dcode)** | Coding harness | Blueprint-managed | Pattern 2 / NemoClaw | **Yes** |
+| **ADK / LangGraph / CrewAI / Strands** | BYOA frameworks | Bring-your-image | Pattern 1 | No |
+| **OpenShell** | Runtime | — | — | N/A |
+| **NemoClaw** | NVIDIA packaged stack | Blueprint-managed | — | N/A |
+
+Use the [Interactive Wizard](stack-wizard.html) for isolation profiles and owner-accurate stacks.
+
+!!! note "Identity (Kagenti convergence)"
+    Kagenti shipped full SPIRE via AuthBridge (Dev Preview only — no GA). OpenShell authenticates supervisors with **gateway-minted sandbox JWTs / JWT-SVID** (SPIFFE-shaped subjects) and is **closing the SPIFFE gap**; Red Hat contributes OIDC + SPIFFE identity drivers. Platform SPIFFE/SPIRE on OpenShift layers on for cluster zero-trust — complementary, not “OpenShell already is full SPIRE.”
+
+!!! note "Maturity"
+    OpenShell is **alpha** (single-player-first). Field target: Dev/Tech Preview in RHOAI **3.5/3.6** (H2 CY2026).
 
 ---
 
@@ -193,25 +222,25 @@ Google ADK is a **framework + partial harness**. It gives you build-time primiti
 
 ## Where OpenShell Fits
 
-OpenShell provides the **sandbox/runtime component** of a harness. Specifically:
+OpenShell provides the **application-level sandbox** in Red Hat AI's defense-in-depth model (Mode 1 whole-agent; composes with Mode 2 via ogx). Specifically:
 
-| What OpenShell does | Harness component it fulfills |
+| What OpenShell does | Layer |
 |---|---|
-| Network namespace + OPA proxy | Sandbox — safe execution environment |
-| Landlock + seccomp | Sandbox — filesystem and syscall isolation |
-| `inference.local` routing | Credential masking — agent never sees API keys |
-| OCSF logging | Observability — audit trail of all agent actions |
-| Network policy (per-binary, per-host, per-method) | Sandbox — granular access control |
-| Hot-reloadable policy | Sandbox — adapt permissions without restart |
+| Network namespace + OPA proxy (L4 + optional L7 / MCP-aware) | Application runtime policy |
+| Landlock + seccomp | OS-level controls inside the sandbox |
+| `inference.local` routing | Credential masking / privacy router |
+| OCSF v1.7.0 logging | Security audit (SIEM) — not MLflow product tracing |
+| Hot-reloadable network/inference policy | Operational flexibility |
 
-**OpenShell doesn't provide:**
+**OpenShell doesn't provide (platform / other products do):**
 
-- Orchestration loops (that's your harness/framework)
-- Memory or session persistence (that's ADK/LangGraph)
-- Planning or verification (that's your agent logic)
-- Context management (that's your harness)
+- Kata / OSC hardware isolation (L5)
+- MCP Gateway tool OAuth exchange (Kuadrant/Authorino)
+- ogx / Open Responses Mode-2 API surface
+- MLflow + EvalHub + Garak Agent Ops
+- Orchestration loops, memory, planning (harness/framework)
 
-**OpenShell's value:** "No matter what harness or framework you use, we make sure the agent can only do what the policy allows."
+**OpenShell's value (field line):** Agents are zero-trust employees — OpenShell makes sure the agent can only do what policy allows, portably from laptop (Podman) to OpenShift.
 
 ---
 
@@ -245,32 +274,35 @@ OpenShell provides the **sandbox/runtime component** of a harness. Specifically:
 
     Multiple teams running multiple agents with governance.
 
-    **You need:** Framework (ADK/LangGraph) + Runtime (OpenShell with OIDC + workspaces) on OpenShift
+    **You need:** Framework (ADK/LangGraph) + Runtime (OpenShell with OIDC) on OpenShift projects/RBAC. OpenShift AI workspaces are a platform surface on top — not an OpenShell core feature.
 
 ---
 
 ## The Stack on OpenShift
 
-For this reference architecture, the stack is:
+For this reference architecture (BYOA on Red Hat AI):
 
 ```
 ┌─────────────────────────────────────────┐
-│ Your Agent (ADK / LangGraph / custom)   │  ← You build this
+│ Your Agent (BYOA harness / framework)   │  ← You bring this
 ├─────────────────────────────────────────┤
-│ Framework harness components            │  ← ADK Runner, Sessions,
-│ (orchestration, memory, tools)          │     Workflows, Memory
+│ OpenShift AI Agent Ops (optional)       │  ← MLflow/OTEL, EvalHub,
+│                                         │     MCP Gateway, ogx, guardrails
 ├─────────────────────────────────────────┤
-│ OpenShell (sandbox runtime)             │  ← Network policy, isolation,
-│                                         │     inference routing, audit
+│ OpenShell (application sandbox)         │  ← OPA, Landlock, seccomp,
+│                                         │     inference.local, OCSF
 ├─────────────────────────────────────────┤
-│ Agent Sandbox Controller (operator)     │  ← Creates pods from Sandbox CRs
+│ Optional: OSC / Kata (L5)               │  ← Dedicated kernel when risk
+│                                         │     demands hardware isolation
 ├─────────────────────────────────────────┤
-│ OpenShift (compute platform)            │  ← Scheduling, networking,
-│                                         │     storage, RBAC
+│ agent-sandbox controller                │  ← Sandbox CR lifecycle
+├─────────────────────────────────────────┤
+│ OpenShift                               │  ← SCC/RBAC, NetworkPolicy/UDN,
+│                                         │     SPIFFE/SPIRE, scheduling
 └─────────────────────────────────────────┘
 ```
 
-Each layer has a single responsibility. Your agent code doesn't know about OpenShell. OpenShell doesn't know about your agent logic. OpenShift doesn't know about either — it just runs pods.
+Each layer has a single responsibility. Kagenti (Dev Preview) converged into this OpenShell-centered runtime story; MCP Gateway / SPIFFE platform work continues as Red Hat AI platform layers — not as a return to Kagenti.
 
 ---
 
