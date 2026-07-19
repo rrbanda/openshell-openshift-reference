@@ -165,10 +165,18 @@ Aligned to Red Hat AI field positioning (July 2026): **Kagenti → OpenShell**, 
 
 ### Entry paths (NVIDIA OpenShell / NemoClaw)
 
-Per [OpenShell Supported Agents](https://docs.nvidia.com/openshell/about/supported-agents) and [NemoClaw ecosystem](https://docs.nvidia.com/nemoclaw/user-guide/openclaw/about/ecosystem):
+Do **not** conflate these catalogs:
 
-1. **OpenShell path:** `openshell sandbox create` — base trailing commands (`-- claude`), community `--from` names (`gemini`, `ollama`, `pi`, `openclaw`), or BYO container image / local directory.
-2. **NemoClaw path:** `nemoclaw onboard` (default OpenClaw), `nemohermes onboard`, or `nemo-deepagents onboard` — blueprint-managed reference stack on top of OpenShell.
+| Catalog | What it is | Agents |
+|---|---|---|
+| **NemoClaw** | Always-on reference stack on OpenShell | OpenClaw, Hermes, LangChain Deep Agents Code only |
+| **OpenShell Supported Agents** | Coding CLIs / community sandboxes via `openshell` | Claude Code, Copilot CLI, OpenCode, Codex, Gemini (`--from gemini`), Ollama, Pi, … |
+| **OpenShift AI BYOA** | You bring a framework image | LangGraph, ADK, CrewAI, … |
+
+Claude Code / Copilot / Codex may appear in NemoClaw install prompts as the **host coding agent that helps you install** — that does not make them NemoClaw sandboxed agents.
+
+1. **OpenShell path:** `openshell sandbox create` — base trailing commands, community `--from`, or BYO image.
+2. **NemoClaw path:** `nemoclaw onboard` / `nemohermes onboard` / `nemo-deepagents onboard`.
 
 ### Agents / frameworks
 

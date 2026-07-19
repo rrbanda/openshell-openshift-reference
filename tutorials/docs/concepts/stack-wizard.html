@@ -183,6 +183,22 @@ body::before {
 .hint { font-size: 0.76rem; color: var(--muted); margin: 0 0 0.65rem; line-height: 1.4; }
 
 /* ---- Grids: stretch equal-height cells; never clip ---- */
+.agent-groups { display: flex; flex-direction: column; gap: 1.25rem; }
+.agent-group-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.35rem;
+}
+.agent-group-note {
+  font-size: 0.78rem;
+  color: var(--dim);
+  margin: 0 0 0.65rem;
+  line-height: 1.4;
+  max-width: 52rem;
+}
 .agent-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
@@ -693,10 +709,13 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
 
 <div class="header">
   <div class="header-row"><h1>Pick Your Agent. See Your Stack.</h1></div>
-  <p class="tagline">Agent = Model + Harness · BYOA on Red Hat OpenShift AI · product at the base</p>
+  <p class="tagline">Three catalogs · NemoClaw ≠ OpenShell coding CLIs ≠ BYOA frameworks</p>
   <details>
     <summary>About · sources</summary>
-    Agent matrix from <a href="https://docs.nvidia.com/openshell/about/supported-agents" target="_blank" rel="noopener">OpenShell Supported Agents</a>, Community <code>--from</code> sandboxes, and <a href="https://docs.nvidia.com/nemoclaw/" target="_blank" rel="noopener">NemoClaw</a> (OpenClaw / Hermes / Deep Agents). Isolation profiles from Red Hat AI Sandboxing for Agents. Product base: Red Hat OpenShift AI.
+    <strong>NemoClaw</strong> only sandboxes OpenClaw, Hermes, and LangChain Deep Agents Code (<a href="https://docs.nvidia.com/nemoclaw/" target="_blank" rel="noopener">docs</a>).
+    <strong>OpenShell Supported Agents</strong> separately lists base/community coding CLIs such as Claude Code and OpenCode (<a href="https://docs.nvidia.com/openshell/about/supported-agents" target="_blank" rel="noopener">matrix</a>) — those are not NemoClaw agents.
+    Claude Code / Copilot / Codex may appear in NemoClaw install prompts as the <em>host coding agent that helps you install</em>, not as the agent running inside the sandbox.
+    <strong>OpenShift AI</strong> is the product base for BYOA frameworks (LangGraph, ADK, …) plus OpenShell as a portfolio capability — choosing Claude Code does not mean “NemoClaw on OpenShift AI.”
   </details>
 </div>
 
@@ -723,8 +742,8 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
   <div class="step active" id="step1" role="tabpanel">
     <div class="step-label">Step 1 — Choose your agent</div>
     <div class="question">I'm using (or plan to use)…</div>
-    <p class="hint">Tap <strong>i</strong> for detail. Badges follow NVIDIA OpenShell Supported Agents (base / Community / NemoClaw) or BYO <code>--from</code> image. NemoClaw path uses <code>nemoclaw onboard</code>.</p>
-    <div class="agent-grid" id="agentGrid"></div>
+    <p class="hint">Pick from the correct catalog below. NemoClaw agents are not the same list as OpenShell coding CLIs.</p>
+    <div class="agent-groups" id="agentGrid"></div>
   </div>
 
   <!-- STEP 1: By Use Case -->
@@ -829,39 +848,64 @@ const ISOLATION_PROFILES = {
 };
 
 /**
- * Agent catalog aligned to NVIDIA OpenShell Supported Agents + NemoClaw supported runtimes.
- * Frameworks / OpenHands are BYO OpenShell images (documented --from container path), not matrix rows.
+ * Three catalogs — do not conflate:
+ *   nemoclaw  = NemoClaw docs (OpenClaw, Hermes, Deep Agents Code only)
+ *   openshell = OpenShell Supported Agents / Community --from (coding CLIs)
+ *   byo       = OpenShift AI BYOA frameworks (not on NVIDIA agent matrices)
+ *
+ * Claude Code etc. can install NemoClaw from a host UI; that does not make them NemoClaw agents.
  */
+const AGENT_GROUPS = [
+  {
+    id: "nemoclaw",
+    title: "NemoClaw agents",
+    note: "Always-on agents in the NemoClaw reference stack on OpenShell. Only these three are NemoClaw-supported runtimes.",
+    ids: ["openclaw", "hermes", "deepagents"],
+  },
+  {
+    id: "openshell",
+    title: "OpenShell coding agents",
+    note: "From the OpenShell Supported Agents / Community matrix. They run via openshell sandbox create — not via nemoclaw onboard. Not NemoClaw agents.",
+    ids: ["claude", "copilot", "opencode", "codex", "gemini", "ollama", "pi"],
+  },
+  {
+    id: "byo",
+    title: "BYOA frameworks (OpenShift AI)",
+    note: "You bring the image. Not listed as named agents on OpenShell Supported Agents or NemoClaw. Typical OpenShift AI BYOA + OpenShell policy path.",
+    ids: ["langgraph", "adk", "crewai", "strands", "watsonx", "openhands", "custom"],
+  },
+];
+
 const agents = {
   claude: {
     name: "Claude Code", by: "Anthropic", type: "coding",
     nemoclaw: false, source: "base", policy: "full", path: "openshell",
     command: "openshell sandbox create -- claude",
-    desc: "OpenShell Supported Agents: source base, full coverage. Trailing command on the base image. ANTHROPIC_API_KEY or inference.local + provider.",
+    desc: "OpenShell Supported Agents (base, full coverage) — not a NemoClaw agent. Trailing command on the base image. Separate from using Claude Code on the host to help install NemoClaw.",
   },
   copilot: {
     name: "GitHub Copilot CLI", by: "GitHub", type: "coding",
     nemoclaw: false, source: "base", policy: "full", path: "openshell",
     command: "openshell sandbox create -- copilot",
-    desc: "OpenShell Supported Agents: source base, full coverage. GITHUB_TOKEN or COPILOT_GITHUB_TOKEN.",
+    desc: "OpenShell Supported Agents (base, full coverage) — not a NemoClaw agent. GITHUB_TOKEN or COPILOT_GITHUB_TOKEN.",
   },
   opencode: {
     name: "OpenCode", by: "Open-source", type: "coding",
     nemoclaw: false, source: "base", policy: "partial", path: "openshell",
     command: "openshell sandbox create -- opencode",
-    desc: "OpenShell Supported Agents: source base, partial coverage. Add opencode.ai endpoint and OpenCode binary paths for full function; often pairs with inference.local.",
+    desc: "OpenShell Supported Agents (base, partial coverage) — not a NemoClaw agent. Add opencode.ai + binary paths for full function.",
   },
   codex: {
     name: "Codex CLI", by: "OpenAI", type: "coding",
     nemoclaw: false, source: "base", policy: "none", path: "openshell",
     command: "openshell sandbox create --policy ./codex-policy.yaml -- codex",
-    desc: "OpenShell Supported Agents: source base, no default coverage. Custom policy with OpenAI endpoints + Codex binary paths. OPENAI_API_KEY.",
+    desc: "OpenShell Supported Agents (base, no coverage) — not a NemoClaw agent. Custom policy + OPENAI_API_KEY.",
   },
   gemini: {
     name: "Gemini CLI", by: "Google", type: "coding",
     nemoclaw: false, source: "community", policy: "bundled", path: "openshell",
     command: "openshell sandbox create --from gemini",
-    desc: "OpenShell Community sandbox (not in base image). NVIDIA OpenShell-Community: openshell sandbox create --from gemini. Bundled image + policy for Gemini CLI.",
+    desc: "OpenShell Community --from gemini — not a NemoClaw agent and not in the base image.",
   },
   ollama: {
     name: "Ollama sandbox", by: "Community", type: "coding",
@@ -1216,9 +1260,8 @@ function agentMaturity(_a) {
   return null;
 }
 
-function renderAgentGrid() {
-  const grid = document.getElementById("agentGrid");
-  grid.innerHTML = Object.entries(agents).map(([id, a]) => `
+function agentCardHtml(id, a) {
+  return `
     <div class="card${selectedAgent === id ? " selected" : ""}" data-id="${id}" role="button" tabindex="0"
       aria-pressed="${selectedAgent === id}" onclick="selectAgent('${id}')"
       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectAgent('${id}')}">
@@ -1232,8 +1275,23 @@ function renderAgentGrid() {
         ${policyBadge(a.policy)}
         ${maturityBadge(agentMaturity(a))}
       </div>
-    </div>
-  `).join("");
+    </div>`;
+}
+
+function renderAgentGrid() {
+  const root = document.getElementById("agentGrid");
+  root.innerHTML = AGENT_GROUPS.map((g) => {
+    const cards = g.ids.map((id) => {
+      const a = agents[id];
+      return a ? agentCardHtml(id, a) : "";
+    }).join("");
+    return `
+      <section class="agent-group" aria-labelledby="ag-${g.id}">
+        <h3 class="agent-group-label" id="ag-${g.id}">${g.title}</h3>
+        <p class="agent-group-note">${g.note}</p>
+        <div class="agent-grid">${cards}</div>
+      </section>`;
+  }).join("");
 }
 
 function renderUseCaseGrid() {
