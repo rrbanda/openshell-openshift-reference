@@ -375,7 +375,7 @@ body::before {
     <div class="checks">
       <div class="check-item"><input type="checkbox" id="chk-network" checked><div><label for="chk-network">Network policy</label><div class="check-desc">Per-binary, per-host, per-HTTP-method egress control via OPA/Rego</div></div></div>
       <div class="check-item"><input type="checkbox" id="chk-creds" checked><div><label for="chk-creds">Credential masking</label><div class="check-desc">Agent calls inference.local — never sees real API keys</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-audit" checked><div><label for="chk-audit">Audit + tracing</label><div class="check-desc">OCSF audit logs + MLflow/OpenTelemetry deep execution traces</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-audit" checked><div><label for="chk-audit">Audit + tracing</label><div class="check-desc">OCSF audit logs + MLflow tracing (via Red Hat OpenShift AI) + OpenTelemetry</div></div></div>
       <div class="check-item"><input type="checkbox" id="chk-fs" checked><div><label for="chk-fs">Filesystem + process isolation</label><div class="check-desc">Landlock LSM + seccomp syscall filtering + network namespace</div></div></div>
       <div class="check-item"><input type="checkbox" id="chk-identity" checked><div><label for="chk-identity">Agent identity (SPIFFE/SPIRE)</label><div class="check-desc">Cryptographic workload identity — no hardcoded keys, short-lived scoped tokens</div></div></div>
       <div class="check-item"><input type="checkbox" id="chk-mcp" checked><div><label for="chk-mcp">Tool governance (MCP Gateway)</label><div class="check-desc">OAuth2 token exchange for tool access, identity-based filtering, no prompt-based auth</div></div></div>
@@ -413,10 +413,10 @@ const agents = {
 };
 
 const usecases = {
-  private_chatbot: { name: 'Private-Data Chatbot', profile: 'OpenShell with Kata or VM', platform: 'OpenShift + Kata Containers', desc: 'Chatbot with access to private data, MCP servers, and Agent Skills — needs privilege scoping and kernel isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: true, kata: true, multi: false } },
-  email_agent: { name: 'Email / Messaging Agent', profile: 'OpenShell with Kata or VM', platform: 'OpenShift + Kata Containers', desc: 'Reads untrusted input (email, chat), writes to untrusted destinations — needs full isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: false, guardrails: true, kata: true, multi: false } },
+  private_chatbot: { name: 'Private-Data Chatbot', profile: 'OpenShell with Kata or VM', platform: 'Red Hat OpenShift AI + Kata Containers', desc: 'Chatbot with access to private data, MCP servers, and Agent Skills — needs privilege scoping and kernel isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: true, kata: true, multi: false } },
+  email_agent: { name: 'Email / Messaging Agent', profile: 'OpenShell with Kata or VM', platform: 'Red Hat OpenShift AI + Kata Containers', desc: 'Reads untrusted input (email, chat), writes to untrusted destinations — needs full isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: false, guardrails: true, kata: true, multi: false } },
   coding_laptop: { name: 'Coding Agent on Laptop', profile: 'OpenShell, Typical Configuration', platform: 'Podman (local workstation)', desc: 'Coding assistant on your workstation — OpenShell sandbox protects the host from the agent', harness: 'Claude Code, dcode, OpenCode, or similar', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: false, kata: false, multi: false } },
-  coding_cluster: { name: 'Coding Agent in Cluster', profile: 'OpenShell, Typical Configuration', platform: 'OpenShift', desc: 'Coding assistant on OpenShift — for policy enforcement, shared compute, or always-on access', harness: 'Claude Code, dcode, OpenCode, or similar', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: false, kata: false, multi: true } }
+  coding_cluster: { name: 'Coding Agent in Cluster', profile: 'OpenShell, Typical Configuration', platform: 'Red Hat OpenShift AI', desc: 'Coding assistant on Red Hat OpenShift AI — for policy enforcement, shared compute, or always-on access', harness: 'Claude Code, dcode, OpenCode, or similar', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: false, kata: false, multi: true } }
 };
 
 let currentJourney = 'agent';
@@ -505,7 +505,7 @@ function showResult() {
     { label: 'Credential masking (inference.local)', enabled: chkCreds },
     { label: 'Landlock + seccomp + network namespace', enabled: chkFs },
     { label: 'SPIFFE/SPIRE agent identity', enabled: chkIdentity },
-    { label: 'Deep tracing (MLflow + OTEL)', enabled: chkAudit },
+    { label: 'Deep tracing (MLflow via RHOAI + OTEL)', enabled: chkAudit },
     { label: 'Multi-user (OIDC + RBAC + workspaces)', enabled: chkMulti }
   ];
 
@@ -537,13 +537,13 @@ function showResult() {
   } else if (a.nemoclaw) {
     setupPath = `<h4>Setup path</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">Or deploy OpenShell directly via Helm if you prefer manual control.</p>`;
   } else {
-    setupPath = `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
+    setupPath = `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on Red Hat OpenShift AI. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
   }
 
   const resultName = isUC ? uc.name : a.name;
   const harnessName = isUC ? uc.harness : a.name;
   const harnessDesc = isUC ? uc.desc : a.desc;
-  const platformName = isUC ? uc.platform : 'OpenShift';
+  const platformName = isUC ? uc.platform : 'Red Hat OpenShift AI';
 
   const html = `
     <div class="result-title">Your stack for: <span>${resultName}</span></div>
@@ -589,7 +589,7 @@ function showResult() {
       <div class="stack-section platform-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">Platform</span>
-          <span class="info-icon">i<span class="tooltip">OpenShift + Kubernetes agent-sandbox. Compute, networking, storage, GPU scheduling. The agent-sandbox controller manages pod lifecycle via CRDs.</span></span>
+          <span class="info-icon">i<span class="tooltip">Red Hat OpenShift AI provides agent lifecycle (Kagenti/AgentRuntime), model serving (vLLM, KServe), MLflow tracing, and EvalHub. Kubernetes agent-sandbox manages pod lifecycle, warm pools, and optional Kata isolation via CRDs.</span></span>
         </div>
         <div class="stack-section-product">${platformName}${kataNote}</div>
       </div>
