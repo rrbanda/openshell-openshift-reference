@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pick Your Agent. See Your Stack. | OpenShell on Red Hat OpenShift AI</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta name="description" content="Technically accurate stack wizard: map agents and use cases to OpenShell runtime capabilities vs OpenShift AI platform add-ons.">
+<meta name="description" content="Technically accurate stack wizard for Red Hat OpenShift AI: map agents and use cases to portfolio capabilities (OpenShell, OSC, MCP Gateway, safety portfolio) — capabilities are not separate products.">
 <style>
 :root {
   --bg: #0a0e14;
@@ -433,6 +433,20 @@ body::before {
   background: rgba(10, 14, 20, 0.45);
   box-shadow: 0 16px 48px rgba(0,0,0,0.35);
 }
+.cake-product-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.05rem;
+  border-bottom: 1px solid rgba(230,237,243,0.12);
+  background: linear-gradient(90deg, rgba(238,0,0,0.1), rgba(22,27,34,0.9) 55%);
+  border-radius: 14px 14px 0 0;
+  font-size: 0.86rem;
+}
+.cake-product-bar strong { font-size: 0.95rem; }
+.cake-product-bar .muted { color: var(--muted); font-size: 0.72rem; }
+.cake > .cake-layer:first-of-type { border-radius: 0; }
 .cake-layer {
   position: relative;
   overflow: visible;
@@ -442,7 +456,6 @@ body::before {
   border-left: 4px solid transparent;
   background: rgba(22, 27, 34, 0.55);
 }
-.cake-layer:first-child { border-radius: 14px 14px 0 0; }
 .cake-layer:last-child {
   border-bottom: none;
   border-radius: 0 0 14px 14px;
@@ -689,10 +702,10 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
 
 <div class="header">
   <div class="header-row"><h1>Pick Your Agent. See Your Stack.</h1></div>
-  <p class="tagline">BYOA · OpenShell ∪ OpenShift AI · field-accurate composition</p>
+  <p class="tagline">Product: OpenShift AI · BYOA · capabilities compose the stack</p>
   <details>
     <summary>About · sources · layering</summary>
-    BYOA on Red Hat AI: you bring the agent; the platform operationalizes it. Compose <strong>OpenShell</strong> (application sandbox) with <strong>OpenShift / OpenShift AI</strong> layers (Kata, MCP Gateway, ogx, MLflow, SPIFFE) — never conflating them. Aligned to July 2026 field guides (Kagenti→OpenShell, Agentic Strategy, Sandboxing for Agents). OpenShell is <strong>alpha</strong>; RHOAI DP/TP target 3.5/3.6.
+    <strong>Product:</strong> Red Hat OpenShift AI (Red Hat AI portfolio). You bring the agent (BYOA); the product operationalizes it. <strong>Capabilities</strong> (not separate products): OpenShell app sandbox (NVIDIA collab; planned Developer Preview in OpenShift AI 3.5, targeting Tech Preview in 3.6), OpenShift Sandboxed Containers / Kata (GA layered), MCP Gateway, ogx / Open Responses, safety portfolio (NeMo Guardrails, EvalHub, Garak), MLflow/OTEL. Aligned to Red Hat AI Agentic Strategy 2026 and Kagenti→OpenShell field guide.
   </details>
 </div>
 
@@ -742,10 +755,11 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
     <div class="question">What do you need?</div>
     <p class="hint">Left edge = owner. Tap <strong>i</strong> for technical detail. Amber = not fully ready or platform-target.</p>
     <div class="cap-legend">
-      <span><span class="badge badge-owner-os">OpenShell</span> app sandbox</span>
-      <span><span class="badge badge-owner-plat">Platform</span> OpenShift AI</span>
-      <span><span class="badge badge-owner-addon">OpenShift AI</span> Agent Ops</span>
-      <span><span class="badge badge-maturity">Target / gap</span></span>
+      <span><span class="badge badge-owner-plat">Product</span> OpenShift AI</span>
+      <span><span class="badge badge-owner-os">OpenShell</span> sandbox capability</span>
+      <span><span class="badge badge-owner-plat">OpenShift</span> cluster / OSC</span>
+      <span><span class="badge badge-owner-addon">Safety</span> portfolio capabilities</span>
+      <span><span class="badge badge-maturity">Maturity</span></span>
     </div>
     <div class="checks" id="capChecks"></div>
     <div class="actions">
@@ -779,8 +793,12 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
  * OpenShell closes the gap with JWT-SVID grants / exchange; Red Hat contributes
  * OIDC + SPIFFE identity drivers. Subjects are SPIFFE-shaped today.
  *
- * Maturity: OpenShell is alpha / single-player-first; RHOAI Dev/Tech Preview
- * targeted 3.5/3.6 (H2 CY2026) per field guide.
+ * Product vs capability (Red Hat AI Agentic Strategy 2026 Appendix A):
+ *   Product = Red Hat OpenShift AI (Red Hat AI portfolio).
+ *   OpenShell = capability (Planned DP in OpenShift AI 3.5, targeting TP in 3.6; NVIDIA collab).
+ *   MCP Gateway, ogx, NeMo Guardrails, EvalHub, Garak, MLflow = capabilities (not products).
+ *   Kata / OSC = GA layered product on OpenShift (compose under OpenShift AI).
+ * Upstream OpenShell is also alpha / single-player-first.
  */
 
 const POLICY_BADGES = {
@@ -1094,35 +1112,35 @@ const capabilities = [
     owner: "platform",
     maturity: "platform-target",
     label: "MCP Gateway",
-    desc: "Red Hat AI Envoy-based tool gateway (OAuth2 exchange, Kuadrant AuthPolicy + Authorino). Authorization from token claims — not the prompt. Platform layer — not an OpenShell core subsystem. Compose when available in your OpenShift AI environment; do not assume it ships inside OpenShell alpha.",
+    desc: "OpenShift AI capability (Preview): Envoy-based tool gateway (OAuth2 exchange, Kuadrant AuthPolicy + Authorino). Authorization from token claims — not the prompt. Not a separate product; not an OpenShell subsystem.",
   },
   {
     id: "ogx",
     owner: "platform",
     maturity: "platform-target",
     label: "ogx / Responses",
-    desc: "Multi-protocol agentic API surface (Responses API, etc.) for Mode 2: sandbox execution via platform APIs. Distinct from OpenShell Mode 1 whole-agent runtime. Platform target — enable only when ogx is available in your cluster.",
+    desc: "OpenShift AI capability (Preview): Open Responses / ogx multi-protocol agentic API surface for Mode 2. Distinct from OpenShell Mode 1 whole-agent sandboxing. Not a separate product.",
   },
   {
     id: "mlflow",
     owner: "platform",
     maturity: "platform-target",
     label: "MLflow / OTEL",
-    desc: "OpenShift AI Agent Ops observability: prompts, tool calls, LLM requests. EvalHub for online eval. Complements — does not replace — OpenShell OCSF security audit. Requires Agent Ops / platform enablement.",
+    desc: "OpenShift AI capability (Preview): MLflow tracing with OpenTelemetry for agent observability. Complements — does not replace — OpenShell OCSF security audit. Not a separate product.",
   },
   {
     id: "guardrails",
     owner: "addon",
     maturity: "platform-target",
-    label: "RHOAI Guardrails / EvalHub",
-    desc: "OpenShift AI (TrustyAI) portfolio — not OpenShell: NeMo Guardrails / Guardrails Orchestrator (runtime; 3.5 TP includes MCP Gateway tool-call enforcement), EvalHub orchestration with Garak and other providers for adversarial/capability eval. Complements OpenShell OPA/OCSF; does not replace them. Requires OpenShift AI Agent Ops / TrustyAI enablement.",
+    label: "Safety portfolio",
+    desc: "OpenShift AI safety portfolio capabilities (TrustyAI) — not separate products and not OpenShell: NeMo Guardrails / Guardrails Orchestrator (runtime; Preview), EvalHub evaluation hub (orchestrates Garak and other providers), Garak adversarial scanning. Complements OpenShell OPA/OCSF; does not replace them.",
   },
 ];
 
 const OWNER_BADGE = {
-  openshell: { cls: "badge-owner-os", text: "OS" },
-  platform: { cls: "badge-owner-plat", text: "Plat" },
-  addon: { cls: "badge-owner-addon", text: "OpenShift AI" },
+  openshell: { cls: "badge-owner-os", text: "OpenShell" },
+  platform: { cls: "badge-owner-plat", text: "OpenShift" },
+  addon: { cls: "badge-owner-addon", text: "Safety" },
 };
 
 const rhHat = `<img class="rh-hat" src="redhat-hat.png" alt="">`;
@@ -1138,11 +1156,13 @@ function ownerBadge(owner) {
 
 const MATURITY_BADGES = {
   ga: { cls: "badge-ga", text: "GA" },
-  "platform-target": { cls: "badge-maturity", text: "Target" },
+  "platform-target": { cls: "badge-maturity", text: "Preview" },
   "closing-gap": { cls: "badge-maturity", text: "Gap" },
   alpha: { cls: "badge-maturity", text: "Alpha" },
+  "rhoai-dp": { cls: "badge-maturity", text: "DP 3.5 → TP 3.6" },
   announced: { cls: "badge-maturity", text: "Announced" },
   "not-in-matrix": { cls: "badge-maturity", text: "Custom img" },
+  capability: { cls: "badge-bundled", text: "Capability" },
 };
 
 function maturityBadge(key) {
@@ -1408,9 +1428,9 @@ function showResult() {
 
   const addonItems = [];
   if (caps.guardrails) {
-    addonItems.push("NeMo Guardrails — OpenShift AI / TrustyAI runtime rails (3.5 TP: MCP Gateway tool-call enforcement)");
-    addonItems.push("EvalHub — OpenShift AI evaluation hub (orchestrates Garak and other providers)");
-    addonItems.push("Garak — adversarial / vulnerability scanning via EvalHub providers");
+    addonItems.push("NeMo Guardrails — OpenShift AI safety capability (Preview; TrustyAI)");
+    addonItems.push("EvalHub — OpenShift AI evaluation capability (orchestrates Garak and other providers)");
+    addonItems.push("Garak — adversarial scanning capability via EvalHub providers");
   }
   if (a?.nemoclaw) addonItems.push(`NemoClaw / Pattern 2: <code>${a.command}</code>`);
 
@@ -1464,10 +1484,11 @@ function showResult() {
     : platformName;
 
   const modelTip = [
-    "Route inference through inference.local and/or platform gateways — not conflated with OpenShell policy.",
-    "Red Hat AI captures Completions, Responses/ogx, planned Anthropic Messages & Google Interactions for vLLM/llm-d without rewrites.",
+    "Inference capabilities inside OpenShift AI — not a separate product.",
+    "Route through inference.local and/or platform gateways; do not conflate with OpenShell policy.",
+    "Red Hat AI captures Completions, Responses/ogx (Preview capability), planned Anthropic Messages & Google Interactions for vLLM/llm-d without rewrites.",
     "Direct provider hosts still need explicit OpenShell network allows.",
-    caps.ogx ? "ogx selected: Mode 2 platform API path — distinct from Mode 1 whole-agent OpenShell." : "",
+    caps.ogx ? "ogx selected: Mode 2 API capability — distinct from OpenShell Mode 1 whole-agent sandboxing." : "",
   ].filter(Boolean).join(" ");
 
   const policyTip = (() => {
@@ -1482,35 +1503,37 @@ function showResult() {
   ].filter(Boolean).join(" ");
 
   const openshellTip = [
-    `Isolation: ${profile.name} (${profile.layers}) — ${profile.blurb}`,
-    "OpenShell is the application-level sandbox (Mode 1; composes with Mode 2).",
-    "Landlock, seccomp, netns, OPA L4/L7, inference.local, OCSF. Does not replace Kata, MCP Gateway, or MLflow.",
-    "Compose: Kata (L5) ∪ OpenShell (app policy) ∪ agent-sandbox (lifecycle). Network/inference hot-reload; Landlock/seccomp need recreate.",
-    "Maturity: alpha · RHOAI DP/TP target 3.5/3.6.",
+    "OpenShell is an OpenShift AI portfolio capability (NVIDIA collaboration) — not a separate product from OpenShift AI.",
+    "Red Hat AI Agentic Strategy 2026 Appendix A: Planned Developer Preview in OpenShift AI 3.5, targeting Tech Preview in 3.6. Upstream OpenShell is also alpha / single-player-first.",
+    `Isolation profile: ${profile.name} (${profile.layers}) — ${profile.blurb}`,
+    "Application-level sandbox (Mode 1; composes with Mode 2): Landlock, seccomp, netns, OPA L4/L7, inference.local, OCSF.",
+    "Compose: Kata (L5, GA layered on OpenShift) ∪ OpenShell (app policy) ∪ agent-sandbox (lifecycle).",
   ].join(" ");
 
   const platformTip = [
+    "OpenShift cluster foundation capabilities inside the OpenShift AI product — not a second product.",
     computeLine,
+    uc ? `Use-case context: ${platformName}.` : "",
     "NetworkPolicy + optional UDN + egress proxy (composable with OpenShell proxy).",
     "SPIFFE/SPIRE on OpenShift layers with sandbox JWT.",
-    "OSC node eligibility: RHCOS workers, virt/NFD kata label, nested virt caveats.",
-  ].join(" ");
+    "OSC / Kata: GA layered product. MCP Gateway and ogx: Preview capabilities per strategy appendix.",
+  ].filter(Boolean).join(" ");
 
   const safetyTip = addonItems.length
     ? addonItems.join(" · ")
-    : "None selected — OpenShell OCSF + OPA remain the security baseline. Enable OpenShift AI Agent Ops / TrustyAI (EvalHub, Garak, NeMo Guardrails, MLflow) when you need product safety and eval.";
+    : "None selected — OpenShell OCSF + OPA remain the security baseline. Enable OpenShift AI safety portfolio capabilities (EvalHub, Garak, NeMo Guardrails, MLflow) when you need product safety and eval.";
 
   const harnessMaturity = a ? maturityBadge(agentMaturity(a)) : "";
   const safetyTipFull = [
-    "Layer 05 is OpenShift AI Agent Ops / TrustyAI — not an OpenShell subsystem.",
-    "NeMo Guardrails (runtime rails; OpenShift AI 3.5 TP includes MCP Gateway tool-call enforcement), EvalHub (evaluation hub with Garak and other providers), and MLflow/OTEL tracing ship with OpenShift AI.",
-    "Compose with OpenShell: these complement Landlock/OPA/OCSF and do not replace them.",
+    "Safety portfolio capabilities of OpenShift AI (TrustyAI) — capabilities, not separate products.",
+    "NeMo Guardrails (Preview), EvalHub (evaluation hub; orchestrates Garak and other providers), Garak (adversarial scanning), MLflow/OTEL (Preview tracing).",
+    "These complement OpenShell Landlock/OPA/OCSF and do not replace them.",
     safetyTip,
   ].join(" ");
 
   const html = `
     <div class="result-header">
-      <div class="result-title">Your stack for: <span>${resultName}</span></div>
+      <div class="result-title">OpenShift AI stack for: <span>${resultName}</span></div>
       <div class="actions actions-sm">
         <button type="button" class="btn btn-secondary" id="shareBtn" onclick="copyShareLink()">Copy link</button>
         <button type="button" class="btn btn-secondary" onclick="restart()">Restart</button>
@@ -1523,15 +1546,21 @@ function showResult() {
     </div>
 
     <div class="result-pane active" id="pane-arch" role="tabpanel">
-      <p class="cake-hint">Architecture layers only · tap <strong>i</strong> for detail · Next steps are on the other tab</p>
-      <div class="cake" role="list" aria-label="Architecture layers">
+      <p class="cake-hint">Product = OpenShift AI · layers = capabilities (not products) · tap <strong>i</strong> for detail</p>
+      <div class="cake" role="list" aria-label="OpenShift AI capability layers">
+        <div class="cake-product-bar">
+          <span class="badge badge-owner-plat">Product</span>
+          <strong class="rh-brand">${rhHat}Red Hat OpenShift AI</strong>
+          <span class="muted">Red Hat AI portfolio · BYOA platform</span>
+        </div>
         <section class="cake-layer layer-model" role="listitem">
           <div class="cake-top">
             <span class="cake-index">01 · Model</span>
             <div class="cake-title-row">
-              <div class="cake-product">BYOM — frontier or self-hosted</div>
-              ${maturityBadge(caps.ogx ? "platform-target" : null)}
-              ${infoButton(modelTip, "About model and APIs")}
+              <div class="cake-product">Inference &amp; APIs</div>
+              ${maturityBadge("capability")}
+              ${caps.ogx ? maturityBadge("platform-target") : ""}
+              ${infoButton(modelTip, "About model and API capabilities")}
             </div>
           </div>
           <ul class="cake-chips">
@@ -1546,6 +1575,7 @@ function showResult() {
             <span class="cake-index">02 · Harness</span>
             <div class="cake-title-row">
               <div class="cake-product">${harnessName}</div>
+              <span class="badge badge-bundled">BYOA</span>
               ${harnessMaturity}
               ${a ? policyBadge(a.policy) : ""}
               ${a?.nemoclaw ? '<span class="badge badge-nc">NemoClaw</span>' : ""}
@@ -1561,12 +1591,13 @@ function showResult() {
 
         <section class="cake-layer layer-openshell" role="listitem">
           <div class="cake-top">
-            <span class="cake-index">03 · Runtime</span>
+            <span class="cake-index">03 · Sandbox</span>
             <div class="cake-title-row">
-              <div class="cake-product"><span style="color:var(--nv)">NVIDIA</span> OpenShell</div>
-              ${maturityBadge("alpha")}
+              <div class="cake-product">OpenShell</div>
+              ${maturityBadge("capability")}
+              ${maturityBadge("rhoai-dp")}
               <span class="badge badge-bundled">${profile.name}</span>
-              ${infoButton(openshellTip, "About OpenShell")}
+              ${infoButton(openshellTip, "About OpenShell capability")}
             </div>
           </div>
           <ul class="cake-chips">${openshellChips || chipOn("Baseline sandbox")}</ul>
@@ -1574,11 +1605,12 @@ function showResult() {
 
         <section class="cake-layer layer-platform" role="listitem">
           <div class="cake-top">
-            <span class="cake-index">04 · Platform</span>
+            <span class="cake-index">04 · Cluster</span>
             <div class="cake-title-row">
-              <div class="cake-product">${platformTitle}</div>
-              ${caps.kata ? maturityBadge("ga") : maturityBadge("platform-target")}
-              ${infoButton(platformTip, "About platform layer")}
+              <div class="cake-product">OpenShift foundation</div>
+              ${maturityBadge("capability")}
+              ${caps.kata ? maturityBadge("ga") : ""}
+              ${infoButton(platformTip, "About OpenShift foundation capabilities")}
             </div>
           </div>
           <ul class="cake-chips">${platformChips}</ul>
@@ -1586,12 +1618,12 @@ function showResult() {
 
         <section class="cake-layer layer-safety" role="listitem">
           <div class="cake-top">
-            <span class="cake-index">05 · OpenShift AI</span>
+            <span class="cake-index">05 · Safety</span>
             <div class="cake-title-row">
-              <div class="cake-product">Agent Ops — Guardrails · EvalHub · Garak</div>
-              <span class="badge badge-owner-addon">OpenShift AI</span>
+              <div class="cake-product">Safety portfolio</div>
+              ${maturityBadge("capability")}
               ${(caps.guardrails || caps.mlflow) ? maturityBadge("platform-target") : ""}
-              ${infoButton(safetyTipFull, "About OpenShift AI Agent Ops")}
+              ${infoButton(safetyTipFull, "About safety portfolio capabilities")}
             </div>
           </div>
           <ul class="cake-chips">${safetyChips}</ul>
@@ -1602,12 +1634,12 @@ function showResult() {
     <div class="result-pane" id="pane-next" role="tabpanel">
       <div class="next-panel">
         <h3>Next steps</h3>
-        <p class="next-lead">Commands, auth posture, and links — not part of the architecture cake.</p>
+        <p class="next-lead">Commands, auth posture, and links — not architecture layers and not product names.</p>
         <div class="stack-section-label" style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.5;margin-bottom:0.25rem">Commands</div>
         <div class="cmd-list">
           ${commands.map((c) => `<code class="cmd">${c}</code>`).join("")}
         </div>
-        <div class="callout callout-warn"><strong>Auth / maturity:</strong> ${authNote} OpenShell is alpha (single-player-first). Privileged SCC for sandbox netns is intentionally powerful.</div>
+        <div class="callout callout-warn"><strong>Auth / maturity:</strong> ${authNote} OpenShell upstream is alpha (single-player-first); OpenShift AI path is planned DP in 3.5 → TP in 3.6. Privileged SCC for sandbox netns is intentionally powerful.</div>
         <div class="actions actions-sm">
           <a class="btn btn-primary" href="../quickstart/">Open Quickstart</a>
           <a class="btn btn-secondary" href="../sandboxes/network-policies/">Network policies</a>
@@ -1617,7 +1649,7 @@ function showResult() {
       </div>
     </div>
 
-    <p class="footer-note">Kagenti → OpenShell · compose OpenShell + OpenShift AI layers — do not conflate with OSC or MCP Gateway. Vault <em>dev mode</em> / eval TLS flags are for learning only.</p>
+    <p class="footer-note">Product: Red Hat OpenShift AI. OpenShell, MCP Gateway, ogx, EvalHub, NeMo Guardrails, and Garak are <em>capabilities</em> in the Red Hat AI portfolio — not separate products. Kata/OSC is a GA layered OpenShift product that composes under OpenShift AI. Vault <em>dev mode</em> / eval TLS flags in this reference are for learning only.</p>
   `;
 
   document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));
