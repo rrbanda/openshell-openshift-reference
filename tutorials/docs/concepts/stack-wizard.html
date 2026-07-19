@@ -198,62 +198,59 @@ body::before {
 }
 .result-title span { color: #76b900; }
 
-/* Result two-panel layout */
+/* Result grid — horizontal-first layout */
 .result-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.4rem;
-  align-items: start;
+  gap: 0.6rem;
 }
-.result-sidebar { display: flex; flex-direction: column; gap: 0.6rem; }
-.sidebar-card { padding: 0.9rem 1.1rem !important; margin-bottom: 0 !important; }
-
-/* Stack — layered cake */
-.stack { display: flex; flex-direction: column; gap: 0; }
-
-.stack-section {
-  padding: 1.1rem 1.4rem;
-  border-left: 3px solid rgba(230,237,243,0.1);
-  border-radius: 10px;
+.result-card {
   backdrop-filter: blur(16px);
-  background: rgba(16, 20, 26, 0.7);
+  border-radius: 10px;
   border: 1px solid rgba(230,237,243,0.07);
-  position: relative;
-  animation: layerIn 0.4s ease forwards;
-  opacity: 0;
-  transform: translateY(10px);
-  margin-top: -6px;
+  padding: 0.85rem 1.1rem;
+  animation: layerIn 0.35s ease forwards;
+  opacity: 0; transform: translateY(8px);
 }
-.stack-section:first-child { margin-top: 0; }
-.stack-section:nth-child(1) { animation-delay: 0.08s; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-.stack-section:nth-child(2) { animation-delay: 0.16s; z-index: 4; box-shadow: 0 3px 12px rgba(0,0,0,0.25); }
-.stack-section:nth-child(3) { animation-delay: 0.24s; z-index: 3; box-shadow: 0 4px 18px rgba(0,0,0,0.3); }
-.stack-section:nth-child(4) { animation-delay: 0.32s; z-index: 2; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
-.stack-section:nth-child(5) { animation-delay: 0.40s; z-index: 1; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+.result-card:nth-child(1) { animation-delay: 0.05s; }
+.result-card:nth-child(2) { animation-delay: 0.10s; }
+.result-card:nth-child(3) { animation-delay: 0.15s; }
+.result-card:nth-child(4) { animation-delay: 0.20s; }
+.result-card:nth-child(5) { animation-delay: 0.25s; }
+.result-card:nth-child(6) { animation-delay: 0.30s; }
+.result-wide { grid-column: 1 / -1; }
 
 @keyframes layerIn { to { opacity: 1; transform: translateY(0); } }
 
-/* Color-coded layers */
-.stack-section.model-layer {
-  border-left: 3px solid rgba(230,237,243,0.12);
+/* Color-coded cards */
+.result-card.model-layer {
   background: linear-gradient(135deg, rgba(16,20,26,0.8) 0%, rgba(22,27,34,0.6) 100%);
-  padding: 0.8rem 1.2rem;
+  border-left: 3px solid rgba(230,237,243,0.12);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
-.stack-section.harness-layer {
-  border-left: 3px solid rgba(230,237,243,0.25);
+.result-card.harness-layer {
   background: linear-gradient(135deg, rgba(18,22,28,0.8) 0%, rgba(26,31,38,0.6) 100%);
+  border-left: 3px solid rgba(230,237,243,0.25);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.25);
 }
-.stack-section.runtime-layer {
-  border-left: 4px solid #76b900;
+.result-card.runtime-layer {
   background: linear-gradient(135deg, rgba(118,185,0,0.06) 0%, rgba(16,20,26,0.8) 100%);
-  box-shadow: 0 4px 20px rgba(118,185,0,0.08), 0 4px 18px rgba(0,0,0,0.3) !important;
+  border-left: 4px solid #76b900;
+  box-shadow: 0 4px 20px rgba(118,185,0,0.08), 0 4px 18px rgba(0,0,0,0.3);
 }
-.stack-section.platform-layer {
-  border-left: 4px solid #ee0000;
+.result-card.platform-layer {
   background: linear-gradient(135deg, rgba(238,0,0,0.04) 0%, rgba(16,20,26,0.8) 100%);
-  padding: 0.8rem 1.2rem;
-  box-shadow: 0 6px 24px rgba(238,0,0,0.06), 0 8px 30px rgba(0,0,0,0.35) !important;
+  border-left: 4px solid #ee0000;
+  box-shadow: 0 4px 20px rgba(238,0,0,0.06), 0 6px 24px rgba(0,0,0,0.3);
 }
+.result-card.inference-card {
+  background: rgba(22, 27, 34, 0.5);
+  border-color: rgba(238,0,0,0.15);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+}
+
+/* Runtime features — 2 columns */
+.stack-features { margin-top: 0.3rem; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 0.5rem; }
 
 /* Red Hat brand accent for product names */
 .rh-brand { color: #ee0000; }
@@ -329,6 +326,8 @@ body::before {
 
 @media (max-width: 768px) {
   .result-grid { grid-template-columns: 1fr; }
+  .result-wide { grid-column: 1; }
+  .stack-features { grid-template-columns: 1fr; }
   .usecase-grid { gap: 0.5rem; }
 }
 @media (max-width: 500px) {
@@ -566,51 +565,38 @@ function showResult() {
       </div>
     </div>
     <div class="result-grid">
-      <div class="stack">
-        <div class="stack-section model-layer">
-          <div class="stack-section-header">
-            <span class="stack-section-label">Model</span>
-            <span class="info-icon">i<span class="tooltip">The LLM that reasons and decides what to do next. It outputs text — tool calls, code, plans. By itself it cannot execute anything, remember between calls, or access external systems.</span></span>
-          </div>
-          <div class="stack-section-product">Your chosen LLM</div>
-        </div>
-        <div class="stack-section harness-layer">
-          <div class="stack-section-header">
-            <span class="stack-section-label">Harness</span>
-            <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning.</span></span>
-          </div>
-          <div class="stack-section-product">${harnessName}</div>
-          <div class="stack-section-desc">${harnessDesc}</div>
-        </div>
-        <div class="stack-section runtime-layer">
-          <div class="stack-section-header">
-            <span class="stack-section-label">Runtime — OpenShell</span>
-            <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. Network isolation, credential masking, filesystem restrictions, and audit logging — regardless of which harness you use.</span></span>
-          </div>
-          <div class="stack-section-product"><span style="color:#76b900">NVIDIA</span> OpenShell</div>
-          <ul class="stack-features">
-            ${features.map(f => `<li class="${f.enabled ? 'enabled' : 'disabled'}">${f.label}</li>`).join('')}
-          </ul>
-        </div>
-        <div class="stack-section platform-layer">
-          <div class="stack-section-header">
-            <span class="stack-section-label">Platform</span>
-            <span class="info-icon">i<span class="tooltip">Red Hat OpenShift AI: Kagenti/AgentRuntime, model serving (vLLM, KServe), MLflow tracing, EvalHub. Kubernetes agent-sandbox manages pod lifecycle and optional Kata isolation.</span></span>
-          </div>
-          <div class="stack-section-product">${platformName.includes('Red Hat') ? platformName.replace('Red Hat', rhHat + '<span class="rh-brand">Red Hat</span>') : platformName}${kataNote}</div>
-          <div class="stack-section-desc" style="font-size:0.78rem;opacity:0.5;margin-top:0.15rem">${setupPathShort}</div>
-        </div>
+      <div class="result-card model-layer">
+        <div class="stack-section-label">Model</div>
+        <div class="stack-section-product">Your chosen LLM</div>
       </div>
-      <div class="result-sidebar">
-        <div class="setup-path sidebar-card" style="border-color:rgba(238,0,0,0.15)">
-          <h4>Inference & Governance</h4>
-          <p>inference.local → flexible backend</p>
-          <div class="routes" style="margin-top:0.25rem">
-            <span>${rhHatSm}<span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
-            <span>Cloud (Vertex, Anthropic, OpenAI)</span>
-            <span>Local (Ollama, vLLM)</span>
-          </div>${governanceSection}
+      <div class="result-card harness-layer">
+        <div class="stack-section-label">Harness</div>
+        <div class="stack-section-product">${harnessName}</div>
+        <div class="stack-section-desc">${harnessDesc}</div>
+      </div>
+      <div class="result-card runtime-layer result-wide">
+        <div class="stack-section-header">
+          <span class="stack-section-label">Runtime — OpenShell</span>
+          <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. Network isolation, credential masking, filesystem restrictions, and audit logging — regardless of which harness you use.</span></span>
         </div>
+        <div class="stack-section-product"><span style="color:#76b900">NVIDIA</span> OpenShell</div>
+        <ul class="stack-features">
+          ${features.map(f => `<li class="${f.enabled ? 'enabled' : 'disabled'}">${f.label}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="result-card platform-layer">
+        <div class="stack-section-label">Platform</div>
+        <div class="stack-section-product">${platformName.includes('Red Hat') ? platformName.replace('Red Hat', rhHat + '<span class="rh-brand">Red Hat</span>') : platformName}${kataNote}</div>
+        <div class="stack-section-desc" style="font-size:0.75rem;opacity:0.5;margin-top:0.15rem">${setupPathShort}</div>
+      </div>
+      <div class="result-card inference-card">
+        <div class="stack-section-label">Inference & Governance</div>
+        <div style="font-size:0.85rem;opacity:0.7;margin:0.2rem 0">inference.local → flexible backend</div>
+        <div class="routes">
+          <span>${rhHatSm}<span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
+          <span>Cloud (Vertex, Anthropic, OpenAI)</span>
+          <span>Local (Ollama, vLLM)</span>
+        </div>${governanceSection}
       </div>
     </div>
   `;
