@@ -40,7 +40,7 @@ body::before {
 @keyframes shimmer { to { background-position: 200% center; } }
 .header p { opacity: 0.6; font-size: 0.95rem; line-height: 1.5; }
 
-.container { max-width: 1060px; width: 100%; position: relative; z-index: 1; }
+.container { max-width: 960px; width: 100%; position: relative; z-index: 1; }
 
 /* Journey tabs */
 .journey-tabs {
@@ -197,8 +197,8 @@ body::before {
 /* Result two-panel layout */
 .result-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 1.2rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem;
   align-items: start;
 }
 .result-sidebar { display: flex; flex-direction: column; gap: 0.8rem; }
@@ -292,8 +292,8 @@ body::before {
 .info-icon:hover .tooltip { display: block; }
 
 /* Inference routes */
-.routes span { display: block; padding: 0.1rem 0; font-size: 0.82rem; opacity: 0.7; }
-.routes span::before { content: "→ "; color: #76b900; }
+.routes span { display: block; padding: 0.15rem 0; font-size: 0.82rem; opacity: 0.7; white-space: nowrap; }
+.routes span::before { content: "→ "; color: rgba(238,0,0,0.5); }
 
 /* Setup path */
 .setup-path {
