@@ -30,13 +30,15 @@ body::before {
 
 .header { text-align: center; margin-bottom: 0.4rem; max-width: 560px; position: relative; z-index: 1; }
 
-.top-nav { text-align: right; margin-bottom: 0.3rem; }
+.tabs-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
+.tabs-row .top-nav { display: flex; gap: 0.3rem; }
 .top-nav a {
   font-size: 0.72rem; font-weight: 600; text-decoration: none; padding: 0.3rem 0.7rem;
   border-radius: 5px; border: 1px solid rgba(230,237,243,0.1);
-  color: rgba(230,237,243,0.5); transition: all 0.2s; margin-left: 0.3rem;
+  color: rgba(230,237,243,0.5); transition: all 0.2s;
 }
 .top-nav a:hover { color: #76b900; border-color: rgba(118,185,0,0.3); }
+@media (max-width: 500px) { .tabs-row { flex-direction: column; gap: 0.3rem; align-items: center; } }
 .header h1 {
   font-size: 1.7rem; font-weight: 800;
   background: linear-gradient(135deg, #76b900 0%, #a0e030 50%, #76b900 100%);
@@ -58,7 +60,6 @@ body::before {
   border-radius: 8px; padding: 0.25rem;
   border: 1px solid rgba(230,237,243,0.06);
 }
-.journey-tabs-wrap { text-align: center; margin-bottom: 0.3rem; }
 .jtab {
   padding: 0.45rem 1.2rem; border-radius: 6px; border: none;
   font-size: 0.82rem; font-weight: 600; cursor: pointer;
@@ -350,15 +351,14 @@ body::before {
 
 <div class="container">
 
-  <div class="top-nav">
-    <a href="../quickstart/">Quickstart</a>
-    <a href="agent-architecture/">Concepts</a>
-  </div>
-
-  <div class="journey-tabs-wrap">
+  <div class="tabs-row">
     <div class="journey-tabs">
       <button class="jtab active" id="jtab-agent" onclick="setJourney('agent')">By Agent</button>
       <button class="jtab" id="jtab-usecase" onclick="setJourney('usecase')">By Use Case</button>
+    </div>
+    <div class="top-nav">
+      <a href="../quickstart/">Quickstart</a>
+      <a href="agent-architecture/">Concepts</a>
     </div>
   </div>
 
