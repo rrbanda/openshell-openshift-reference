@@ -25,12 +25,16 @@ oc adm policy add-scc-to-user privileged -z openshell-sandbox -n openshell
 
     ```shell
     helm install openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-      --version 0.6.0 \
+      --version 0.0.80 \
       --namespace openshell \
       --set server.disableTls=true \
+      --set server.auth.allowUnauthenticatedUsers=true \
       --set podSecurityContext.fsGroup=null \
       --set securityContext.runAsUser=null
     ```
+
+    !!! warning "Evaluation only"
+        `disableTls` and `allowUnauthenticatedUsers` are for quick eval. For production, configure [mTLS](../production/expose-route.md) or [OIDC](../production/oidc-auth.md).
 
 === "Dev build (latest main)"
 
@@ -39,6 +43,7 @@ oc adm policy add-scc-to-user privileged -z openshell-sandbox -n openshell
       --version 0.0.0-dev \
       --namespace openshell \
       --set server.disableTls=true \
+      --set server.auth.allowUnauthenticatedUsers=true \
       --set podSecurityContext.fsGroup=null \
       --set securityContext.runAsUser=null
     ```

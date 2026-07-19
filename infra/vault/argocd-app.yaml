@@ -5,6 +5,8 @@ metadata:
   namespace: openshift-gitops
   labels:
     app.kubernetes.io/part-of: openshell-infra
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:

@@ -1,19 +1,25 @@
 # Install Agent Sandbox
 
-OpenShell uses the [Kubernetes Agent Sandbox](https://agent-sandbox.sigs.k8s.io) SIG project to provision sandbox pods. The controller and CRDs must be installed before the OpenShell Helm chart.
+OpenShell uses the Kubernetes Agent Sandbox controller to provision sandbox pods. The controller and CRDs must be installed before the OpenShell Helm chart.
 
 ## Install the Controller
 
-Apply the latest release manifest:
+=== "Option 1: Red Hat build of Agent Sandbox (OpenShift)"
 
-```shell
-oc apply -f https://github.com/kubernetes-sigs/agent-sandbox/releases/latest/download/manifest.yaml
-```
+    Follow the installation instructions at [Deploying Red Hat build of Agent Sandbox](https://docs.redhat.com/en/documentation/red_hat_build_of_agent_sandbox). The Red Hat build includes version-pinned OpenShift compatibility and creates CRDs (`Sandbox`, `SandboxClaim`, `SandboxTemplate`, `SandboxWarmPool`) in `v1beta1`.
 
-This creates:
+=== "Option 2: Upstream k8s-sigs operator"
+
+    Apply the latest upstream release manifest:
+
+    ```shell
+    oc apply -f https://github.com/kubernetes-sigs/agent-sandbox/releases/latest/download/manifest.yaml
+    ```
+
+Both options create:
 
 - The `agent-sandbox-system` namespace
-- The `sandboxes.agents.x-k8s.io` CRD
+- Agent Sandbox CRDs (`sandboxes.agents.x-k8s.io`)
 - The Agent Sandbox controller deployment
 
 ## Verify the Controller

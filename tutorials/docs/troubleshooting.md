@@ -211,6 +211,18 @@ oc -n openshell exec statefulset/openshell -- curl -s localhost:8081/healthz
 oc -n openshell exec statefulset/openshell -- curl -s localhost:8081/readyz
 ```
 
+## FIPS Clusters
+
+On FIPS-enabled OpenShift clusters, sandbox containers may fail TLS operations:
+
+```
+curl: (35) Insufficient randomness
+```
+
+This occurs because the base sandbox container image may not include FIPS-compatible OpenSSL libraries. Outbound HTTPS requests from within the sandbox (including policy-allowed endpoints) will fail with this error.
+
+**Workaround:** Use a FIPS-compatible base sandbox image, or disable FIPS mode on the worker nodes hosting sandbox pods. This is a known limitation tracked upstream.
+
 ---
 
 !!! info "Still Stuck?"

@@ -59,8 +59,11 @@ flowchart LR
     openshell provider create \
       --name ollama \
       --type openai-compatible \
-      --config BASE_URL=http://host.docker.internal:11434/v1
+      --config BASE_URL=http://ollama.ollama.svc.cluster.local:11434/v1
     ```
+
+    !!! note
+        `host.docker.internal` only works with Docker Desktop, not on OpenShift. Use a cluster-reachable Service URL (e.g., `ollama.<namespace>.svc.cluster.local`) or a NodePort instead.
 
 ## Enable Provider Pipeline and Set Route
 

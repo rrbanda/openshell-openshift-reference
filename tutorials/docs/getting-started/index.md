@@ -2,6 +2,9 @@
 
 Deploy OpenShell on OpenShift in under 10 minutes.
 
+!!! warning "Experimental"
+    The OpenShift install path should be treated as experimental and not used in production. APIs and behavior may change without notice. See the [upstream docs](https://docs.nvidia.com/openshell/latest/) for the latest status.
+
 <div class="grid cards" markdown>
 
 -   :material-check-circle:{ .lg .middle } __Prerequisites__

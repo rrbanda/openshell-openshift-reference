@@ -28,4 +28,12 @@ Create, manage, and secure AI agent sandboxes.
 
     [:octicons-arrow-right-24: Policies](network-policies.md)
 
+-   :material-swap-horizontal:{ .lg .middle } __Inference Routing__
+
+    ---
+
+    Route LLM calls through `inference.local` with credential masking.
+
+    [:octicons-arrow-right-24: Inference routing](inference-routing.md)
+
 </div>

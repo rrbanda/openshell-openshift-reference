@@ -26,10 +26,32 @@ oc -n openshell port-forward svc/openshell 8080:8080 &
 !!! tip "Keep the port-forward running"
     The `&` backgrounds the port-forward. It must stay alive for CLI commands to work. If it dies, restart it. For production without port-forward, see [Expose via Route](../production/expose-route.md).
 
+### Install the mTLS Client Bundle
+
+If TLS is enabled on the gateway (default), extract the mTLS client bundle so the CLI can establish a trusted connection:
+
+```shell
+mkdir -p ~/.config/openshell/gateways/openshift/mtls
+
+oc -n openshell get secret openshell-client-tls \
+  -o jsonpath='{.data.ca\.crt}'  | base64 -d > ~/.config/openshell/gateways/openshift/mtls/ca.crt
+
+oc -n openshell get secret openshell-client-tls \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d > ~/.config/openshell/gateways/openshift/mtls/tls.crt
+
+oc -n openshell get secret openshell-client-tls \
+  -o jsonpath='{.data.tls\.key}' | base64 -d > ~/.config/openshell/gateways/openshift/mtls/tls.key
+```
+
+!!! note
+    This mTLS bundle is for transport security (encryption), not user authentication. If you deployed with `disableTls=true` and `allowUnauthenticatedUsers=true` (eval mode), skip this step.
+
+### Register the Gateway
+
 In the same or another terminal, register the gateway:
 
 ```shell
-openshell gateway add http://127.0.0.1:8080 --local --name openshift
+openshell gateway add https://127.0.0.1:8080 --local --name openshift
 ```
 
 Check connectivity:

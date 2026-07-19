@@ -63,7 +63,7 @@ flowchart LR
 
 <div class="grid cards" markdown>
 
--   :material-clock-fast:{ .lg .middle } __Set up in 5 minutes__
+-   :material-clock-fast:{ .lg .middle } __Set up in 10 steps__
 
     ---
 
@@ -108,12 +108,15 @@ flowchart LR
 
 ---
 
+!!! tip "Red Hat OpenShift AI"
+    For model serving (vLLM + llm-d), MLflow tracing, EvalHub, and agent lifecycle management, see [Red Hat OpenShift AI](https://www.redhat.com/en/products/ai/openshift-ai). This tutorial covers OpenShell deployment on base OpenShift — RHOAI adds the broader AI platform capabilities on top.
+
 ## Tested On
 
 | Component | Version |
 |---|---|
 | OpenShift | 4.20 (Kubernetes 1.33) |
-| OpenShell Helm chart | `0.0.0-dev` |
+| OpenShell Helm chart | `0.0.80` |
 | Agent Sandbox | v0.4.6 |
 | External Secrets Operator | v1 |
 | HashiCorp Vault | 1.19 (dev mode) |

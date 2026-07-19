@@ -5,6 +5,9 @@ This page describes an alternative deployment path using ArgoCD (OpenShift GitOp
 !!! info "Two Paths"
     The [Getting Started](../getting-started/prerequisites.md) tutorial uses manual `helm install`. This page describes the GitOps alternative. Choose one — they are independent.
 
+!!! warning "Vault Dev Mode"
+    This reference uses Vault in **dev mode** (in-memory storage, root token) for simplicity. Dev mode is suitable for evaluation and learning — **not for production**. For production Vault, see the [HashiCorp production deployment guide](https://developer.hashicorp.com/vault/tutorials/getting-started/getting-started-deploy).
+
 ## Prerequisites
 
 In addition to the [standard prerequisites](../getting-started/prerequisites.md):

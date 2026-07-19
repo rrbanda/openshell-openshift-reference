@@ -33,7 +33,7 @@ oc adm policy add-scc-to-user privileged -z openshell-sandbox -n openshell
 
 # Deploy
 helm install openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version 0.0.0-dev \
+  --version 0.0.80 \
   --namespace openshell \
   --set server.disableTls=true \
   --set podSecurityContext.fsGroup=null \
@@ -124,7 +124,7 @@ Published to GitHub Pages automatically on push to `main`.
 | Component | Version |
 |---|---|
 | OpenShift | 4.20.22 (Kubernetes 1.33) |
-| Helm chart | 0.0.0-dev |
+| Helm chart | 0.0.80 |
 | Agent Sandbox | v0.4.6 |
 | External Secrets Operator | v1 API |
 | Vault | 1.19 (dev mode) |

@@ -6,7 +6,7 @@ declared in Git and reconciled by ArgoCD — including Vault itself.
 ## Architecture
 
 ```
-deploy/gitops/
+openshell-openshift-reference/
 ├── app-of-apps.yaml                # Single entry point — deploys everything
 ├── argocd-app.yaml                 # OpenShell Application (Helm + kustomize)
 ├── infra/
@@ -60,7 +60,7 @@ One command deploys the entire stack — Vault, configuration, and OpenShell:
 oc apply -f https://github.com/kubernetes-sigs/agent-sandbox/releases/latest/download/manifest.yaml
 
 # 2. Deploy the App-of-Apps (ArgoCD reconciles everything else)
-oc apply -f deploy/gitops/app-of-apps.yaml
+oc apply -f app-of-apps.yaml
 ```
 
 ArgoCD then automatically:

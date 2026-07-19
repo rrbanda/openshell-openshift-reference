@@ -21,7 +21,7 @@ spec:
     # Source 2: Helm chart from OCI registry
     - repoURL: ghcr.io/nvidia/openshell
       chart: helm-chart
-      targetRevision: 0.0.0-dev
+      targetRevision: 0.0.80
       helm:
         releaseName: openshell
         valueFiles:
