@@ -201,7 +201,8 @@ body::before {
   gap: 1.4rem;
   align-items: start;
 }
-.result-sidebar { display: flex; flex-direction: column; gap: 0.8rem; }
+.result-sidebar { display: flex; flex-direction: column; gap: 0.6rem; }
+.sidebar-card { padding: 0.9rem 1.1rem !important; margin-bottom: 0 !important; }
 
 /* Stack — layered cake */
 .stack { display: flex; flex-direction: column; gap: 0; }
@@ -514,12 +515,6 @@ function showResult() {
   const chkKata = document.getElementById('chk-kata').checked;
   const chkMulti = document.getElementById('chk-multi').checked;
 
-  const nemoclawCard = (a && a.nemoclaw) ? `
-        <div class="setup-path" style="border-color:rgba(118,185,0,0.25)">
-          <h4>NemoClaw (optional)</h4>
-          <p>One-command onboarding via <code>nemoclaw onboard</code>. Bundles OpenShell + inference routing + hardened blueprints.</p>
-        </div>` : '';
-
   const features = [
     { label: 'Network policy (per-binary, per-host, L7)', enabled: chkNetwork },
     { label: 'Credential masking (inference.local)', enabled: chkCreds },
@@ -529,17 +524,15 @@ function showResult() {
     { label: 'Multi-user (OIDC + RBAC + workspaces)', enabled: chkMulti }
   ];
 
-  const mcpLayer = chkMcp ? `
-        <div class="setup-path" style="border-color:rgba(118,185,0,0.2)">
-          <h4>Tool Governance — MCP Gateway</h4>
-          <p>OAuth2 token exchange, identity-based tool filtering, credential management</p>
-        </div>` : '';
-
-  const guardrailsLayer = chkGuardrails ? `
-        <div class="setup-path" style="border-color:rgba(118,185,0,0.2)">
-          <h4>Safety Guardrails</h4>
-          <p>NeMo Guardrails + Garak — jailbreak detection, prompt injection defense, content moderation</p>
-        </div>` : '';
+  const governanceItems = [];
+  if (a && a.nemoclaw) governanceItems.push('NemoClaw onboarding (nemoclaw onboard)');
+  if (chkMcp) governanceItems.push('MCP Gateway — OAuth2 token exchange, identity-based tool filtering');
+  if (chkGuardrails) governanceItems.push('NeMo Guardrails + Garak — prompt injection defense, content moderation');
+  const governanceSection = governanceItems.length ? `
+          <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(230,237,243,0.06)">
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#76b900;margin-bottom:0.25rem;font-weight:600">Governance</div>
+            ${governanceItems.map(g => `<div style="font-size:0.78rem;opacity:0.65;padding:0.1rem 0">● ${g}</div>`).join('')}
+          </div>` : '';
 
   const kataNote = chkKata ? ' + Kata Containers (hardware-isolated VM)' : '';
 
@@ -596,16 +589,16 @@ function showResult() {
         </div>
       </div>
       <div class="result-sidebar">
-        <div class="setup-path" style="border-color:rgba(238,0,0,0.15)">
-          <h4>Inference Routing</h4>
+        <div class="setup-path sidebar-card" style="border-color:rgba(238,0,0,0.15)">
+          <h4>Inference & Governance</h4>
           <p>inference.local → flexible backend</p>
-          <div class="routes" style="margin-top:0.3rem">
+          <div class="routes" style="margin-top:0.25rem">
             <span>${rhHatSm}<span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
             <span>Cloud (Vertex, Anthropic, OpenAI)</span>
             <span>Local (Ollama, vLLM)</span>
-          </div>
-        </div>${nemoclawCard}${mcpLayer}${guardrailsLayer}
-        <div class="setup-path">${setupPath}</div>
+          </div>${governanceSection}
+        </div>
+        <div class="setup-path sidebar-card">${setupPath}</div>
         <div class="actions">
           <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
           <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Concepts</a>
