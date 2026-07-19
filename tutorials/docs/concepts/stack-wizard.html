@@ -12,7 +12,7 @@ body {
   background: #0a0e14;
   color: rgba(230, 237, 243, 0.9);
   min-height: 100vh;
-  padding: 2rem 1rem;
+  padding: 1.2rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,7 +28,7 @@ body::before {
   z-index: 0;
 }
 
-.header { text-align: center; margin-bottom: 1.5rem; max-width: 560px; position: relative; z-index: 1; }
+.header { text-align: center; margin-bottom: 0.8rem; max-width: 560px; position: relative; z-index: 1; }
 .header h1 {
   font-size: 1.7rem; font-weight: 800;
   background: linear-gradient(135deg, #76b900 0%, #a0e030 50%, #76b900 100%);
@@ -43,7 +43,7 @@ body::before {
 .container { max-width: 700px; width: 100%; position: relative; z-index: 1; }
 
 /* Progress dots */
-.progress-dots { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+.progress-dots { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.8rem; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(230,237,243,0.15); transition: all 0.3s; }
 .dot.active { background: #76b900; box-shadow: 0 0 8px rgba(118,185,0,0.5); transform: scale(1.3); }
 .dot.done { background: rgba(118,185,0,0.4); }
@@ -145,7 +145,7 @@ body::before {
 }
 
 .stack-section {
-  padding: 0.9rem 1.1rem;
+  padding: 0.55rem 1rem;
   border-bottom: 1px solid rgba(230,237,243,0.05);
   animation: layerIn 0.4s ease forwards;
   opacity: 0;
@@ -172,13 +172,13 @@ body::before {
   border-left: 2px solid rgba(118,185,0,0.25);
 }
 
-.stack-section-header { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; }
-.stack-section-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; }
-.stack-section-product { font-weight: 700; font-size: 0.92rem; }
-.stack-section-desc { font-size: 0.73rem; opacity: 0.6; line-height: 1.4; margin-top: 0.15rem; }
+.stack-section-header { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem; }
+.stack-section-label { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; }
+.stack-section-product { font-weight: 700; font-size: 0.85rem; }
+.stack-section-desc { font-size: 0.68rem; opacity: 0.6; line-height: 1.3; margin-top: 0.1rem; }
 
-.stack-features { margin-top: 0.4rem; padding: 0; }
-.stack-features li { font-size: 0.72rem; opacity: 0.8; padding: 0.12rem 0; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
+.stack-features { margin-top: 0.25rem; padding: 0; }
+.stack-features li { font-size: 0.67rem; opacity: 0.8; padding: 0.08rem 0; list-style: none; display: flex; align-items: center; gap: 0.35rem; }
 .stack-features li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .stack-features li.enabled::before { background: #76b900; box-shadow: 0 0 4px rgba(118,185,0,0.5); }
 .stack-features li.disabled::before { background: rgba(230,237,243,0.15); }
@@ -207,19 +207,19 @@ body::before {
 .info-icon:hover .tooltip { display: block; }
 
 /* Inference routes */
-.routes span { display: block; padding: 0.12rem 0; font-size: 0.72rem; opacity: 0.7; }
+.routes span { display: block; padding: 0.06rem 0; font-size: 0.67rem; opacity: 0.7; }
 .routes span::before { content: "→ "; color: #76b900; }
 
 /* Setup path */
 .setup-path {
   backdrop-filter: blur(10px);
   background: rgba(22, 27, 34, 0.5);
-  border-radius: 8px; padding: 0.75rem 1rem;
+  border-radius: 8px; padding: 0.5rem 0.9rem;
   border: 1px solid rgba(118,185,0,0.12);
-  margin-bottom: 1rem;
+  margin-bottom: 0.7rem;
 }
-.setup-path h4 { font-size: 0.7rem; color: #76b900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem; }
-.setup-path p { font-size: 0.78rem; opacity: 0.75; line-height: 1.4; }
+.setup-path h4 { font-size: 0.65rem; color: #76b900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.15rem; }
+.setup-path p { font-size: 0.72rem; opacity: 0.75; line-height: 1.3; }
 .setup-path code { background: rgba(118,185,0,0.08); padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; }
 
 /* Buttons */
