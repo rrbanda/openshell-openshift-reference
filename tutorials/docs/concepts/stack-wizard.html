@@ -147,6 +147,7 @@ body::before {
 .agent-card:nth-child(11) { animation-delay: 0.22s; }
 .agent-card:nth-child(12) { animation-delay: 0.24s; }
 .agent-card:nth-child(13) { animation-delay: 0.26s; }
+.agent-card:nth-child(14) { animation-delay: 0.28s; }
 
 @keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -381,6 +382,7 @@ body::before {
       <div class="agent-card" onclick="selectAgent('langgraph')"><h4>LangGraph</h4><p>LangChain</p></div>
       <div class="agent-card" onclick="selectAgent('crewai')"><h4>CrewAI</h4><p>Multi-agent</p></div>
       <div class="agent-card" onclick="selectAgent('strands')"><h4>Strands</h4><p>AWS (open-source)</p></div>
+      <div class="agent-card" onclick="selectAgent('watsonx')"><h4>watsonx Orchestrate</h4><p>IBM</p></div>
       <div class="agent-card nc-supported" onclick="selectAgent('openclaw')"><h4>OpenClaw</h4><p>Assistant</p><span class="badge-nc">NemoClaw</span></div>
       <div class="agent-card nc-supported" onclick="selectAgent('hermes')"><h4>Hermes</h4><p>Nous Research</p><span class="badge-nc">NemoClaw</span></div>
       <div class="agent-card nc-supported" onclick="selectAgent('deepagents')"><h4>Deep Agents</h4><p>LangChain</p><span class="badge-nc">NemoClaw</span></div>
@@ -439,6 +441,7 @@ const agents = {
   langgraph: { name: 'LangGraph', by: 'LangChain', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Graph-based agent orchestration with durable execution, checkpointing, and state management' },
   crewai: { name: 'CrewAI', by: 'CrewAI', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Role-based multi-agent framework with task delegation, tool sharing, and parallel execution' },
   strands: { name: 'Strands', by: 'AWS (open-source)', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'AWS open-source agent SDK with model-driven orchestration, tools, and sessions' },
+  watsonx: { name: 'watsonx Orchestrate', by: 'IBM', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Enterprise agentic control plane with workflow builder, ADK, AgentOps, agent catalog, and MCP tool governance. Deploys on IBM Cloud, AWS, or Red Hat OpenShift AI.' },
   openclaw: { name: 'OpenClaw', by: 'Community', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Always-on personal assistant with multi-channel messaging, persistent memory, and heartbeat' },
   hermes: { name: 'Hermes', by: 'Nous Research', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Self-improving agent with learning loop, persistent skills, and cross-session memory' },
   deepagents: { name: 'LangChain Deep Agents Code', by: 'LangChain', type: 'coding', hasOwnSandbox: false, nemoclaw: true, desc: 'Terminal coding agent (dcode) with persistent memory, custom skills, remote sandboxes, and human-in-the-loop controls' },
@@ -537,7 +540,10 @@ function showResult() {
   const governanceItems = [];
   if (a && a.nemoclaw) governanceItems.push('NemoClaw onboarding (nemoclaw onboard)');
   if (chkMcp) governanceItems.push('MCP Gateway — OAuth2 token exchange, identity-based tool filtering');
-  if (chkGuardrails) governanceItems.push('NeMo Guardrails + Garak — prompt injection defense, content moderation');
+  if (chkGuardrails) {
+    governanceItems.push('NeMo Guardrails + Garak — prompt injection defense, content moderation');
+    governanceItems.push('watsonx.governance — agentic monitoring, guardrail manager, compliance (200+ frameworks)');
+  }
   const governanceSection = governanceItems.length ? `
           <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(230,237,243,0.06)">
             <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#76b900;margin-bottom:0.25rem;font-weight:600">Governance</div>
