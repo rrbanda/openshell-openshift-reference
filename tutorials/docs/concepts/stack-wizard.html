@@ -42,6 +42,59 @@ body::before {
 
 .container { max-width: 640px; width: 100%; position: relative; z-index: 1; }
 
+/* Journey tabs */
+.journey-tabs {
+  display: flex; justify-content: center; gap: 0.25rem; margin-bottom: 1rem;
+  backdrop-filter: blur(10px);
+  background: rgba(22, 27, 34, 0.5);
+  border-radius: 8px; padding: 0.25rem;
+  border: 1px solid rgba(230,237,243,0.06);
+  display: inline-flex;
+}
+.journey-tabs-wrap { text-align: center; margin-bottom: 0.5rem; }
+.jtab {
+  padding: 0.45rem 1.2rem; border-radius: 6px; border: none;
+  font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  background: transparent; color: rgba(230,237,243,0.5);
+  transition: all 0.2s;
+}
+.jtab:hover { color: rgba(230,237,243,0.8); }
+.jtab.active { background: rgba(118,185,0,0.15); color: #76b900; }
+
+/* Use case grid */
+.usecase-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+.usecase-card {
+  backdrop-filter: blur(12px);
+  background: rgba(22, 27, 34, 0.6);
+  border: 1px solid rgba(230, 237, 243, 0.08);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: cardIn 0.3s ease forwards;
+  opacity: 0;
+}
+.usecase-card:nth-child(1) { animation-delay: 0.02s; }
+.usecase-card:nth-child(2) { animation-delay: 0.06s; }
+.usecase-card:nth-child(3) { animation-delay: 0.10s; }
+.usecase-card:nth-child(4) { animation-delay: 0.14s; }
+.usecase-card:nth-child(5) { animation-delay: 0.18s; }
+.usecase-card:nth-child(6) { animation-delay: 0.22s; }
+.usecase-card:nth-child(7) { animation-delay: 0.26s; }
+.usecase-card:hover {
+  border-color: rgba(118, 185, 0, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(118, 185, 0, 0.1), 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+.usecase-card:active { transform: scale(0.98); }
+.usecase-card h4 { font-size: 0.95rem; color: #e6edf3; margin-bottom: 0.15rem; font-weight: 600; }
+.usecase-card p { font-size: 0.8rem; opacity: 0.55; line-height: 1.4; }
+.usecase-card .uc-profile {
+  display: inline-block; margin-top: 0.4rem;
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  color: #76b900; opacity: 0.7;
+}
+
 /* Progress dots */
 .progress-dots { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(230,237,243,0.15); transition: all 0.3s; }
@@ -271,13 +324,20 @@ body::before {
 
 <div class="container">
 
+  <div class="journey-tabs-wrap">
+    <div class="journey-tabs">
+      <button class="jtab active" id="jtab-agent" onclick="setJourney('agent')">By Agent</button>
+      <button class="jtab" id="jtab-usecase" onclick="setJourney('usecase')">By Use Case</button>
+    </div>
+  </div>
+
   <div class="progress-dots" id="progress">
     <div class="dot active" id="dot1"></div>
     <div class="dot" id="dot2"></div>
     <div class="dot" id="dot3"></div>
   </div>
 
-  <!-- STEP 1 -->
+  <!-- STEP 1: By Agent -->
   <div class="step active" id="step1">
     <div class="step-label">Step 1 — Choose your agent</div>
     <div class="question">I'm using (or plan to use)...</div>
@@ -295,6 +355,21 @@ body::before {
       <div class="agent-card nc-supported" onclick="selectAgent('hermes')"><h4>Hermes</h4><p>Nous Research</p><span class="badge-nc">NemoClaw</span></div>
       <div class="agent-card nc-supported" onclick="selectAgent('deepagents')"><h4>Deep Agents</h4><p>LangChain</p><span class="badge-nc">NemoClaw</span></div>
       <div class="agent-card" onclick="selectAgent('custom')"><h4>Custom / Other</h4><p>My own agent</p></div>
+    </div>
+  </div>
+
+  <!-- STEP 1: By Use Case -->
+  <div class="step" id="step1uc">
+    <div class="step-label">Step 1 — Choose your use case</div>
+    <div class="question">What are you building?</div>
+    <div class="usecase-grid">
+      <div class="usecase-card" onclick="selectUseCase('chatbot')"><h4>Trusted Chatbot</h4><p>Read-only chatbot using RAG over public data. No access to private systems.</p><span class="uc-profile">Permissive profile</span></div>
+      <div class="usecase-card" onclick="selectUseCase('scheduled')"><h4>Scheduled Data Agent</h4><p>Nightly summaries, Jira reports, or batch jobs writing to hardcoded locations.</p><span class="uc-profile">Permissive profile</span></div>
+      <div class="usecase-card" onclick="selectUseCase('private_chatbot')"><h4>Private-Data Chatbot</h4><p>Access to private data, MCP servers, Agent Skills, and PII. Needs kernel isolation.</p><span class="uc-profile">OpenShell + Kata</span></div>
+      <div class="usecase-card" onclick="selectUseCase('email_agent')"><h4>Email / Messaging Agent</h4><p>Reads untrusted input (email, chat) and writes output. Untrusted context in, untrusted export out.</p><span class="uc-profile">OpenShell + Kata</span></div>
+      <div class="usecase-card" onclick="selectUseCase('coding_env')"><h4>Coding Environment</h4><p>IDE or Jupyter notebook deployed in-cluster for interactive development.</p><span class="uc-profile">Dev Spaces / Workbench</span></div>
+      <div class="usecase-card" onclick="selectUseCase('coding_laptop')"><h4>Coding Agent on Laptop</h4><p>Claude Code, dcode, or similar on your workstation. Sandbox protects the host machine.</p><span class="uc-profile">OpenShell + Podman</span></div>
+      <div class="usecase-card" onclick="selectUseCase('coding_cluster')"><h4>Coding Agent in Cluster</h4><p>Coding assistant deployed on OpenShift — for policy, compute, or always-on access.</p><span class="uc-profile">OpenShell + OpenShift</span></div>
     </div>
   </div>
 
@@ -343,7 +418,19 @@ const agents = {
   custom: { name: 'Custom Agent', by: 'You', type: 'any', hasOwnSandbox: false, nemoclaw: false, desc: 'Your own agent packaged as a container image — any language, any framework' }
 };
 
+const usecases = {
+  chatbot: { name: 'Trusted Chatbot', profile: 'Permissive', platform: 'OpenShift (normal containers)', desc: 'Read-only chatbot using RAG over public data, guardrails on input and output', harness: 'Your agent framework', defaults: { network: true, creds: false, audit: true, fs: false, identity: false, mcp: false, guardrails: true, kata: false, multi: false } },
+  scheduled: { name: 'Scheduled Data Agent', profile: 'Permissive', platform: 'OpenShift (Kubernetes Job)', desc: 'Nightly batch jobs — Jira summaries, reports, data pipelines writing to controlled destinations', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: false, identity: true, mcp: false, guardrails: false, kata: false, multi: false } },
+  private_chatbot: { name: 'Private-Data Chatbot', profile: 'OpenShell + Kata', platform: 'OpenShift + Kata Containers', desc: 'Chatbot with access to private data, MCP servers, and Agent Skills — needs privilege scoping and kernel isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: true, kata: true, multi: false } },
+  email_agent: { name: 'Email / Messaging Agent', profile: 'OpenShell + Kata', platform: 'OpenShift + Kata Containers', desc: 'Reads untrusted input (email, chat), writes to untrusted destinations — needs full isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: false, guardrails: true, kata: true, multi: false } },
+  coding_env: { name: 'Coding Environment', profile: 'Dev Spaces / Workbench', platform: 'OpenShift (Dev Spaces or RHOAI Workbench)', desc: 'IDE or Jupyter notebook deployed in-cluster for interactive development', harness: 'Dev Spaces / RHOAI Workbench', defaults: { network: true, creds: false, audit: true, fs: true, identity: false, mcp: false, guardrails: false, kata: false, multi: false } },
+  coding_laptop: { name: 'Coding Agent on Laptop', profile: 'OpenShell, Typical Configuration', platform: 'Podman (local workstation)', desc: 'Coding assistant on your workstation — OpenShell sandbox protects the host from the agent', harness: 'Claude Code, dcode, OpenCode, or similar', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: false, kata: false, multi: false } },
+  coding_cluster: { name: 'Coding Agent in Cluster', profile: 'OpenShell, Typical Configuration', platform: 'OpenShift', desc: 'Coding assistant on OpenShift — for policy enforcement, shared compute, or always-on access', harness: 'Claude Code, dcode, OpenCode, or similar', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: false, kata: false, multi: true } }
+};
+
+let currentJourney = 'agent';
 let selectedAgent = null;
+let selectedUseCase = null;
 
 function updateDots(step) {
   document.querySelectorAll('.dot').forEach((d, i) => {
@@ -351,9 +438,42 @@ function updateDots(step) {
   });
 }
 
+function setJourney(type) {
+  currentJourney = type;
+  selectedAgent = null;
+  selectedUseCase = null;
+  document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
+  document.getElementById('result').innerHTML = '';
+  document.getElementById('jtab-agent').classList.toggle('active', type === 'agent');
+  document.getElementById('jtab-usecase').classList.toggle('active', type === 'usecase');
+  document.getElementById(type === 'agent' ? 'step1' : 'step1uc').classList.add('active');
+  updateDots(0);
+}
+
 function selectAgent(id) {
   selectedAgent = id;
+  selectedUseCase = null;
   document.getElementById('selectedLabel').querySelector('span').textContent = agents[id].name;
+  document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
+  document.getElementById('step2').classList.add('active');
+  updateDots(1);
+}
+
+function selectUseCase(id) {
+  selectedUseCase = id;
+  selectedAgent = null;
+  const uc = usecases[id];
+  document.getElementById('selectedLabel').querySelector('span').textContent = uc.name;
+  const d = uc.defaults;
+  document.getElementById('chk-network').checked = d.network;
+  document.getElementById('chk-creds').checked = d.creds;
+  document.getElementById('chk-audit').checked = d.audit;
+  document.getElementById('chk-fs').checked = d.fs;
+  document.getElementById('chk-identity').checked = d.identity;
+  document.getElementById('chk-mcp').checked = d.mcp;
+  document.getElementById('chk-guardrails').checked = d.guardrails;
+  document.getElementById('chk-kata').checked = d.kata;
+  document.getElementById('chk-multi').checked = d.multi;
   document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
   document.getElementById('step2').classList.add('active');
   updateDots(1);
@@ -361,12 +481,14 @@ function selectAgent(id) {
 
 function goBack() {
   document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
-  document.getElementById('step1').classList.add('active');
+  document.getElementById(currentJourney === 'agent' ? 'step1' : 'step1uc').classList.add('active');
   updateDots(0);
 }
 
 function showResult() {
-  const a = agents[selectedAgent];
+  const isUC = currentJourney === 'usecase';
+  const a = isUC ? null : agents[selectedAgent];
+  const uc = isUC ? usecases[selectedUseCase] : null;
   const chkNetwork = document.getElementById('chk-network').checked;
   const chkCreds = document.getElementById('chk-creds').checked;
   const chkAudit = document.getElementById('chk-audit').checked;
@@ -377,7 +499,7 @@ function showResult() {
   const chkKata = document.getElementById('chk-kata').checked;
   const chkMulti = document.getElementById('chk-multi').checked;
 
-  const nemoclawLayer = a.nemoclaw ? `
+  const nemoclawLayer = (a && a.nemoclaw) ? `
       <div class="stack-section nemoclaw-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">NemoClaw (optional — one-command setup)</span>
@@ -418,12 +540,22 @@ function showResult() {
 
   const kataNote = chkKata ? ' + Kata Containers (hardware-isolated VM)' : '';
 
-  const setupPath = a.nemoclaw
-    ? `<h4>Setup path</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">Or deploy OpenShell directly via Helm if you prefer manual control.</p>`
-    : `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
+  let setupPath;
+  if (isUC) {
+    setupPath = `<h4>Setup path</h4><p>Deploy using the <strong>${uc.profile}</strong> isolation profile on ${uc.platform}.</p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">${uc.desc}</p>`;
+  } else if (a.nemoclaw) {
+    setupPath = `<h4>Setup path</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">Or deploy OpenShell directly via Helm if you prefer manual control.</p>`;
+  } else {
+    setupPath = `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
+  }
+
+  const resultName = isUC ? uc.name : a.name;
+  const harnessName = isUC ? uc.harness : a.name;
+  const harnessDesc = isUC ? uc.desc : a.desc;
+  const platformName = isUC ? uc.platform : 'OpenShift';
 
   const html = `
-    <div class="result-title">Your stack for: <span>${a.name}</span></div>
+    <div class="result-title">Your stack for: <span>${resultName}</span></div>
     <div class="stack">
       <div class="stack-section model-layer">
         <div class="stack-section-header">
@@ -438,8 +570,8 @@ function showResult() {
           <span class="stack-section-label">Harness (makes the model useful)</span>
           <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning. It turns a text-generator into a working agent that can complete real tasks.</span></span>
         </div>
-        <div class="stack-section-product">${a.name}</div>
-        <div class="stack-section-desc">${a.desc}</div>
+        <div class="stack-section-product">${harnessName}</div>
+        <div class="stack-section-desc">${harnessDesc}</div>
       </div>${nemoclawLayer}
       <div class="stack-section runtime-layer">
         <div class="stack-section-header">
@@ -468,7 +600,7 @@ function showResult() {
           <span class="stack-section-label">Platform</span>
           <span class="info-icon">i<span class="tooltip">OpenShift + Kubernetes agent-sandbox. Compute, networking, storage, GPU scheduling. The agent-sandbox controller manages pod lifecycle via CRDs.</span></span>
         </div>
-        <div class="stack-section-product">OpenShift${kataNote}</div>
+        <div class="stack-section-product">${platformName}${kataNote}</div>
       </div>
     </div>
     <div class="setup-path">${setupPath}</div>
@@ -489,8 +621,10 @@ function showResult() {
 function restart() {
   document.getElementById('result').classList.remove('active');
   document.getElementById('result').innerHTML = '';
+  selectedAgent = null;
+  selectedUseCase = null;
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  document.getElementById('step1').classList.add('active');
+  document.getElementById(currentJourney === 'agent' ? 'step1' : 'step1uc').classList.add('active');
   updateDots(0);
 }
 </script>
