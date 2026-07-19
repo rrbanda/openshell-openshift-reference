@@ -309,8 +309,8 @@ body::before {
 .info-icon:hover .tooltip { display: block; }
 
 /* Inference routes */
-.routes span { display: block; padding: 0.15rem 0; font-size: 0.82rem; opacity: 0.7; white-space: nowrap; }
-.routes span::before { content: "→ "; color: rgba(238,0,0,0.5); }
+.routes > span { display: block; padding: 0.15rem 0; font-size: 0.82rem; opacity: 0.7; white-space: nowrap; }
+.routes > span::before { content: "→ "; color: rgba(238,0,0,0.5); }
 
 /* Setup path */
 .setup-path {
@@ -619,7 +619,7 @@ function showResult() {
         <div class="stack-section-label">Inference & Governance</div>
         <div style="font-size:0.85rem;opacity:0.7;margin:0.2rem 0">inference.local → flexible backend</div>
         <div class="routes">
-          <span>${rhHatSm}<span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
+            <span><span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
           <span>Cloud (Vertex, Anthropic, OpenAI)</span>
           <span>Local (Ollama, vLLM)</span>
         </div>${governanceSection}
