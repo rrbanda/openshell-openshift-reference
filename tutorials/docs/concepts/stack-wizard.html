@@ -149,6 +149,7 @@ body::before {
 .agent-card:nth-child(12) { animation-delay: 0.24s; }
 .agent-card:nth-child(13) { animation-delay: 0.26s; }
 .agent-card:nth-child(14) { animation-delay: 0.28s; }
+.agent-card:nth-child(15) { animation-delay: 0.30s; }
 
 @keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -375,6 +376,7 @@ body::before {
     <div class="agent-grid">
       <div class="agent-card" onclick="selectAgent('claude')"><h4>Claude Code</h4><p>Anthropic</p></div>
       <div class="agent-card" onclick="selectAgent('codex')"><h4>Codex CLI</h4><p>OpenAI</p></div>
+      <div class="agent-card" onclick="selectAgent('copilot')"><h4>Copilot CLI</h4><p>GitHub</p></div>
       <div class="agent-card" onclick="selectAgent('gemini')"><h4>Gemini CLI</h4><p>Google</p></div>
       <div class="agent-card" onclick="selectAgent('opencode')"><h4>OpenCode</h4><p>Open-source</p></div>
       <div class="agent-card" onclick="selectAgent('openhands')"><h4>OpenHands</h4><p>Open-source</p></div>
@@ -432,10 +434,11 @@ body::before {
 
 <script>
 const agents = {
-  claude: { name: 'Claude Code', by: 'Anthropic', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness: planning, tools, memory, verification, git, context compaction, agentic loops (/goal, /loop)' },
-  codex: { name: 'OpenAI Codex CLI', by: 'OpenAI', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness with sandboxed code execution, tool dispatch, and verification' },
-  gemini: { name: 'Gemini CLI', by: 'Google', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Terminal coding agent with built-in code execution sandbox and Gemini models' },
-  opencode: { name: 'OpenCode', by: 'Open-source', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Model-agnostic coding agent — terminal, desktop, IDE. Supports 75+ LLM providers.' },
+  claude: { name: 'Claude Code', by: 'Anthropic', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness: planning, tools, memory, verification, git, context compaction, agentic loops (/goal, /loop). OpenShell: full policy coverage.' },
+  codex: { name: 'OpenAI Codex CLI', by: 'OpenAI', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness with sandboxed code execution, tool dispatch, and verification. OpenShell: requires custom policy for OpenAI endpoints.' },
+  copilot: { name: 'GitHub Copilot CLI', by: 'GitHub', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Pre-installed in OpenShell base image. Works out of the box with GITHUB_TOKEN or COPILOT_GITHUB_TOKEN. OpenShell: full policy coverage.' },
+  gemini: { name: 'Gemini CLI', by: 'Google', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Terminal coding agent with built-in code execution sandbox and Gemini models. Not yet in OpenShell supported agents — use custom image.' },
+  opencode: { name: 'OpenCode', by: 'Open-source', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Model-agnostic coding agent — terminal, desktop, IDE. 75+ LLM providers. OpenShell: partial policy coverage, add opencode.ai endpoint.' },
   openhands: { name: 'OpenHands', by: 'Open-source', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full AI software engineering platform with Docker sandbox, multi-agent SDK, and Agent Canvas' },
   adk: { name: 'Google ADK', by: 'Google', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Full framework: Runner, Sessions, Workflows, Memory, Ambient Agents. No built-in sandbox.' },
   langgraph: { name: 'LangGraph', by: 'LangChain', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Graph-based agent orchestration with durable execution, checkpointing, and state management' },
