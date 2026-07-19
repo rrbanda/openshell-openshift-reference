@@ -416,27 +416,27 @@ body::before {
 
 .result-header {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;
+  margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem;
 }
-.result-title { font-size: 1.15rem; font-weight: 700; color: rgba(230,237,243,0.9); margin: 0; }
+.result-title { font-size: 1.05rem; font-weight: 700; color: rgba(230,237,243,0.9); margin: 0; }
 .result-title span { color: var(--nv); }
 
-/* Vertical layered cake — never clip layer borders */
+/* Vertical layered cake — compact face, detail in (i); never clip */
 .cake {
   display: flex;
   flex-direction: column;
   gap: 0;
   width: 100%;
   overflow: visible;
-  border: 1px solid rgba(230,237,243,0.12);
+  border: 1px solid rgba(230,237,243,0.14);
   border-radius: 14px;
-  background: rgba(10, 14, 20, 0.4);
+  background: rgba(10, 14, 20, 0.45);
   box-shadow: 0 16px 48px rgba(0,0,0,0.35);
 }
 .cake-layer {
   position: relative;
   overflow: visible;
-  padding: 0.9rem 1.05rem 1rem;
+  padding: 0.55rem 0.85rem 0.6rem;
   border-bottom: 1px solid rgba(230,237,243,0.1);
   border-left: 4px solid transparent;
   background: rgba(22, 27, 34, 0.55);
@@ -448,71 +448,65 @@ body::before {
 }
 .cake-layer.layer-model {
   border-left-color: rgba(230,237,243,0.35);
-  background: linear-gradient(90deg, rgba(230,237,243,0.04), rgba(22,27,34,0.55) 40%);
+  background: linear-gradient(90deg, rgba(230,237,243,0.05), rgba(22,27,34,0.55) 42%);
 }
 .cake-layer.layer-harness {
   border-left-color: rgba(230,237,243,0.55);
-  background: linear-gradient(90deg, rgba(230,237,243,0.06), rgba(22,27,34,0.55) 40%);
+  background: linear-gradient(90deg, rgba(230,237,243,0.07), rgba(22,27,34,0.55) 42%);
 }
 .cake-layer.layer-openshell {
   border-left-color: var(--nv);
-  background: linear-gradient(90deg, rgba(118,185,0,0.1), rgba(16,20,26,0.75) 45%);
+  background: linear-gradient(90deg, rgba(118,185,0,0.12), rgba(16,20,26,0.78) 48%);
 }
 .cake-layer.layer-platform {
   border-left-color: var(--rh);
-  background: linear-gradient(90deg, rgba(238,0,0,0.08), rgba(16,20,26,0.75) 45%);
+  background: linear-gradient(90deg, rgba(238,0,0,0.09), rgba(16,20,26,0.78) 48%);
 }
 .cake-layer.layer-safety {
   border-left-color: var(--addon);
-  background: linear-gradient(90deg, rgba(126,184,255,0.1), rgba(16,20,26,0.75) 45%);
+  background: linear-gradient(90deg, rgba(126,184,255,0.11), rgba(16,20,26,0.78) 48%);
 }
 .cake-layer.layer-next {
   border-left-color: rgba(118,185,0,0.45);
-  background: rgba(22, 27, 34, 0.72);
+  background: rgba(22, 27, 34, 0.78);
+  padding-bottom: 0.7rem;
 }
 .cake-top {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.65rem;
-  margin-bottom: 0.35rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 .cake-index {
   font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
+  font-size: 0.62rem;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--dim);
   white-space: nowrap;
+  min-width: 7.5rem;
 }
-.cake-layer.layer-openshell .cake-index { color: rgba(118,185,0,0.75); }
-.cake-layer.layer-platform .cake-index { color: rgba(255,107,107,0.85); }
-.cake-layer.layer-safety .cake-index { color: rgba(126,184,255,0.85); }
+.cake-layer.layer-openshell .cake-index { color: rgba(118,185,0,0.8); }
+.cake-layer.layer-platform .cake-index { color: rgba(255,107,107,0.9); }
+.cake-layer.layer-safety .cake-index { color: rgba(126,184,255,0.9); }
 .cake-title-row {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
   flex: 1 1 auto;
   min-width: 0;
 }
 .cake-product {
   font-weight: 700;
-  font-size: 1rem;
-  line-height: 1.25;
+  font-size: 0.92rem;
+  line-height: 1.2;
   word-break: break-word;
-}
-.cake-blurb {
-  font-size: 0.78rem;
-  color: var(--muted);
-  line-height: 1.4;
-  margin: 0.15rem 0 0.45rem;
-  max-width: 72ch;
 }
 .cake-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.28rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -520,29 +514,33 @@ body::before {
 .cake-chips li {
   display: inline-flex;
   align-items: center;
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 600;
-  padding: 0.22rem 0.5rem;
+  padding: 0.16rem 0.45rem;
   border-radius: 999px;
-  border: 1px solid rgba(230,237,243,0.12);
-  background: rgba(0,0,0,0.22);
-  color: rgba(230,237,243,0.82);
-}
-.cake-chips li.on {
-  border-color: rgba(118,185,0,0.4);
+  border: 1px solid rgba(118,185,0,0.35);
   background: rgba(118,185,0,0.12);
   color: #c8e86a;
 }
-.cake-chips li.off {
-  opacity: 0.4;
-}
+.cake-chips li.off { display: none; }
 .cake-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
+  gap: 0.28rem;
   align-items: center;
-  margin-top: 0.45rem;
+  margin: 0 0 0.28rem;
 }
+.cake-hint {
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+  color: var(--dim);
+}
+body.showing-stack .header details,
+body.showing-stack .header .tagline { display: none; }
+body.showing-stack .header { margin-bottom: 0.35rem; }
+body.showing-stack .header h1 { font-size: clamp(1.1rem, 2.2vw, 1.35rem); }
+body.showing-stack .progress { margin-bottom: 0.4rem; }
+body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
 
 .callout {
   margin-top: 0.55rem; padding: 0.55rem 0.7rem; border-radius: 7px;
@@ -553,15 +551,14 @@ body::before {
 .callout-dim { background: rgba(230,237,243,0.03); border: 1px solid var(--line); color: var(--muted); }
 
 .cmd {
-  display: block; margin-top: 0.35rem; padding: 0.5rem 0.65rem;
+  display: block; margin-top: 0.2rem; padding: 0.35rem 0.55rem;
   background: rgba(0,0,0,0.35); border: 1px solid var(--line); border-radius: 6px;
-  font-family: var(--mono); font-size: 0.74rem; color: #d7ecc0;
-  overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+  font-family: var(--mono); font-size: 0.7rem; color: #d7ecc0;
+  overflow-x: auto; white-space: nowrap;
 }
-.cmd-list { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.4rem; }
-
-.routes > span { display: block; padding: 0.12rem 0; font-size: 0.8rem; color: var(--muted); }
-.routes > span::before { content: "→ "; color: rgba(238,0,0,0.5); }
+.cmd-list { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.25rem; }
+.cake-layer.layer-next .actions { margin-top: 0.4rem !important; }
+.cake-layer.layer-next .callout { margin-top: 0.35rem; padding: 0.4rem 0.55rem; font-size: 0.7rem; }
 .rh-brand { color: var(--rh); }
 .rh-hat { display: inline-block; width: 18px; height: 18px; vertical-align: -3px; margin-right: 3px; border-radius: 3px; object-fit: contain; }
 
@@ -1157,6 +1154,7 @@ function setJourney(type) {
   currentJourney = type;
   selectedAgent = null;
   selectedUseCase = null;
+  document.body.classList.remove("showing-stack");
   document.querySelectorAll(".step, .result").forEach((s) => s.classList.remove("active"));
   document.getElementById("result").innerHTML = "";
   ["agent", "usecase"].forEach((t) => {
@@ -1271,6 +1269,7 @@ function selectUseCase(id) {
 }
 
 function goBack() {
+  document.body.classList.remove("showing-stack");
   document.querySelectorAll(".step, .result").forEach((s) => s.classList.remove("active"));
   document.getElementById(currentJourney === "agent" ? "step1" : "step1uc").classList.add("active");
   updateProgress(0);
@@ -1314,7 +1313,7 @@ function suggestAgentsHtml(ids) {
     if (!a) return "";
     return `<button type="button" class="btn btn-secondary" style="margin:0.15rem 0.15rem 0 0" onclick="setJourney('agent');selectAgent('${id}')">${a.name}</button>`;
   }).join("");
-  return `<div style="margin-top:0.45rem"><div class="cake-index">Suggested agents</div><div style="margin-top:0.3rem">${chips}</div></div>`;
+  return `<div class="cake-meta" style="margin-top:0.28rem">${chips}</div>`;
 }
 
 function syncUrl(caps) {
@@ -1396,29 +1395,62 @@ function showResult() {
 
   syncUrl(caps);
 
-  const chip = (label, on) => `<li class="${on ? "on" : "off"}">${label}</li>`;
-  const openshellChips = openshellFeatures.map((f) => chip(f.label, f.enabled)).join("");
+  // Face shows only enabled chips; full detail lives in (i) so the cake fits the viewport.
+  const chipOn = (label) => `<li>${label}</li>`;
+  const openshellChips = openshellFeatures.filter((f) => f.enabled).map((f) => chipOn(f.label)).join("");
   const platformChips = [
-    ...platformFeatures.map((f) => chip(f.label, f.enabled)),
-    chip("OSC node eligibility", !!caps.kata),
-    chip("vLLM / llm-d", true),
+    ...platformFeatures.filter((f) => f.enabled).map((f) => chipOn(f.label)),
+    ...(caps.kata ? [chipOn("OSC node eligibility")] : []),
+    chipOn("vLLM / llm-d"),
   ].join("");
   const safetyChips = [
-    chip("NeMo Guardrails", !!caps.guardrails),
-    chip("Garak", !!caps.guardrails),
-    chip("EvalHub", !!caps.guardrails),
-    chip("MLflow / OTEL", !!caps.mlflow),
-  ].join("");
+    ...(caps.guardrails ? [chipOn("NeMo Guardrails"), chipOn("Garak"), chipOn("EvalHub")] : []),
+    ...(caps.mlflow ? [chipOn("MLflow / OTEL")] : []),
+  ].join("") || chipOn("OpenShell OCSF baseline");
   const platformTitle = (String(platformName).includes("Red Hat") || String(platformName).includes("OpenShift"))
     ? `${rhHat}<span class="rh-brand">${platformName}</span>`
     : platformName;
-  const modelTip = "Inference via inference.local (OpenShell cred masking) and/or platform gateways. Red Hat AI captures Completions, Responses/ogx, planned Anthropic Messages & Google Interactions so agents move to vLLM/llm-d without rewrites. Direct provider hosts still need explicit OpenShell network allows.";
-  const openshellTip = "OpenShell is the application-level sandbox (Mode 1 whole-agent; composes with Mode 2). Landlock, seccomp, netns, OPA L4/L7 (MCP-aware), inference.local, OCSF. Does not replace Kata, MCP Gateway, or MLflow. Alpha · RHOAI DP/TP target 3.5/3.6.";
-  const platformTip = `${computeLine} NetworkPolicy + optional UDN + egress proxy. SPIFFE/SPIRE on OpenShift layers with sandbox JWT. OSC needs RHCOS workers, virt/NFD kata label.`;
+
+  const modelTip = [
+    "Route inference through inference.local and/or platform gateways — not conflated with OpenShell policy.",
+    "Red Hat AI captures Completions, Responses/ogx, planned Anthropic Messages & Google Interactions for vLLM/llm-d without rewrites.",
+    "Direct provider hosts still need explicit OpenShell network allows.",
+    caps.ogx ? "ogx selected: Mode 2 platform API path — distinct from Mode 1 whole-agent OpenShell." : "",
+  ].filter(Boolean).join(" ");
+
+  const policyTip = (() => {
+    const el = document.createElement("div");
+    el.innerHTML = policyCallout(a) || "";
+    return (el.textContent || "").replace(/\s+/g, " ").trim();
+  })();
+  const harnessTip = [
+    harnessDesc,
+    entryLine,
+    policyTip,
+  ].filter(Boolean).join(" ");
+
+  const openshellTip = [
+    `Isolation: ${profile.name} (${profile.layers}) — ${profile.blurb}`,
+    "OpenShell is the application-level sandbox (Mode 1; composes with Mode 2).",
+    "Landlock, seccomp, netns, OPA L4/L7, inference.local, OCSF. Does not replace Kata, MCP Gateway, or MLflow.",
+    "Compose: Kata (L5) ∪ OpenShell (app policy) ∪ agent-sandbox (lifecycle). Network/inference hot-reload; Landlock/seccomp need recreate.",
+    "Maturity: alpha · RHOAI DP/TP target 3.5/3.6.",
+  ].join(" ");
+
+  const platformTip = [
+    computeLine,
+    "NetworkPolicy + optional UDN + egress proxy (composable with OpenShell proxy).",
+    "SPIFFE/SPIRE on OpenShift layers with sandbox JWT.",
+    "OSC node eligibility: RHCOS workers, virt/NFD kata label, nested virt caveats.",
+  ].join(" ");
+
   const safetyTip = addonItems.length
     ? addonItems.join(" · ")
     : "None selected — OpenShell OCSF + OPA remain the security baseline. Add MLflow/EvalHub/Garak via OpenShift AI Agent Ops when you need product tracing and eval.";
+
+  const nextTip = `${authNote} OpenShell is alpha (single-player-first). Privileged SCC for sandbox netns is intentionally powerful. Commands: ${commands.join(" · ")}`;
   const harnessMaturity = a ? maturityBadge(agentMaturity(a)) : "";
+  const primaryCmd = commands[0] || "";
 
   const html = `
     <div class="result-header">
@@ -1428,118 +1460,110 @@ function showResult() {
         <button type="button" class="btn btn-secondary" onclick="restart()">Restart</button>
       </div>
     </div>
+    <p class="cake-hint">Layer cake · tap <strong>i</strong> on each layer for full technical detail</p>
 
     <div class="cake" role="list" aria-label="Architecture layers">
       <section class="cake-layer layer-model" role="listitem">
         <div class="cake-top">
+          <span class="cake-index">01 · Model</span>
           <div class="cake-title-row">
-            <span class="cake-index">01 · Model &amp; APIs</span>
             <div class="cake-product">BYOM — frontier or self-hosted</div>
             ${maturityBadge(caps.ogx ? "platform-target" : null)}
             ${infoButton(modelTip, "About model and APIs")}
           </div>
         </div>
-        <p class="cake-blurb">Route inference through <code>inference.local</code> and/or platform gateways — not conflated with OpenShell policy.</p>
         <ul class="cake-chips">
-          ${chip("inference.local", !!caps.creds)}
-          ${chip("ogx / Responses (Mode 2)", !!caps.ogx)}
-          ${chip("Direct provider allows", true)}
+          ${caps.creds ? chipOn("inference.local") : ""}
+          ${caps.ogx ? chipOn("ogx / Mode 2") : ""}
+          ${chipOn("Provider allows")}
         </ul>
-        ${caps.ogx ? `<div class="callout callout-info"><strong>ogx selected:</strong> Mode 2 platform API path — distinct from Mode 1 whole-agent OpenShell.</div>` : ""}
       </section>
 
       <section class="cake-layer layer-harness" role="listitem">
         <div class="cake-top">
+          <span class="cake-index">02 · Harness</span>
           <div class="cake-title-row">
-            <span class="cake-index">02 · Harness (BYOA)</span>
             <div class="cake-product">${harnessName}</div>
             ${harnessMaturity}
-            ${infoButton(harnessDesc || entryLine, "About harness")}
+            ${a ? policyBadge(a.policy) : ""}
+            ${a?.nemoclaw ? '<span class="badge badge-nc">NemoClaw</span>' : ""}
+            ${infoButton(harnessTip, "About harness")}
           </div>
         </div>
-        <p class="cake-blurb">${entryLine}</p>
-        <div class="cake-meta">
-          ${a ? `${policyBadge(a.policy)}${a.nemoclaw ? ' <span class="badge badge-nc">NemoClaw</span>' : ""}` : ""}
-        </div>
-        ${policyCallout(a)}
+        <ul class="cake-chips">
+          ${chipOn(a?.entry === "harness" ? "Pattern 2" : "Pattern 1")}
+          ${a?.nemoclaw ? chipOn("NemoClaw path") : chipOn("BYOA image")}
+        </ul>
         ${suggestAgentsHtml(uc?.suggestedAgents)}
       </section>
 
       <section class="cake-layer layer-openshell" role="listitem">
         <div class="cake-top">
+          <span class="cake-index">03 · Runtime</span>
           <div class="cake-title-row">
-            <span class="cake-index">03 · Runtime</span>
             <div class="cake-product"><span style="color:var(--nv)">NVIDIA</span> OpenShell</div>
             ${maturityBadge("alpha")}
+            <span class="badge badge-bundled">${profile.name}</span>
             ${infoButton(openshellTip, "About OpenShell")}
           </div>
         </div>
-        <p class="cake-blurb"><strong>${profile.name}</strong> (${profile.layers}) — ${profile.blurb}</p>
-        <ul class="cake-chips">${openshellChips}</ul>
-        <div class="callout callout-dim"><strong>Compose:</strong> Kata (L5) ∪ OpenShell (app policy) ∪ agent-sandbox (lifecycle). Network/inference hot-reload; Landlock/seccomp need recreate.</div>
+        <ul class="cake-chips">${openshellChips || chipOn("Baseline sandbox")}</ul>
       </section>
 
       <section class="cake-layer layer-platform" role="listitem">
         <div class="cake-top">
+          <span class="cake-index">04 · Platform</span>
           <div class="cake-title-row">
-            <span class="cake-index">04 · Platform</span>
             <div class="cake-product">${platformTitle}</div>
-            ${caps.kata ? maturityBadge("ga") : ""}
+            ${caps.kata ? maturityBadge("ga") : maturityBadge("platform-target")}
             ${infoButton(platformTip, "About platform layer")}
           </div>
         </div>
-        <p class="cake-blurb">${computeLine}</p>
         <ul class="cake-chips">${platformChips}</ul>
-        <div class="routes" style="margin-top:0.45rem">
-          <span>NetworkPolicy + optional UDN + egress proxy</span>
-          <span>SPIFFE/SPIRE on OpenShift (layers with sandbox JWT)</span>
-        </div>
       </section>
 
       <section class="cake-layer layer-safety" role="listitem">
         <div class="cake-top">
+          <span class="cake-index">05 · Safety</span>
           <div class="cake-title-row">
-            <span class="cake-index">05 · Safety &amp; Agent Ops</span>
-            <div class="cake-product">Add-ons (do not replace OpenShell)</div>
+            <div class="cake-product">Agent Ops add-ons</div>
             ${(caps.guardrails || caps.mlflow) ? maturityBadge("platform-target") : ""}
             ${infoButton(safetyTip, "About safety add-ons")}
           </div>
         </div>
-        <p class="cake-blurb">${addonItems.length ? "Selected portfolio capabilities from OpenShift AI / NeMo." : "None selected — OpenShell OCSF + OPA remain the security baseline."}</p>
         <ul class="cake-chips">${safetyChips}</ul>
       </section>
 
       <section class="cake-layer layer-next" role="listitem">
         <div class="cake-top">
+          <span class="cake-index">Next</span>
           <div class="cake-title-row">
-            <span class="cake-index">Next steps</span>
-            <div class="cake-product">Commands &amp; maturity</div>
+            <div class="cake-product">Commands</div>
+            ${infoButton(nextTip, "Auth, maturity, and all commands")}
           </div>
         </div>
-        <div class="cmd-list">
-          ${commands.map((c) => `<code class="cmd">${c}</code>`).join("")}
-        </div>
-        <div class="callout callout-warn"><strong>Auth / maturity:</strong> ${authNote} OpenShell is alpha (single-player-first). Privileged SCC for sandbox netns is intentionally powerful.</div>
-        <div class="actions actions-sm" style="margin-top:0.65rem">
-          <a class="btn btn-primary" href="../quickstart/">Open Quickstart</a>
-          <a class="btn btn-secondary" href="../sandboxes/network-policies/">Network policies</a>
+        ${primaryCmd ? `<code class="cmd">${primaryCmd}</code>` : ""}
+        <div class="actions actions-sm">
+          <a class="btn btn-primary" href="../quickstart/">Quickstart</a>
           <a class="btn btn-secondary" href="../agent-stack-decision-guide/">Decision Guide</a>
           <a class="btn btn-secondary" href="https://docs.nvidia.com/openshell/latest/about/supported-agents.html" target="_blank" rel="noopener">Supported agents</a>
         </div>
       </section>
     </div>
 
-    <p class="footer-note">Field positioning: <em>Kagenti → OpenShell</em> — BYOA unchanged; infrastructure is OpenShell + OpenShift AI platform layers (Kata, MCP Gateway, ogx, MLflow, SPIFFE). Do not market OpenShell as replacing OSC or MCP Gateway. Vault <em>dev mode</em> and eval TLS/unauth flags in this reference repo are for learning only.</p>
+    <p class="footer-note">Kagenti → OpenShell · compose OpenShell + OpenShift AI layers — do not conflate with OSC or MCP Gateway. Vault <em>dev mode</em> / eval TLS flags are for learning only.</p>
   `;
 
   document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));
   const resultEl = document.getElementById("result");
   resultEl.innerHTML = html;
   resultEl.classList.add("active");
+  document.body.classList.add("showing-stack");
   updateProgress(2);
 }
 
 function restart() {
+  document.body.classList.remove("showing-stack");
   document.getElementById("result").classList.remove("active");
   document.getElementById("result").innerHTML = "";
   selectedAgent = null;
