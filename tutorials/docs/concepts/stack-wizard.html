@@ -532,24 +532,16 @@ function showResult() {
   ];
 
   const mcpLayer = chkMcp ? `
-      <div class="stack-section addon-layer">
-        <div class="stack-section-header">
-          <span class="stack-section-label">Tool Governance — MCP Gateway</span>
-          <span class="info-icon">i<span class="tooltip">When agents call tools, requests go through the MCP Gateway. It performs OAuth2 token exchange, swapping the agent's identity for downstream access tokens. Authorization is by token claims, not prompts — prompt injection cannot bypass it.</span></span>
-        </div>
-        <div class="stack-section-product">MCP Gateway</div>
-        <div class="stack-section-desc">OAuth2 token exchange, identity-based tool filtering, credential management</div>
-      </div>` : '';
+        <div class="setup-path" style="border-color:rgba(118,185,0,0.2)">
+          <h4>Tool Governance — MCP Gateway</h4>
+          <p>OAuth2 token exchange, identity-based tool filtering, credential management</p>
+        </div>` : '';
 
   const guardrailsLayer = chkGuardrails ? `
-      <div class="stack-section addon-layer">
-        <div class="stack-section-header">
-          <span class="stack-section-label">Safety Guardrails</span>
-          <span class="info-icon">i<span class="tooltip">Programmable safety rails at the inference boundary. NeMo Guardrails for conversation control, Guardrails Orchestrator for policy enforcement, Garak for pre-production adversarial scanning.</span></span>
-        </div>
-        <div class="stack-section-product">NeMo Guardrails + Garak</div>
-        <div class="stack-section-desc">Jailbreak detection, prompt injection defense, content moderation</div>
-      </div>` : '';
+        <div class="setup-path" style="border-color:rgba(118,185,0,0.2)">
+          <h4>Safety Guardrails</h4>
+          <p>NeMo Guardrails + Garak — jailbreak detection, prompt injection defense, content moderation</p>
+        </div>` : '';
 
   const kataNote = chkKata ? ' + Kata Containers (hardware-isolated VM)' : '';
 
@@ -596,7 +588,7 @@ function showResult() {
           <ul class="stack-features">
             ${features.map(f => `<li class="${f.enabled ? 'enabled' : 'disabled'}">${f.label}</li>`).join('')}
           </ul>
-        </div>${mcpLayer}${guardrailsLayer}
+        </div>
         <div class="stack-section platform-layer">
           <div class="stack-section-header">
             <span class="stack-section-label">Platform</span>
@@ -614,7 +606,7 @@ function showResult() {
             <span>Cloud (Vertex, Anthropic, OpenAI)</span>
             <span>Local (Ollama, vLLM)</span>
           </div>
-        </div>
+        </div>${mcpLayer}${guardrailsLayer}
         <div class="setup-path">${setupPath}</div>
         <div class="actions">
           <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
