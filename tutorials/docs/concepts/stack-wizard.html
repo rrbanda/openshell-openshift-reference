@@ -183,22 +183,6 @@ body::before {
 .hint { font-size: 0.76rem; color: var(--muted); margin: 0 0 0.65rem; line-height: 1.4; }
 
 /* ---- Grids: stretch equal-height cells; never clip ---- */
-.agent-groups { display: flex; flex-direction: column; gap: 1.25rem; }
-.agent-group-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 0 0 0.35rem;
-}
-.agent-group-note {
-  font-size: 0.78rem;
-  color: var(--dim);
-  margin: 0 0 0.65rem;
-  line-height: 1.4;
-  max-width: 52rem;
-}
 .agent-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
@@ -709,13 +693,12 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
 
 <div class="header">
   <div class="header-row"><h1>Pick Your Agent. See Your Stack.</h1></div>
-  <p class="tagline">Three catalogs · NemoClaw ≠ OpenShell coding CLIs ≠ BYOA frameworks</p>
+  <p class="tagline">Agent = Model + Harness · OpenShell on Red Hat OpenShift AI</p>
   <details>
     <summary>About · sources</summary>
-    <strong>NemoClaw</strong> only sandboxes OpenClaw, Hermes, and LangChain Deep Agents Code (<a href="https://docs.nvidia.com/nemoclaw/" target="_blank" rel="noopener">docs</a>).
-    <strong>OpenShell Supported Agents</strong> separately lists base/community coding CLIs such as Claude Code and OpenCode (<a href="https://docs.nvidia.com/openshell/about/supported-agents" target="_blank" rel="noopener">matrix</a>) — those are not NemoClaw agents.
-    Claude Code / Copilot / Codex may appear in NemoClaw install prompts as the <em>host coding agent that helps you install</em>, not as the agent running inside the sandbox.
-    <strong>OpenShift AI</strong> is the product base for BYOA frameworks (LangGraph, ADK, …) plus OpenShell as a portfolio capability — choosing Claude Code does not mean “NemoClaw on OpenShift AI.”
+    <a href="https://docs.nvidia.com/openshell/about/supported-agents" target="_blank" rel="noopener">OpenShell Supported Agents</a>
+    · <a href="https://docs.nvidia.com/nemoclaw/" target="_blank" rel="noopener">NemoClaw</a> (blueprint agents: OpenClaw, Hermes, Deep Agents Code only)
+    · Red Hat AI Sandboxing for Agents. Product base: Red Hat OpenShift AI.
   </details>
 </div>
 
@@ -742,8 +725,8 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
   <div class="step active" id="step1" role="tabpanel">
     <div class="step-label">Step 1 — Choose your agent</div>
     <div class="question">I'm using (or plan to use)…</div>
-    <p class="hint">Pick from the correct catalog below. NemoClaw agents are not the same list as OpenShell coding CLIs.</p>
-    <div class="agent-groups" id="agentGrid"></div>
+    <p class="hint">Tap <strong>i</strong> for detail. <strong>OpenShell only</strong> = <code>openshell sandbox create</code> (no NemoClaw blueprint). <strong>NemoClaw blueprint</strong> = OpenClaw / Hermes / Deep Agents via <code>nemoclaw onboard</code>.</p>
+    <div class="agent-grid" id="agentGrid"></div>
   </div>
 
   <!-- STEP 1: By Use Case -->
@@ -812,6 +795,12 @@ const SOURCE_BADGES = {
   byo: { cls: "badge-custom", text: "BYO" },
 };
 
+/** How the agent attaches — badge answers "NemoClaw blueprint or OpenShell only?" */
+const PATH_BADGES = {
+  openshell: { cls: "badge-bundled", text: "OpenShell only" },
+  nemoclaw: { cls: "badge-nc", text: "NemoClaw blueprint" },
+};
+
 /** NVIDIA ecosystem: OpenShell path vs NemoClaw reference path. */
 const ENTRY_PATHS = {
   openshell: "OpenShell path — openshell sandbox create",
@@ -848,136 +837,118 @@ const ISOLATION_PROFILES = {
 };
 
 /**
- * Three catalogs — do not conflate:
- *   nemoclaw  = NemoClaw docs (OpenClaw, Hermes, Deep Agents Code only)
- *   openshell = OpenShell Supported Agents / Community --from (coding CLIs)
- *   byo       = OpenShift AI BYOA frameworks (not on NVIDIA agent matrices)
- *
- * Claude Code etc. can install NemoClaw from a host UI; that does not make them NemoClaw agents.
+ * Path validity (NVIDIA docs, July 2026):
+ * - NemoClaw blueprint agents ONLY: OpenClaw, Hermes, LangChain Deep Agents Code
+ *   https://github.com/NVIDIA/NemoClaw — nemoclaw onboard / nemohermes / nemo-deepagents
+ * - Claude Code, Copilot, OpenCode, Codex: OpenShell base image path ONLY
+ *   https://docs.nvidia.com/openshell/about/supported-agents — openshell sandbox create -- <agent>
+ * - Gemini / Ollama / Pi: OpenShell Community --from ONLY (not NemoClaw blueprints)
+ * - Claude/Codex/Copilot may install NemoClaw as a *host* coding agent; that is not a blueprint
+ * - OpenShift AI: OpenShell is a portfolio capability — OpenShell-path agents run under OpenShell
+ *   on the platform; NemoClaw blueprints are an additional NVIDIA reference packaging layer
  */
-const AGENT_GROUPS = [
-  {
-    id: "nemoclaw",
-    title: "NemoClaw agents",
-    note: "Always-on agents in the NemoClaw reference stack on OpenShell. Only these three are NemoClaw-supported runtimes.",
-    ids: ["openclaw", "hermes", "deepagents"],
-  },
-  {
-    id: "openshell",
-    title: "OpenShell coding agents",
-    note: "From the OpenShell Supported Agents / Community matrix. They run via openshell sandbox create — not via nemoclaw onboard. Not NemoClaw agents.",
-    ids: ["claude", "copilot", "opencode", "codex", "gemini", "ollama", "pi"],
-  },
-  {
-    id: "byo",
-    title: "BYOA frameworks (OpenShift AI)",
-    note: "You bring the image. Not listed as named agents on OpenShell Supported Agents or NemoClaw. Typical OpenShift AI BYOA + OpenShell policy path.",
-    ids: ["langgraph", "adk", "crewai", "strands", "watsonx", "openhands", "custom"],
-  },
-];
-
 const agents = {
   claude: {
     name: "Claude Code", by: "Anthropic", type: "coding",
     nemoclaw: false, source: "base", policy: "full", path: "openshell",
     command: "openshell sandbox create -- claude",
-    desc: "OpenShell Supported Agents (base, full coverage) — not a NemoClaw agent. Trailing command on the base image. Separate from using Claude Code on the host to help install NemoClaw.",
+    desc: "Valid with OpenShell only (base image, full coverage). Not a NemoClaw blueprint agent. On OpenShift AI: run via OpenShell capability. Host tip: Claude Code can help install NemoClaw, but the sandboxed agent would still be OpenClaw/Hermes/Deep Agents — not Claude Code itself.",
   },
   copilot: {
     name: "GitHub Copilot CLI", by: "GitHub", type: "coding",
     nemoclaw: false, source: "base", policy: "full", path: "openshell",
     command: "openshell sandbox create -- copilot",
-    desc: "OpenShell Supported Agents (base, full coverage) — not a NemoClaw agent. GITHUB_TOKEN or COPILOT_GITHUB_TOKEN.",
+    desc: "Valid with OpenShell only (base image, full coverage). Not a NemoClaw blueprint. On OpenShift AI: OpenShell path. GITHUB_TOKEN or COPILOT_GITHUB_TOKEN.",
   },
   opencode: {
     name: "OpenCode", by: "Open-source", type: "coding",
     nemoclaw: false, source: "base", policy: "partial", path: "openshell",
     command: "openshell sandbox create -- opencode",
-    desc: "OpenShell Supported Agents (base, partial coverage) — not a NemoClaw agent. Add opencode.ai + binary paths for full function.",
+    desc: "Valid with OpenShell only (base image, partial coverage). Not a NemoClaw blueprint. Add opencode.ai + binary paths for full function.",
   },
   codex: {
     name: "Codex CLI", by: "OpenAI", type: "coding",
     nemoclaw: false, source: "base", policy: "none", path: "openshell",
     command: "openshell sandbox create --policy ./codex-policy.yaml -- codex",
-    desc: "OpenShell Supported Agents (base, no coverage) — not a NemoClaw agent. Custom policy + OPENAI_API_KEY.",
+    desc: "Valid with OpenShell only (base image, no default coverage — custom policy). Not a NemoClaw blueprint. OPENAI_API_KEY.",
   },
   gemini: {
     name: "Gemini CLI", by: "Google", type: "coding",
     nemoclaw: false, source: "community", policy: "bundled", path: "openshell",
     command: "openshell sandbox create --from gemini",
-    desc: "OpenShell Community --from gemini — not a NemoClaw agent and not in the base image.",
+    desc: "Valid with OpenShell Community (--from gemini). Not in base image. Not a NemoClaw blueprint. On OpenShift AI: OpenShell path.",
   },
   ollama: {
     name: "Ollama sandbox", by: "Community", type: "coding",
     nemoclaw: false, source: "community", policy: "bundled", path: "openshell",
     command: "openshell sandbox create --from ollama",
-    desc: "OpenShell Supported Agents: source ollama, bundled policy. Launch with --from ollama.",
+    desc: "Valid with OpenShell Community (--from ollama). Not a NemoClaw blueprint.",
   },
   pi: {
     name: "Pi", by: "Community", type: "coding",
     nemoclaw: false, source: "community", policy: "bundled", path: "openshell",
     command: "openshell sandbox create --from pi",
-    desc: "OpenShell Supported Agents: source pi, bundled policy. Launch with --from pi.",
+    desc: "Valid with OpenShell Community (--from pi). Not a NemoClaw blueprint.",
   },
   openclaw: {
     name: "OpenClaw", by: "Community", type: "assistant",
     nemoclaw: true, source: "nemoclaw", policy: "blueprint", path: "nemoclaw",
     command: "nemoclaw onboard",
-    desc: "OpenShell Supported Agents + NemoClaw: blueprint-managed. Prefer nemoclaw onboard (reference stack). Community alternative: openshell sandbox create --from openclaw (less automation/hardening than NemoClaw).",
+    desc: "Valid with NemoClaw blueprint on OpenShell (recommended): nemoclaw onboard. Also valid OpenShell-alone via --from openclaw (community; less hardening). NemoClaw default agent.",
   },
   hermes: {
     name: "Hermes", by: "Nous Research", type: "assistant",
     nemoclaw: true, source: "nemoclaw", policy: "blueprint", path: "nemoclaw",
     command: "nemohermes onboard",
-    desc: "NemoClaw supported agent (Tested per NemoClaw platform support). Onboard with nemohermes onboard or nemoclaw onboard --agent hermes. Not a base-image trailing command. Production parity with OpenClaw is not asserted.",
+    desc: "Valid with NemoClaw blueprint on OpenShell: nemohermes onboard or nemoclaw onboard --agent hermes. Not an OpenShell base trailing command. Production parity with OpenClaw is not asserted.",
   },
   deepagents: {
     name: "Deep Agents (dcode)", by: "LangChain", type: "coding",
     nemoclaw: true, source: "nemoclaw", policy: "blueprint", path: "nemoclaw",
     command: "nemo-deepagents onboard",
-    desc: "NemoClaw supported agent: LangChain Deep Agents Code. Onboard with nemo-deepagents onboard or nemoclaw onboard --agent langchain-deepagents-code (NEMOCLAW_AGENT=langchain-deepagents-code).",
+    desc: "Valid with NemoClaw blueprint on OpenShell: nemo-deepagents onboard or nemoclaw onboard --agent langchain-deepagents-code. Distinct from BYO LangGraph images.",
   },
   openhands: {
     name: "OpenHands", by: "Open-source", type: "coding",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <image> --policy ./policy.yaml",
-    desc: "Not listed on OpenShell Supported Agents. OpenShell path: bring your own container image via --from (registry image or local build) and author policy.",
+    desc: "OpenShell BYO only (not on Supported Agents matrix, not a NemoClaw blueprint). --from your image + policy.",
   },
   adk: {
     name: "Google ADK", by: "Google", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not listed on OpenShell Supported Agents. BYO framework image on the OpenShell path (--from + policy).",
+    desc: "OpenShell BYO only — not a NemoClaw blueprint. On OpenShift AI: package ADK agent image + OpenShell policy.",
   },
   langgraph: {
     name: "LangGraph", by: "LangChain", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not listed on OpenShell Supported Agents. BYO framework image on the OpenShell path. (LangChain Deep Agents Code is a separate NemoClaw-supported runtime.)",
+    desc: "OpenShell BYO only — not a NemoClaw blueprint. (Deep Agents Code is the separate NemoClaw-supported LangChain runtime.)",
   },
   crewai: {
     name: "CrewAI", by: "CrewAI", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not listed on OpenShell Supported Agents. BYO framework image on the OpenShell path (--from + policy).",
+    desc: "OpenShell BYO only — not a NemoClaw blueprint.",
   },
   strands: {
     name: "Strands", by: "AWS (open-source)", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not listed on OpenShell Supported Agents. BYO SDK image on the OpenShell path (--from + policy).",
+    desc: "OpenShell BYO only — not a NemoClaw blueprint.",
   },
   watsonx: {
     name: "watsonx Orchestrate", by: "IBM", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not listed on OpenShell Supported Agents. If the workload runs in OpenShell, use a BYO image + policy; watsonx control plane is not OpenShell.",
+    desc: "OpenShell BYO only if the workload runs in OpenShell — not a NemoClaw blueprint. watsonx control plane ≠ OpenShell.",
   },
   custom: {
     name: "Custom / Other", by: "You", type: "any",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-image> --policy ./policy.yaml -- <entrypoint>",
-    desc: "OpenShell documented BYO path: --from a community name, local directory, or container image; supply policy as needed.",
+    desc: "OpenShell BYO only — not a NemoClaw blueprint unless you adopt one of the three NemoClaw agents.",
   },
 };
 
@@ -1225,6 +1196,11 @@ function sourceBadge(source) {
   return `<span class="badge ${b.cls}">${b.text}</span>`;
 }
 
+function pathBadge(path) {
+  const b = PATH_BADGES[path] || PATH_BADGES.openshell;
+  return `<span class="badge ${b.cls}">${b.text}</span>`;
+}
+
 function profileBadge(profileKey) {
   const p = ISOLATION_PROFILES[profileKey];
   if (!p) return "";
@@ -1260,8 +1236,9 @@ function agentMaturity(_a) {
   return null;
 }
 
-function agentCardHtml(id, a) {
-  return `
+function renderAgentGrid() {
+  const grid = document.getElementById("agentGrid");
+  grid.innerHTML = Object.entries(agents).map(([id, a]) => `
     <div class="card${selectedAgent === id ? " selected" : ""}" data-id="${id}" role="button" tabindex="0"
       aria-pressed="${selectedAgent === id}" onclick="selectAgent('${id}')"
       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectAgent('${id}')}">
@@ -1271,27 +1248,13 @@ function agentCardHtml(id, a) {
       </div>
       <p>${a.by}</p>
       <div class="meta">
+        ${pathBadge(a.path)}
         ${sourceBadge(a.source)}
         ${policyBadge(a.policy)}
         ${maturityBadge(agentMaturity(a))}
       </div>
-    </div>`;
-}
-
-function renderAgentGrid() {
-  const root = document.getElementById("agentGrid");
-  root.innerHTML = AGENT_GROUPS.map((g) => {
-    const cards = g.ids.map((id) => {
-      const a = agents[id];
-      return a ? agentCardHtml(id, a) : "";
-    }).join("");
-    return `
-      <section class="agent-group" aria-labelledby="ag-${g.id}">
-        <h3 class="agent-group-label" id="ag-${g.id}">${g.title}</h3>
-        <p class="agent-group-note">${g.note}</p>
-        <div class="agent-grid">${cards}</div>
-      </section>`;
-  }).join("");
+    </div>
+  `).join("");
 }
 
 function renderUseCaseGrid() {
@@ -1607,7 +1570,7 @@ function showResult() {
             </div>
           </div>
           <ul class="cake-chips">
-            ${chipOn(a?.path === "nemoclaw" ? "NemoClaw path" : "OpenShell path")}
+            ${chipOn(a?.path === "nemoclaw" ? "NemoClaw blueprint" : "OpenShell only")}
             ${a?.source === "community" ? chipOn(a.command.replace("openshell sandbox create ", "")) : ""}
             ${a?.source === "base" ? chipOn("base image") : ""}
             ${a?.source === "byo" ? chipOn("--from <image>") : ""}
