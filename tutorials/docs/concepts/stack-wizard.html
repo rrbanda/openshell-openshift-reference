@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pick Your Agent. See Your Stack. | OpenShell on OpenShift</title>
+<title>Pick Your Agent. See Your Stack. | OpenShell on Red Hat OpenShift AI</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -29,14 +29,14 @@ body::before {
 }
 
 .header { text-align: center; margin-bottom: 1.5rem; max-width: 560px; position: relative; z-index: 1; }
-.header-nav { position: absolute; top: 0; right: -80px; display: flex; gap: 0.4rem; }
-.header-nav a {
+
+.top-nav { text-align: right; margin-bottom: 0.3rem; }
+.top-nav a {
   font-size: 0.72rem; font-weight: 600; text-decoration: none; padding: 0.3rem 0.7rem;
   border-radius: 5px; border: 1px solid rgba(230,237,243,0.1);
-  color: rgba(230,237,243,0.5); transition: all 0.2s;
+  color: rgba(230,237,243,0.5); transition: all 0.2s; margin-left: 0.3rem;
 }
-.header-nav a:hover { color: #76b900; border-color: rgba(118,185,0,0.3); }
-@media (max-width: 768px) { .header-nav { position: static; justify-content: center; margin-top: 0.5rem; } }
+.top-nav a:hover { color: #76b900; border-color: rgba(118,185,0,0.3); }
 .header h1 {
   font-size: 1.7rem; font-weight: 800;
   background: linear-gradient(135deg, #76b900 0%, #a0e030 50%, #76b900 100%);
@@ -52,12 +52,11 @@ body::before {
 
 /* Journey tabs */
 .journey-tabs {
-  display: flex; justify-content: center; gap: 0.25rem; margin-bottom: 1rem;
+  display: inline-flex; justify-content: center; gap: 0.25rem; margin-bottom: 1rem;
   backdrop-filter: blur(10px);
   background: rgba(22, 27, 34, 0.5);
   border-radius: 8px; padding: 0.25rem;
   border: 1px solid rgba(230,237,243,0.06);
-  display: inline-flex;
 }
 .journey-tabs-wrap { text-align: center; margin-bottom: 0.5rem; }
 .jtab {
@@ -147,6 +146,7 @@ body::before {
 .agent-card:nth-child(10) { animation-delay: 0.20s; }
 .agent-card:nth-child(11) { animation-delay: 0.22s; }
 .agent-card:nth-child(12) { animation-delay: 0.24s; }
+.agent-card:nth-child(13) { animation-delay: 0.26s; }
 
 @keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -263,12 +263,11 @@ body::before {
 /* Red Hat brand accent for product names */
 .rh-brand { color: #ee0000; }
 .rh-brand-subtle { color: rgba(238,0,0,0.7); }
-.rh-hat { display: inline-block; width: 18px; height: 18px; vertical-align: -2px; margin-right: 2px; }
-.rh-hat-sm { display: inline-block; width: 14px; height: 14px; vertical-align: -1px; margin-right: 2px; }
+.rh-hat { display: inline-block; width: 18px; height: 18px; vertical-align: -2px; margin-right: 2px; border-radius: 3px; object-fit: contain; }
 
 /* Provider icons row */
 .provider-icons { display: flex; gap: 0.6rem; align-items: center; margin-top: 0.4rem; flex-wrap: wrap; }
-.provider-icons img { width: 22px; height: 22px; opacity: 0.8; transition: opacity 0.2s; border-radius: 4px; }
+.provider-icons img { width: 22px; height: 22px; opacity: 0.8; transition: opacity 0.2s; border-radius: 4px; font-size: 0; }
 .provider-icons img.pi-dark { filter: invert(1) brightness(0.85); }
 .provider-icons img:hover { opacity: 1; }
 .provider-icons .rh-hat { width: 22px; height: 22px; vertical-align: middle; }
@@ -279,7 +278,6 @@ body::before {
 .stack-section-product { font-weight: 700; font-size: 1rem; }
 .stack-section-desc { font-size: 0.85rem; opacity: 0.6; line-height: 1.45; margin-top: 0.2rem; }
 
-.stack-features { margin-top: 0.4rem; padding: 0; }
 .stack-features li { font-size: 0.82rem; opacity: 0.8; padding: 0.15rem 0; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
 .stack-features li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .stack-features li.enabled::before { background: #76b900; box-shadow: 0 0 4px rgba(118,185,0,0.5); }
@@ -311,18 +309,6 @@ body::before {
 /* Inference routes */
 .routes > span { display: block; padding: 0.15rem 0; font-size: 0.82rem; opacity: 0.7; white-space: nowrap; }
 .routes > span::before { content: "→ "; color: rgba(238,0,0,0.5); }
-
-/* Setup path */
-.setup-path {
-  backdrop-filter: blur(10px);
-  background: rgba(22, 27, 34, 0.5);
-  border-radius: 10px; padding: 1.2rem 1.4rem;
-  border: 1px solid rgba(118,185,0,0.12);
-  margin-bottom: 1rem;
-}
-.setup-path h4 { font-size: 0.75rem; color: #76b900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
-.setup-path p { font-size: 0.85rem; opacity: 0.75; line-height: 1.45; }
-.setup-path code { background: rgba(118,185,0,0.08); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; }
 
 /* Buttons */
 .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
@@ -357,15 +343,16 @@ body::before {
 <body>
 
 <div class="header">
-  <div class="header-nav">
-    <a href="../quickstart/">Quickstart</a>
-    <a href="agent-architecture/">Concepts</a>
-  </div>
   <h1>Pick Your Agent. See Your Stack.</h1>
-  <p>OpenShell is the security runtime beneath every option. Select your agent to see how the pieces fit together on OpenShift.</p>
+  <p>OpenShell is the security runtime beneath every option. Select your agent to see how the pieces fit together on Red Hat OpenShift AI.</p>
 </div>
 
 <div class="container">
+
+  <div class="top-nav">
+    <a href="../quickstart/">Quickstart</a>
+    <a href="agent-architecture/">Concepts</a>
+  </div>
 
   <div class="journey-tabs-wrap">
     <div class="journey-tabs">
@@ -466,7 +453,6 @@ const usecases = {
 };
 
 const rhHat = `<img class="rh-hat" src="redhat-hat.png" alt="Red Hat">`;
-const rhHatSm = `<img class="rh-hat-sm" src="redhat-hat.png" alt="Red Hat">`;
 
 let currentJourney = 'agent';
 let selectedAgent = null;
@@ -619,7 +605,7 @@ function showResult() {
         <div class="stack-section-label">Inference & Governance</div>
         <div style="font-size:0.85rem;opacity:0.7;margin:0.2rem 0">inference.local → flexible backend</div>
         <div class="routes">
-            <span><span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
+          <span><span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
           <span>Cloud (Vertex, Anthropic, OpenAI)</span>
           <span>Local (Ollama, vLLM)</span>
         </div>${governanceSection}
