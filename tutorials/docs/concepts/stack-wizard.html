@@ -287,11 +287,15 @@ body::before {
     <div class="selected-agent" id="selectedLabel">For: <span></span></div>
     <div class="question">What do you need from the runtime?</div>
     <div class="checks">
-      <div class="check-item"><input type="checkbox" id="chk-network" checked><div><label for="chk-network">Network policy</label><div class="check-desc">Control which endpoints the agent can reach — per-binary, per-host, per-HTTP-method</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-creds" checked><div><label for="chk-creds">Credential masking</label><div class="check-desc">Agent calls inference.local — never sees real API keys. Switch providers without code changes.</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-audit" checked><div><label for="chk-audit">Audit trail</label><div class="check-desc">OCSF structured logs of every network decision for compliance and debugging</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-fs" checked><div><label for="chk-fs">Filesystem isolation</label><div class="check-desc">Landlock LSM restricts which paths the agent can read/write inside the container</div></div></div>
-      <div class="check-item"><input type="checkbox" id="chk-multi"><div><label for="chk-multi">Multi-user / team isolation</label><div class="check-desc">OIDC authentication + workspace separation for shared deployments</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-network" checked><div><label for="chk-network">Network policy</label><div class="check-desc">Per-binary, per-host, per-HTTP-method egress control via OPA/Rego</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-creds" checked><div><label for="chk-creds">Credential masking</label><div class="check-desc">Agent calls inference.local — never sees real API keys</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-audit" checked><div><label for="chk-audit">Audit + tracing</label><div class="check-desc">OCSF audit logs + MLflow/OpenTelemetry deep execution traces</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-fs" checked><div><label for="chk-fs">Filesystem + process isolation</label><div class="check-desc">Landlock LSM + seccomp syscall filtering + network namespace</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-identity" checked><div><label for="chk-identity">Agent identity (SPIFFE/SPIRE)</label><div class="check-desc">Cryptographic workload identity — no hardcoded keys, short-lived scoped tokens</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-mcp" checked><div><label for="chk-mcp">Tool governance (MCP Gateway)</label><div class="check-desc">OAuth2 token exchange for tool access, identity-based filtering, no prompt-based auth</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-guardrails"><div><label for="chk-guardrails">Safety guardrails</label><div class="check-desc">NeMo Guardrails + Guardrails Orchestrator at inference boundary</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-kata"><div><label for="chk-kata">Hardware isolation (Kata Containers)</label><div class="check-desc">Kernel-level VM isolation via OpenShift Sandboxed Containers</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-multi"><div><label for="chk-multi">Multi-user / team isolation</label><div class="check-desc">OIDC + RBAC + namespace isolation + workspaces</div></div></div>
     </div>
     <div class="actions">
       <button class="btn btn-primary" onclick="showResult()">Show my architecture</button>
@@ -350,6 +354,10 @@ function showResult() {
   const chkCreds = document.getElementById('chk-creds').checked;
   const chkAudit = document.getElementById('chk-audit').checked;
   const chkFs = document.getElementById('chk-fs').checked;
+  const chkIdentity = document.getElementById('chk-identity').checked;
+  const chkMcp = document.getElementById('chk-mcp').checked;
+  const chkGuardrails = document.getElementById('chk-guardrails').checked;
+  const chkKata = document.getElementById('chk-kata').checked;
   const chkMulti = document.getElementById('chk-multi').checked;
 
   const nemoclawLayer = a.nemoclaw ? `
@@ -364,11 +372,34 @@ function showResult() {
 
   const features = [
     { label: 'Network policy (per-binary, per-host, L7)', enabled: chkNetwork },
-    { label: 'Credential masking via inference.local', enabled: chkCreds },
-    { label: 'OCSF audit trail', enabled: chkAudit },
-    { label: 'Landlock filesystem isolation', enabled: chkFs },
-    { label: 'Multi-user isolation (OIDC + workspaces)', enabled: chkMulti }
+    { label: 'Credential masking (inference.local)', enabled: chkCreds },
+    { label: 'Landlock + seccomp + network namespace', enabled: chkFs },
+    { label: 'SPIFFE/SPIRE agent identity', enabled: chkIdentity },
+    { label: 'Deep tracing (MLflow + OTEL)', enabled: chkAudit },
+    { label: 'Multi-user (OIDC + RBAC + workspaces)', enabled: chkMulti }
   ];
+
+  const mcpLayer = chkMcp ? `
+      <div class="stack-section">
+        <div class="stack-section-header">
+          <span class="stack-section-label">Tool Governance — MCP Gateway</span>
+          <span class="info-icon">i<span class="tooltip">When agents call tools, requests go through the MCP Gateway. It performs OAuth2 token exchange, swapping the agent's identity for downstream access tokens. Authorization is by token claims, not prompts — prompt injection cannot bypass it.</span></span>
+        </div>
+        <div class="stack-section-product">MCP Gateway (Envoy-based)</div>
+        <div class="stack-section-desc">OAuth2 token exchange, identity-based tool filtering, credential management</div>
+      </div>` : '';
+
+  const guardrailsLayer = chkGuardrails ? `
+      <div class="stack-section">
+        <div class="stack-section-header">
+          <span class="stack-section-label">Safety Guardrails</span>
+          <span class="info-icon">i<span class="tooltip">Programmable safety rails at the inference boundary. NeMo Guardrails for conversation control, Guardrails Orchestrator for policy enforcement, Garak for pre-production adversarial scanning.</span></span>
+        </div>
+        <div class="stack-section-product">NeMo Guardrails + Garak</div>
+        <div class="stack-section-desc">Jailbreak detection, prompt injection defense, content moderation</div>
+      </div>` : '';
+
+  const kataNote = chkKata ? ' + Kata Containers (hardware-isolated VM)' : '';
 
   const setupPath = a.nemoclaw
     ? `<h4>Setup path</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.68rem;opacity:0.5">Or deploy OpenShell directly via Helm if you prefer manual control.</p>`
@@ -391,7 +422,7 @@ function showResult() {
         </div>
         <div class="stack-section-product">${a.name}</div>
         <div class="stack-section-desc">${a.desc}</div>
-      </div>${nemoclawLayer}
+      </div>${nemoclawLayer}${mcpLayer}${guardrailsLayer}
       <div class="stack-section runtime-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">Runtime (makes it safe) — OpenShell</span>
@@ -419,8 +450,8 @@ function showResult() {
           <span class="stack-section-label">Platform</span>
           <span class="info-icon">i<span class="tooltip">The compute platform that schedules pods, manages networking, storage, and GPU resources. OpenShell deploys as a StatefulSet. Agent Sandbox controller watches Sandbox CRs and creates pods.</span></span>
         </div>
-        <div class="stack-section-product">OpenShift + Red Hat build of Agent Sandbox</div>
-        <div class="stack-section-desc">Compute, networking, storage, GPU scheduling. Agent Sandbox controller manages sandbox pod lifecycle via Sandbox CRDs.</div>
+        <div class="stack-section-product">OpenShift + Red Hat build of Agent Sandbox${kataNote}</div>
+        <div class="stack-section-desc">Compute, networking, storage, GPU scheduling. Agent Sandbox controller manages sandbox pod lifecycle via CRDs.</div>
       </div>
     </div>
     <div class="setup-path">${setupPath}</div>
