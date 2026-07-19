@@ -217,7 +217,7 @@ body::before {
   animation: layerIn 0.4s ease forwards;
   opacity: 0;
   transform: translateY(10px);
-  margin-top: -4px;
+  margin-top: -6px;
 }
 .stack-section:first-child { margin-top: 0; }
 .stack-section:nth-child(1) { animation-delay: 0.08s; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
@@ -255,11 +255,6 @@ body::before {
 .rh-brand-subtle { color: rgba(238,0,0,0.7); }
 .rh-hat { display: inline-block; width: 18px; height: 18px; vertical-align: -2px; margin-right: 2px; }
 .rh-hat-sm { display: inline-block; width: 14px; height: 14px; vertical-align: -1px; margin-right: 2px; }
-
-.stack-section.nemoclaw-layer {
-  background: rgba(118,185,0,0.02);
-  border-left: 3px solid rgba(118,185,0,0.25);
-}
 
 .stack-section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
 .stack-section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; }
@@ -519,15 +514,11 @@ function showResult() {
   const chkKata = document.getElementById('chk-kata').checked;
   const chkMulti = document.getElementById('chk-multi').checked;
 
-  const nemoclawLayer = (a && a.nemoclaw) ? `
-      <div class="stack-section nemoclaw-layer">
-        <div class="stack-section-header">
-          <span class="stack-section-label">NemoClaw (optional — one-command setup)</span>
-          <span class="info-icon">i<span class="tooltip">NemoClaw bundles OpenShell + inference routing + hardened blueprints into a single 'nemoclaw onboard' command. Only supports 3 agents: OpenClaw, Hermes, LangChain Deep Agents Code. For everything else, deploy OpenShell directly.</span></span>
-        </div>
-        <div class="stack-section-product">NVIDIA NemoClaw</div>
-        <div class="stack-section-desc">Guided onboarding, versioned blueprints, managed inference config</div>
-      </div>` : '';
+  const nemoclawCard = (a && a.nemoclaw) ? `
+        <div class="setup-path" style="border-color:rgba(118,185,0,0.25)">
+          <h4>NemoClaw (optional)</h4>
+          <p>One-command onboarding via <code>nemoclaw onboard</code>. Bundles OpenShell + inference routing + hardened blueprints.</p>
+        </div>` : '';
 
   const features = [
     { label: 'Network policy (per-binary, per-host, L7)', enabled: chkNetwork },
@@ -585,7 +576,7 @@ function showResult() {
           </div>
           <div class="stack-section-product">${harnessName}</div>
           <div class="stack-section-desc">${harnessDesc}</div>
-        </div>${nemoclawLayer}
+        </div>
         <div class="stack-section runtime-layer">
           <div class="stack-section-header">
             <span class="stack-section-label">Runtime (makes it safe) — OpenShell</span>
@@ -613,7 +604,7 @@ function showResult() {
             <span>Cloud (Vertex, Anthropic, OpenAI)</span>
             <span>Local (Ollama, vLLM)</span>
           </div>
-        </div>${mcpLayer}${guardrailsLayer}
+        </div>${nemoclawCard}${mcpLayer}${guardrailsLayer}
         <div class="setup-path">${setupPath}</div>
         <div class="actions">
           <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
