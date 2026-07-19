@@ -450,13 +450,22 @@ body {
       <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">OpenClaw or Hermes</div></div><div class="layer-desc">Always-on, multi-channel</div></div>
       <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">Built-in (gateway + heartbeat + memory)</div></div><div class="layer-desc">Learning loop + skills</div></div>
       <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell via NemoClaw</div></div><div class="layer-desc">Sandboxed, one-command setup</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">Your machine / DGX / Server</div></div><div class="layer-desc">Persistent compute</div></div>
+      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">Your machine / DGX / RTX PC</div></div><div class="layer-desc">Persistent compute</div></div>
     </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>NemoClaw bundles everything in one command</li>
+    <div class="extras"><h4>NemoClaw supports exactly 3 agents</h4><ul>
+      <li><strong>OpenClaw</strong> — personal assistant (default)</li>
+      <li><strong>Hermes</strong> — self-improving agent with learning loop</li>
+      <li><strong>LangChain Deep Agents Code</strong> — terminal coding harness</li>
+    </ul><h4 style="margin-top:0.8rem">Key features</h4><ul>
+      <li>nemoclaw onboard — one command to set up everything</li>
       <li>inference.local routes to Nemotron, Ollama, or cloud</li>
       <li>Persistent memory across sessions</li>
-      <li>Messaging: WhatsApp, Slack, Telegram, etc.</li>
+      <li>Messaging: WhatsApp, Slack, Telegram (OpenClaw/Hermes)</li>
+    </ul></div>
+    <div class="extras" style="margin-top:0.75rem; border-color: rgba(238,0,0,0.2)"><h4>Not supported by NemoClaw CLI</h4><ul>
+      <li>Google ADK — use OpenShell directly instead</li>
+      <li>CrewAI — use OpenShell directly instead</li>
+      <li>LangGraph standalone — use OpenShell directly instead</li>
     </ul></div>
     <div class="actions">
       <a class="btn btn-primary" href="https://docs.nvidia.com/nemoclaw/latest/">NemoClaw docs</a>
@@ -486,22 +495,22 @@ body {
 
   <div class="result" id="R5">
     <div class="result-title">Multi-Team Enterprise Platform</div>
-    <div class="result-desc">Isolated projects, managed credentials, team governance</div>
+    <div class="result-desc">Isolated workspaces, managed credentials, team governance</div>
     <div class="stack-diagram">
       <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">Any framework (ADK, LangGraph, etc.)</div></div><div class="layer-desc">Per-team agent definitions</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">ACP runner bridges</div></div><div class="layer-desc">AG-UI streaming + session mgmt</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell (managed by ACP)</div></div><div class="layer-desc">Per-project sandbox isolation</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift + ACP control plane</div></div><div class="layer-desc">Multi-tenant, OIDC, RBAC</div></div>
+      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">Framework-provided (ADK Runner, etc.)</div></div><div class="layer-desc">Sessions + workflows</div></div>
+      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell (workspaces for isolation)</div></div><div class="layer-desc">Per-workspace sandbox + OIDC auth</div></div>
+      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + RBAC + networking</div></div>
     </div>
     <div class="extras"><h4>Key features</h4><ul>
-      <li>Project-level isolation (team A can't see team B)</li>
+      <li>OpenShell workspaces for team isolation (coming)</li>
+      <li>OIDC authentication (Keycloak, Entra ID, Okta)</li>
       <li>Managed credentials via OpenShell providers</li>
-      <li>GitOps agent fleet management</li>
-      <li>Scheduled sessions (cron-based recurring agents)</li>
-      <li>Web UI + CLI + SDK</li>
+      <li>Separate gateway per team (current model)</li>
+      <li>OCSF audit trail per user</li>
     </ul></div>
     <div class="actions">
-      <a class="btn btn-primary" href="https://openshift-online.github.io/agent-control-plane/">ACP docs</a>
+      <a class="btn btn-primary" href="../production/gitops/">GitOps deployment</a>
       <button class="btn btn-secondary" onclick="restart()">Start over</button>
     </div>
   </div>
@@ -510,19 +519,20 @@ body {
     <div class="result-title">Long-Running Coding Agent (Solo)</div>
     <div class="result-desc">Hours/days of autonomous coding with full harness</div>
     <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">LangGraph or OpenHands</div></div><div class="layer-desc">Autonomous coding tasks</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">Deep Agents (dcode) or OpenHands harness</div></div><div class="layer-desc">Full: filesystem, git, compaction, Ralph Loops</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Sandbox + network + credential masking</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Persistent PVC + GPU access</div></div>
+      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">LangChain Deep Agents Code (dcode)</div></div><div class="layer-desc">Autonomous coding tasks</div></div>
+      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">Deep Agents harness (full)</div></div><div class="layer-desc">Filesystem, git, compaction, Ralph Loops, verification</div></div>
+      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell via NemoClaw</div></div><div class="layer-desc">Sandbox + network + credential masking</div></div>
+      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift or local machine</div></div><div class="layer-desc">Persistent PVC + GPU access</div></div>
     </div>
-    <div class="extras"><h4>Key features</h4><ul>
+    <div class="extras"><h4>NemoClaw-supported path</h4><ul>
+      <li>nemo-deepagents onboard — one command setup</li>
       <li>Full coding harness (filesystem, git, bash, verification)</li>
       <li>Context compaction for long sessions</li>
       <li>inference.local with Nemotron or cloud models</li>
       <li>Persistent workspace survives restarts</li>
     </ul></div>
     <div class="actions">
-      <a class="btn btn-primary" href="../production/gitops/">GitOps deployment</a>
+      <a class="btn btn-primary" href="https://docs.nvidia.com/nemoclaw/user-guide/deepagents/get-started/quickstart">Deep Agents quickstart</a>
       <button class="btn btn-secondary" onclick="restart()">Start over</button>
     </div>
   </div>
