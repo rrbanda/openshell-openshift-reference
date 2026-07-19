@@ -466,10 +466,9 @@ body::before {
   border-left-color: var(--addon);
   background: linear-gradient(90deg, rgba(126,184,255,0.11), rgba(16,20,26,0.78) 48%);
 }
-.cake-layer.layer-next {
-  border-left-color: rgba(118,185,0,0.45);
-  background: rgba(22, 27, 34, 0.78);
-  padding-bottom: 0.7rem;
+.cake-layer.layer-safety:last-child {
+  border-radius: 0 0 14px 14px;
+  border-bottom: none;
 }
 .cake-top {
   display: flex;
@@ -531,10 +530,62 @@ body::before {
   margin: 0 0 0.28rem;
 }
 .cake-hint {
-  margin: 0 0 0.45rem;
+  margin: 0 0 0.35rem;
   font-size: 0.68rem;
   color: var(--dim);
 }
+.result-view-tabs {
+  display: inline-flex;
+  gap: 0.2rem;
+  margin: 0 0 0.55rem;
+  padding: 0.18rem;
+  border-radius: 8px;
+  border: 1px solid rgba(230,237,243,0.08);
+  background: rgba(22, 27, 34, 0.55);
+}
+.result-view-tabs button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.result-view-tabs button:hover { color: rgba(230,237,243,0.88); }
+.result-view-tabs button:focus-visible { outline: 2px solid var(--nv); outline-offset: 2px; }
+.result-view-tabs button.active {
+  background: var(--nv-dim);
+  color: var(--nv);
+}
+.result-pane { display: none; }
+.result-pane.active { display: block; }
+.next-panel {
+  border: 1px solid rgba(118,185,0,0.22);
+  border-radius: 12px;
+  padding: 0.85rem 1rem 1rem;
+  background: linear-gradient(165deg, rgba(118,185,0,0.07), rgba(22,27,34,0.85));
+  overflow: visible;
+}
+.next-panel h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+}
+.next-panel .next-lead {
+  margin: 0 0 0.65rem;
+  font-size: 0.74rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.next-panel .cmd-list { margin-top: 0.35rem; }
+.next-panel .cmd {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.next-panel .actions { margin-top: 0.7rem; }
 body.showing-stack .header details,
 body.showing-stack .header .tagline { display: none; }
 body.showing-stack .header { margin-bottom: 0.35rem; }
@@ -557,8 +608,7 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
   overflow-x: auto; white-space: nowrap;
 }
 .cmd-list { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.25rem; }
-.cake-layer.layer-next .actions { margin-top: 0.4rem !important; }
-.cake-layer.layer-next .callout { margin-top: 0.35rem; padding: 0.4rem 0.55rem; font-size: 0.7rem; }
+.next-panel .callout { margin-top: 0.55rem; }
 .rh-brand { color: var(--rh); }
 .rh-hat { display: inline-block; width: 18px; height: 18px; vertical-align: -3px; margin-right: 3px; border-radius: 3px; object-fit: contain; }
 
@@ -1448,9 +1498,11 @@ function showResult() {
     ? addonItems.join(" · ")
     : "None selected — OpenShell OCSF + OPA remain the security baseline. Add MLflow/EvalHub/Garak via OpenShift AI Agent Ops when you need product tracing and eval.";
 
-  const nextTip = `${authNote} OpenShell is alpha (single-player-first). Privileged SCC for sandbox netns is intentionally powerful. Commands: ${commands.join(" · ")}`;
   const harnessMaturity = a ? maturityBadge(agentMaturity(a)) : "";
-  const primaryCmd = commands[0] || "";
+  const safetyTipFull = [
+    "Safety & Agent Ops are OpenShift AI / NeMo portfolio add-ons — they complement OpenShell and do not replace Landlock, OPA egress, or OCSF.",
+    safetyTip,
+  ].join(" ");
 
   const html = `
     <div class="result-header">
@@ -1460,95 +1512,104 @@ function showResult() {
         <button type="button" class="btn btn-secondary" onclick="restart()">Restart</button>
       </div>
     </div>
-    <p class="cake-hint">Layer cake · tap <strong>i</strong> on each layer for full technical detail</p>
 
-    <div class="cake" role="list" aria-label="Architecture layers">
-      <section class="cake-layer layer-model" role="listitem">
-        <div class="cake-top">
-          <span class="cake-index">01 · Model</span>
-          <div class="cake-title-row">
-            <div class="cake-product">BYOM — frontier or self-hosted</div>
-            ${maturityBadge(caps.ogx ? "platform-target" : null)}
-            ${infoButton(modelTip, "About model and APIs")}
-          </div>
-        </div>
-        <ul class="cake-chips">
-          ${caps.creds ? chipOn("inference.local") : ""}
-          ${caps.ogx ? chipOn("ogx / Mode 2") : ""}
-          ${chipOn("Provider allows")}
-        </ul>
-      </section>
+    <div class="result-view-tabs" role="tablist" aria-label="Result view">
+      <button type="button" class="active" id="rv-arch" role="tab" aria-selected="true" onclick="setResultView('arch')">Architecture</button>
+      <button type="button" id="rv-next" role="tab" aria-selected="false" onclick="setResultView('next')">Next steps</button>
+    </div>
 
-      <section class="cake-layer layer-harness" role="listitem">
-        <div class="cake-top">
-          <span class="cake-index">02 · Harness</span>
-          <div class="cake-title-row">
-            <div class="cake-product">${harnessName}</div>
-            ${harnessMaturity}
-            ${a ? policyBadge(a.policy) : ""}
-            ${a?.nemoclaw ? '<span class="badge badge-nc">NemoClaw</span>' : ""}
-            ${infoButton(harnessTip, "About harness")}
+    <div class="result-pane active" id="pane-arch" role="tabpanel">
+      <p class="cake-hint">Architecture layers only · tap <strong>i</strong> for detail · Next steps are on the other tab</p>
+      <div class="cake" role="list" aria-label="Architecture layers">
+        <section class="cake-layer layer-model" role="listitem">
+          <div class="cake-top">
+            <span class="cake-index">01 · Model</span>
+            <div class="cake-title-row">
+              <div class="cake-product">BYOM — frontier or self-hosted</div>
+              ${maturityBadge(caps.ogx ? "platform-target" : null)}
+              ${infoButton(modelTip, "About model and APIs")}
+            </div>
           </div>
-        </div>
-        <ul class="cake-chips">
-          ${chipOn(a?.entry === "harness" ? "Pattern 2" : "Pattern 1")}
-          ${a?.nemoclaw ? chipOn("NemoClaw path") : chipOn("BYOA image")}
-        </ul>
-        ${suggestAgentsHtml(uc?.suggestedAgents)}
-      </section>
+          <ul class="cake-chips">
+            ${caps.creds ? chipOn("inference.local") : ""}
+            ${caps.ogx ? chipOn("ogx / Mode 2") : ""}
+            ${chipOn("Provider allows")}
+          </ul>
+        </section>
 
-      <section class="cake-layer layer-openshell" role="listitem">
-        <div class="cake-top">
-          <span class="cake-index">03 · Runtime</span>
-          <div class="cake-title-row">
-            <div class="cake-product"><span style="color:var(--nv)">NVIDIA</span> OpenShell</div>
-            ${maturityBadge("alpha")}
-            <span class="badge badge-bundled">${profile.name}</span>
-            ${infoButton(openshellTip, "About OpenShell")}
+        <section class="cake-layer layer-harness" role="listitem">
+          <div class="cake-top">
+            <span class="cake-index">02 · Harness</span>
+            <div class="cake-title-row">
+              <div class="cake-product">${harnessName}</div>
+              ${harnessMaturity}
+              ${a ? policyBadge(a.policy) : ""}
+              ${a?.nemoclaw ? '<span class="badge badge-nc">NemoClaw</span>' : ""}
+              ${infoButton(harnessTip, "About harness")}
+            </div>
           </div>
-        </div>
-        <ul class="cake-chips">${openshellChips || chipOn("Baseline sandbox")}</ul>
-      </section>
+          <ul class="cake-chips">
+            ${chipOn(a?.entry === "harness" ? "Pattern 2" : "Pattern 1")}
+            ${a?.nemoclaw ? chipOn("NemoClaw path") : chipOn("BYOA image")}
+          </ul>
+          ${suggestAgentsHtml(uc?.suggestedAgents)}
+        </section>
 
-      <section class="cake-layer layer-platform" role="listitem">
-        <div class="cake-top">
-          <span class="cake-index">04 · Platform</span>
-          <div class="cake-title-row">
-            <div class="cake-product">${platformTitle}</div>
-            ${caps.kata ? maturityBadge("ga") : maturityBadge("platform-target")}
-            ${infoButton(platformTip, "About platform layer")}
+        <section class="cake-layer layer-openshell" role="listitem">
+          <div class="cake-top">
+            <span class="cake-index">03 · Runtime</span>
+            <div class="cake-title-row">
+              <div class="cake-product"><span style="color:var(--nv)">NVIDIA</span> OpenShell</div>
+              ${maturityBadge("alpha")}
+              <span class="badge badge-bundled">${profile.name}</span>
+              ${infoButton(openshellTip, "About OpenShell")}
+            </div>
           </div>
-        </div>
-        <ul class="cake-chips">${platformChips}</ul>
-      </section>
+          <ul class="cake-chips">${openshellChips || chipOn("Baseline sandbox")}</ul>
+        </section>
 
-      <section class="cake-layer layer-safety" role="listitem">
-        <div class="cake-top">
-          <span class="cake-index">05 · Safety</span>
-          <div class="cake-title-row">
-            <div class="cake-product">Agent Ops add-ons</div>
-            ${(caps.guardrails || caps.mlflow) ? maturityBadge("platform-target") : ""}
-            ${infoButton(safetyTip, "About safety add-ons")}
+        <section class="cake-layer layer-platform" role="listitem">
+          <div class="cake-top">
+            <span class="cake-index">04 · Platform</span>
+            <div class="cake-title-row">
+              <div class="cake-product">${platformTitle}</div>
+              ${caps.kata ? maturityBadge("ga") : maturityBadge("platform-target")}
+              ${infoButton(platformTip, "About platform layer")}
+            </div>
           </div>
-        </div>
-        <ul class="cake-chips">${safetyChips}</ul>
-      </section>
+          <ul class="cake-chips">${platformChips}</ul>
+        </section>
 
-      <section class="cake-layer layer-next" role="listitem">
-        <div class="cake-top">
-          <span class="cake-index">Next</span>
-          <div class="cake-title-row">
-            <div class="cake-product">Commands</div>
-            ${infoButton(nextTip, "Auth, maturity, and all commands")}
+        <section class="cake-layer layer-safety" role="listitem">
+          <div class="cake-top">
+            <span class="cake-index">05 · Safety</span>
+            <div class="cake-title-row">
+              <div class="cake-product">Safety &amp; Agent Ops</div>
+              ${(caps.guardrails || caps.mlflow) ? maturityBadge("platform-target") : ""}
+              ${infoButton(safetyTipFull, "About safety and Agent Ops")}
+            </div>
           </div>
+          <ul class="cake-chips">${safetyChips}</ul>
+        </section>
+      </div>
+    </div>
+
+    <div class="result-pane" id="pane-next" role="tabpanel">
+      <div class="next-panel">
+        <h3>Next steps</h3>
+        <p class="next-lead">Commands, auth posture, and links — not part of the architecture cake.</p>
+        <div class="stack-section-label" style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.5;margin-bottom:0.25rem">Commands</div>
+        <div class="cmd-list">
+          ${commands.map((c) => `<code class="cmd">${c}</code>`).join("")}
         </div>
-        ${primaryCmd ? `<code class="cmd">${primaryCmd}</code>` : ""}
+        <div class="callout callout-warn"><strong>Auth / maturity:</strong> ${authNote} OpenShell is alpha (single-player-first). Privileged SCC for sandbox netns is intentionally powerful.</div>
         <div class="actions actions-sm">
-          <a class="btn btn-primary" href="../quickstart/">Quickstart</a>
+          <a class="btn btn-primary" href="../quickstart/">Open Quickstart</a>
+          <a class="btn btn-secondary" href="../sandboxes/network-policies/">Network policies</a>
           <a class="btn btn-secondary" href="../agent-stack-decision-guide/">Decision Guide</a>
           <a class="btn btn-secondary" href="https://docs.nvidia.com/openshell/latest/about/supported-agents.html" target="_blank" rel="noopener">Supported agents</a>
         </div>
-      </section>
+      </div>
     </div>
 
     <p class="footer-note">Kagenti → OpenShell · compose OpenShell + OpenShift AI layers — do not conflate with OSC or MCP Gateway. Vault <em>dev mode</em> / eval TLS flags are for learning only.</p>
@@ -1560,6 +1621,21 @@ function showResult() {
   resultEl.classList.add("active");
   document.body.classList.add("showing-stack");
   updateProgress(2);
+}
+
+function setResultView(which) {
+  const arch = which !== "next";
+  const paneArch = document.getElementById("pane-arch");
+  const paneNext = document.getElementById("pane-next");
+  const tabArch = document.getElementById("rv-arch");
+  const tabNext = document.getElementById("rv-next");
+  if (!paneArch || !paneNext) return;
+  paneArch.classList.toggle("active", arch);
+  paneNext.classList.toggle("active", !arch);
+  tabArch?.classList.toggle("active", arch);
+  tabNext?.classList.toggle("active", !arch);
+  tabArch?.setAttribute("aria-selected", arch ? "true" : "false");
+  tabNext?.setAttribute("aria-selected", arch ? "false" : "true");
 }
 
 function restart() {
