@@ -159,7 +159,7 @@ Aligned to Red Hat AI field positioning (July 2026): **Kagenti → OpenShell**, 
 | **kubernetes-sigs/agent-sandbox** | Sandbox CRD lifecycle | OpenShift / OSC path |
 | **MCP Gateway** | Tool OAuth2 exchange, claim-based auth (Kuadrant/Authorino) | Red Hat AI |
 | **ogx / Open Responses** | Mode 2 agentic API surface | Red Hat AI |
-| **MLflow + OTEL / EvalHub** | Product tracing & evaluation | OpenShift AI Agent Ops |
+| **MLflow + OTEL / EvalHub** | Observability & evaluation capabilities | Red Hat OpenShift AI |
 
 **Compose:** Kata for kernel boundary ∪ OpenShell for application policy ∪ agent-sandbox for lifecycle. OpenShell does **not** replace OSC or MCP Gateway.
 
@@ -232,12 +232,12 @@ OpenShell provides the **application-level sandbox** in Red Hat AI's defense-in-
 | OCSF v1.7.0 logging | Security audit (SIEM) — not MLflow product tracing |
 | Hot-reloadable network/inference policy | Operational flexibility |
 
-**OpenShell doesn't provide (platform / other products do):**
+**OpenShell doesn't provide (other OpenShift AI capabilities / cluster controls do):**
 
 - Kata / OSC hardware isolation (L5)
 - MCP Gateway tool OAuth exchange (Kuadrant/Authorino)
 - ogx / Open Responses Mode-2 API surface
-- MLflow + EvalHub + Garak Agent Ops
+- MLflow / OTEL, EvalHub, Garak, NeMo Guardrails (safety & evaluation portfolio)
 - Orchestration loops, memory, planning (harness/framework)
 
 **OpenShell's value (field line):** Agents are zero-trust employees — OpenShell makes sure the agent can only do what policy allows, portably from laptop (Podman) to OpenShift.
@@ -286,18 +286,15 @@ For this reference architecture (BYOA on Red Hat AI):
 ┌─────────────────────────────────────────┐
 │ Your Agent (BYOA harness / framework)   │  ← You bring this
 ├─────────────────────────────────────────┤
-│ OpenShift AI Agent Ops (optional)       │  ← MLflow/OTEL, EvalHub,
-│                                         │     MCP Gateway, ogx, guardrails
+│ Red Hat OpenShift AI (the product)      │
+│  · Safety & eval: Guardrails, EvalHub,  │
+│    Garak, MLflow/OTEL                   │
+│  · Connectivity: MCP Gateway, ogx       │
+│  · OpenShell (app sandbox capability)   │  ← OPA, Landlock, seccomp,
+│  · OSC / Kata (GA layered isolation)    │     inference.local, OCSF; L5
+│  · agent-sandbox controller             │  ← Sandbox CR lifecycle
 ├─────────────────────────────────────────┤
-│ OpenShell (application sandbox)         │  ← OPA, Landlock, seccomp,
-│                                         │     inference.local, OCSF
-├─────────────────────────────────────────┤
-│ Optional: OSC / Kata (L5)               │  ← Dedicated kernel when risk
-│                                         │     demands hardware isolation
-├─────────────────────────────────────────┤
-│ agent-sandbox controller                │  ← Sandbox CR lifecycle
-├─────────────────────────────────────────┤
-│ OpenShift                               │  ← SCC/RBAC, NetworkPolicy/UDN,
+│ OpenShift (cluster platform)            │  ← SCC/RBAC, NetworkPolicy/UDN,
 │                                         │     SPIFFE/SPIRE, scheduling
 └─────────────────────────────────────────┘
 ```

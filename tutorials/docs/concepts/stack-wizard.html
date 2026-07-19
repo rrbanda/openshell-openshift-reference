@@ -1446,7 +1446,7 @@ function showResult() {
       ? [
           "# Field mapping: AgentRuntime on normal containers may suffice",
           "# Add OpenShell when you need per-binary egress, Landlock, or inference.local",
-          "Follow OpenShift AI AgentRuntime / Agent Ops docs",
+          "Follow OpenShift AI AgentRuntime docs",
         ]
       : [
           "openshell sandbox create --from <image> --policy ./policy.yaml",
@@ -1512,10 +1512,10 @@ function showResult() {
   ].join(" ");
 
   const platformTip = [
-    "Platform capabilities of the Red Hat OpenShift AI product — not a separate product called OpenShift foundation.",
+    "Platform capability group inside the Red Hat OpenShift AI product (isolation, tenancy, tool connectivity).",
     computeLine,
     useCaseContext ? `Use-case context: ${useCaseContext}.` : "",
-    "Includes OpenShift Sandboxed Containers / Kata (GA layered), multitenancy (projects / NetworkPolicy / UDN), MCP Gateway (Preview), and related cluster controls.",
+    "Includes OpenShift Sandboxed Containers / Kata (GA layered), multitenancy (projects / NetworkPolicy / UDN), and MCP Gateway (Preview).",
     "NetworkPolicy + optional UDN + egress proxy compose with the OpenShell capability.",
     "SPIFFE/SPIRE on OpenShift layers with sandbox JWT.",
   ].filter(Boolean).join(" ");
