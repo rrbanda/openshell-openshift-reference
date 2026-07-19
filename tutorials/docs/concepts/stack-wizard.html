@@ -1506,11 +1506,12 @@ function showResult() {
   ].filter(Boolean).join(" ");
 
   const openshellTip = [
-    "OpenShell is an OpenShift AI portfolio capability (NVIDIA collaboration) — not a separate product from OpenShift AI.",
-    "Red Hat AI Agentic Strategy 2026 Appendix A: Planned Developer Preview in OpenShift AI 3.5, targeting Tech Preview in 3.6. Upstream OpenShell is also alpha / single-player-first.",
+    "Sandbox path is a compose, not a single name: OpenShell (app policy) + Agent Sandbox operator (kubernetes-sigs/agent-sandbox CR lifecycle on OpenShift).",
+    "OpenShell is an OpenShift AI portfolio capability (NVIDIA collaboration) — Landlock, seccomp, netns, OPA L4/L7, inference.local, OCSF.",
+    "Agent Sandbox operator owns Sandbox CR lifecycle (create/schedule/teardown); it does not replace OpenShell policy.",
+    "Red Hat AI Agentic Strategy 2026 Appendix A: OpenShell planned Developer Preview in OpenShift AI 3.5, targeting Tech Preview in 3.6. Upstream OpenShell is also alpha / single-player-first.",
     `Isolation profile: ${profile.name} (${profile.layers}) — ${profile.blurb}`,
-    "Application-level sandbox (Mode 1; composes with Mode 2): Landlock, seccomp, netns, OPA L4/L7, inference.local, OCSF.",
-    "Compose: Kata (L5, GA layered on OpenShift) ∪ OpenShell (app policy) ∪ agent-sandbox (lifecycle).",
+    "Optional L5: Kata / OpenShift Sandboxed Containers for dedicated-kernel isolation.",
   ].join(" ");
 
   const platformTip = [
@@ -1590,13 +1591,17 @@ function showResult() {
           <div class="cake-top">
             <span class="cake-index">03 · Sandbox</span>
             <div class="cake-title-row">
-              <div class="cake-product">OpenShell</div>
+              <div class="cake-product">OpenShell + Agent Sandbox</div>
               ${maturityBadge("rhoai-dp")}
               <span class="badge badge-bundled">${profile.name}</span>
-              ${infoButton(openshellTip, "About OpenShell capability")}
+              ${infoButton(openshellTip, "About OpenShell and Agent Sandbox operator")}
             </div>
           </div>
-          <ul class="cake-chips">${openshellChips || chipOn("Baseline sandbox")}</ul>
+          <ul class="cake-chips">
+            ${chipOn("Agent Sandbox operator")}
+            ${chipOn("Sandbox CR lifecycle")}
+            ${openshellChips || chipOn("OpenShell policy")}
+          </ul>
         </section>
 
         <section class="cake-layer layer-platform" role="listitem">
