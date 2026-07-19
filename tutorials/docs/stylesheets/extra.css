@@ -81,15 +81,26 @@
   color: white;
 }
 
-/* Grid cards enhancement */
+/* Grid cards — no translateY (clips against Material content overflow) */
 .md-typeset .grid.cards > ul > li {
   border: 1px solid var(--md-default-fg-color--lightest);
-  transition: transform 0.15s, border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  overflow: visible;
 }
 
 .md-typeset .grid.cards > ul > li:hover {
-  transform: translateY(-2px);
   border-color: var(--md-primary-fg-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* Interactive HTML pages embedded in Material: never clip content */
+.md-typeset {
+  overflow: visible;
+}
+
+.md-content,
+.md-content__inner {
+  overflow: visible;
 }
 
 /* Code blocks */
