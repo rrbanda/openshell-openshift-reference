@@ -110,6 +110,8 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Concepts:
+      - Agent Architecture: concepts/agent-architecture.md
   - Getting Started:
       - getting-started/index.md
       - Prerequisites: getting-started/prerequisites.md
