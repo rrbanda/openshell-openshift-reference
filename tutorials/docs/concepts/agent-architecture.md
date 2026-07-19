@@ -134,15 +134,19 @@ flowchart TB
 
 How real products map to these layers:
 
-| Product | Framework | Harness | Runtime / Sandbox | Infrastructure |
+| Product | Category | Harness | Runtime / Sandbox | NemoClaw supported? |
 |---|---|---|---|---|
-| **Claude Code** | Anthropic SDK | Built-in (full) | Built-in sandbox | Your machine |
-| **LangChain Deep Agents** | LangGraph | `dcode` (full) | OpenShell via NemoClaw | Any (laptop, K8s) |
-| **Google ADK** | ADK | Partial (Runner + Sessions + Workflows) | None built-in | Cloud Run / GKE / Agent Runtime |
-| **OpenClaw** | OpenClaw | Built-in (gateway + heartbeat + memory) | OpenShell via NemoClaw | Any (laptop, server) |
-| **OpenShell** | — | — | **This is the runtime** | K8s / Docker / VM |
-| **NemoClaw** | — | Packages a supported harness | OpenShell (bundled) | Any NVIDIA hardware |
-| **ACP** | — | Runner bridges (per framework) | OpenShell (managed) | OpenShift |
+| **Claude Code** | Coding agent | Built-in (full) | OpenShell (add policy layer) | No — use OpenShell directly |
+| **OpenAI Codex CLI** | Coding agent | Built-in (full) | OpenShell (add policy layer) | No — use OpenShell directly |
+| **Gemini CLI** | Coding agent | Built-in | OpenShell (add policy layer) | No — use OpenShell directly |
+| **OpenCode** | Coding agent | Built-in (full, model-agnostic) | OpenShell (add policy layer) | No — use OpenShell directly |
+| **OpenHands** | Coding platform | Built-in (full + own sandbox) | OpenShell (add policy layer) | No — use OpenShell directly |
+| **LangChain Deep Agents** | Coding harness | `dcode` (full) | OpenShell via NemoClaw | **Yes** |
+| **Hermes** | Always-on agent | Built-in (learning loop + skills) | OpenShell via NemoClaw | **Yes** |
+| **OpenClaw** | Personal assistant | Built-in (gateway + heartbeat + memory) | OpenShell via NemoClaw | **Yes** (default) |
+| **Google ADK** | Framework | Partial (Runner + Sessions + Workflows) | OpenShell (add sandbox) | No — use OpenShell directly |
+| **OpenShell** | Runtime | — | **This IS the runtime** | N/A (NemoClaw uses it) |
+| **NemoClaw** | Packaged stack | Bundles 3 supported harnesses | OpenShell (bundled) | N/A (this IS NemoClaw) |
 
 ---
 
@@ -225,7 +229,7 @@ OpenShell provides the **sandbox/runtime component** of a harness. Specifically:
 
     Multiple teams running multiple agents with governance.
 
-    **You need:** Platform (ACP) + Full harness or framework + Runtime (OpenShell)
+    **You need:** Framework (ADK/LangGraph) + Runtime (OpenShell with OIDC + workspaces) on OpenShift
 
 ---
 

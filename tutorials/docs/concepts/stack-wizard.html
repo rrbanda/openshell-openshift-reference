@@ -290,18 +290,34 @@ body {
     </div>
   </div>
 
-  <!-- Step 2a: Coding agent - duration -->
+  <!-- Step 2a: Coding agent - which harness -->
   <div class="step" id="step2a">
     <div class="breadcrumb">Coding Agent →</div>
-    <div class="question">How long does it run?</div>
+    <div class="question">Which coding agent harness?</div>
     <div class="options">
-      <div class="option" onclick="showResult('R1')">
-        <h3>Minutes</h3>
-        <p>Short tasks: fix a bug, write a function, review a PR</p>
+      <div class="option" onclick="showResult('R_claude')">
+        <h3>Claude Code</h3>
+        <p>Anthropic's agent — most popular, full harness built-in</p>
       </div>
-      <div class="option" onclick="goTo('step3a')">
-        <h3>Hours / Days</h3>
-        <p>Long projects: build a feature, refactor a codebase</p>
+      <div class="option" onclick="showResult('R_codex')">
+        <h3>OpenAI Codex CLI</h3>
+        <p>OpenAI's coding agent with built-in sandbox</p>
+      </div>
+      <div class="option" onclick="showResult('R_gemini')">
+        <h3>Gemini CLI</h3>
+        <p>Google's coding agent for terminal</p>
+      </div>
+      <div class="option" onclick="showResult('R_opencode')">
+        <h3>OpenCode</h3>
+        <p>Open-source (187K stars), model-agnostic, terminal/desktop/IDE</p>
+      </div>
+      <div class="option" onclick="showResult('R_openhands')">
+        <h3>OpenHands</h3>
+        <p>Open-source AI software engineer (78K stars), full platform</p>
+      </div>
+      <div class="option" onclick="showResult('R6')">
+        <h3>LangChain Deep Agents / Hermes</h3>
+        <p>NemoClaw-supported — one-command setup with OpenShell</p>
       </div>
     </div>
   </div>
@@ -403,22 +419,104 @@ body {
   </div>
 
   <!-- Results -->
-  <div class="result" id="R1">
-    <div class="result-title">Short Coding Task</div>
-    <div class="result-desc">Quick agent runs with full sandbox isolation</div>
+  <div class="result" id="R_claude">
+    <div class="result-title">Claude Code + OpenShell</div>
+    <div class="result-desc">Anthropic's coding agent with enterprise-grade sandboxing</div>
     <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">Your code (ADK or LangGraph)</div></div><div class="layer-desc">Short-lived task execution</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">Framework built-in Runner</div></div><div class="layer-desc">Orchestration loop + tools</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Network policy + isolation</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + scheduling</div></div>
+      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">Claude Code (full built-in harness)</div></div><div class="layer-desc">Planning, tools, memory, verification, git</div></div>
+      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Network policy + credential masking</div></div>
+      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + persistent workspace</div></div>
     </div>
     <div class="extras"><h4>Key features</h4><ul>
-      <li>inference.local routes to your chosen LLM</li>
-      <li>Default-deny network — only policy-allowed endpoints</li>
-      <li>OCSF audit trail of all agent actions</li>
+      <li>Claude Code includes the full harness (no separate harness needed)</li>
+      <li>OpenShell adds: network policy, credential masking via inference.local, audit trail</li>
+      <li>ANTHROPIC_BASE_URL=https://inference.local — keys never exposed to agent</li>
+      <li>NemoClaw does NOT support Claude Code — use OpenShell directly</li>
     </ul></div>
     <div class="actions">
-      <a class="btn btn-primary" href="../getting-started/prerequisites/">Get started</a>
+      <a class="btn btn-primary" href="../getting-started/prerequisites/">Deploy on OpenShift</a>
+      <button class="btn btn-secondary" onclick="restart()">Start over</button>
+    </div>
+  </div>
+
+  <div class="result" id="R_codex">
+    <div class="result-title">OpenAI Codex + OpenShell</div>
+    <div class="result-desc">OpenAI's coding agent with sandboxed execution</div>
+    <div class="stack-diagram">
+      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">OpenAI Codex CLI (full built-in harness)</div></div><div class="layer-desc">Planning, tools, code execution, verification</div></div>
+      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Network policy + isolation</div></div>
+      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + persistent workspace</div></div>
+    </div>
+    <div class="extras"><h4>Key features</h4><ul>
+      <li>Codex has its own sandbox — OpenShell adds network-level policy on top</li>
+      <li>OpenShell controls which endpoints Codex can reach</li>
+      <li>OPENAI_BASE_URL=https://inference.local for credential masking</li>
+      <li>NemoClaw does NOT support Codex — use OpenShell directly</li>
+    </ul></div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../getting-started/prerequisites/">Deploy on OpenShift</a>
+      <button class="btn btn-secondary" onclick="restart()">Start over</button>
+    </div>
+  </div>
+
+  <div class="result" id="R_gemini">
+    <div class="result-title">Gemini CLI + OpenShell</div>
+    <div class="result-desc">Google's coding agent with policy-enforced sandboxing</div>
+    <div class="stack-diagram">
+      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">Gemini CLI (built-in harness)</div></div><div class="layer-desc">Google's terminal coding agent</div></div>
+      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Network policy + credential masking</div></div>
+      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + persistent workspace</div></div>
+    </div>
+    <div class="extras"><h4>Key features</h4><ul>
+      <li>Gemini CLI connects to Gemini models natively</li>
+      <li>OpenShell adds: egress control, per-binary policy, audit</li>
+      <li>inference.local can route to Vertex AI or other providers</li>
+      <li>NemoClaw does NOT support Gemini CLI — use OpenShell directly</li>
+    </ul></div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../getting-started/prerequisites/">Deploy on OpenShift</a>
+      <button class="btn btn-secondary" onclick="restart()">Start over</button>
+    </div>
+  </div>
+
+  <div class="result" id="R_opencode">
+    <div class="result-title">OpenCode + OpenShell</div>
+    <div class="result-desc">Open-source, model-agnostic coding agent (187K stars)</div>
+    <div class="stack-diagram">
+      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">OpenCode (full harness, any model)</div></div><div class="layer-desc">Terminal + desktop + IDE, 75+ LLM providers</div></div>
+      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Network policy + credential masking</div></div>
+      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + persistent workspace</div></div>
+    </div>
+    <div class="extras"><h4>Key features</h4><ul>
+      <li>Model-agnostic — works with any LLM provider</li>
+      <li>Open-source (MIT), privacy-first, no data stored</li>
+      <li>OpenShell adds: network isolation, inference routing, audit</li>
+      <li>Listed in NVIDIA Agent Toolkit diagram as supported harness</li>
+      <li>NemoClaw does NOT support OpenCode directly — use OpenShell directly</li>
+    </ul></div>
+    <div class="actions">
+      <a class="btn btn-primary" href="https://opencode.ai">OpenCode docs</a>
+      <button class="btn btn-secondary" onclick="restart()">Start over</button>
+    </div>
+  </div>
+
+  <div class="result" id="R_openhands">
+    <div class="result-title">OpenHands + OpenShell</div>
+    <div class="result-desc">Open-source AI software engineer platform (78K stars)</div>
+    <div class="stack-diagram">
+      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">OpenHands (full platform + harness)</div></div><div class="layer-desc">Multi-agent, SDK, CLI, Agent Canvas</div></div>
+      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell (adds policy layer)</div></div><div class="layer-desc">OpenHands has own sandbox; OpenShell adds network policy</div></div>
+      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Enterprise self-hosted deployment</div></div>
+    </div>
+    <div class="extras"><h4>Key features</h4><ul>
+      <li>OpenHands has its own Docker sandbox (code exec isolation)</li>
+      <li>OpenShell adds network-level policy on top (egress control, audit)</li>
+      <li>Model-agnostic via Agent Client Protocol</li>
+      <li>Enterprise tier available for VPC/K8s deployment</li>
+      <li>Listed in NVIDIA Agent Toolkit diagram as supported harness</li>
+    </ul></div>
+    <div class="actions">
+      <a class="btn btn-primary" href="https://www.openhands.dev">OpenHands docs</a>
       <button class="btn btn-secondary" onclick="restart()">Start over</button>
     </div>
   </div>
