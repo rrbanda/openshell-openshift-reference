@@ -231,8 +231,15 @@ body::before {
   background: rgba(118,185,0,0.04);
 }
 .stack-section.addon-layer { border-left: 3px solid rgba(118,185,0,0.35); }
-.stack-section.inference-layer { border-left: 3px solid rgba(230,237,243,0.12); }
-.stack-section.platform-layer { border-left: 3px solid rgba(230,237,243,0.12); }
+.stack-section.inference-layer { border-left: 3px solid rgba(238,0,0,0.25); }
+.stack-section.platform-layer {
+  border-left: 3px solid #ee0000;
+  background: rgba(238,0,0,0.03);
+}
+
+/* Red Hat brand accent for product names */
+.rh-brand { color: #ee0000; }
+.rh-brand-subtle { color: rgba(238,0,0,0.7); }
 
 .stack-section.nemoclaw-layer {
   background: rgba(118,185,0,0.02);
@@ -569,7 +576,7 @@ function showResult() {
           <span class="stack-section-label">Runtime (makes it safe) — OpenShell</span>
           <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. The harness decides actions; the runtime enforces boundaries. Network isolation, credential masking, filesystem restrictions, and audit logging — regardless of which harness you use.</span></span>
         </div>
-        <div class="stack-section-product">NVIDIA OpenShell</div>
+        <div class="stack-section-product"><span style="color:#76b900">NVIDIA</span> OpenShell</div>
         <ul class="stack-features">
           ${features.map(f => `<li class="${f.enabled ? 'enabled' : 'disabled'}">${f.label}</li>`).join('')}
         </ul>
@@ -581,7 +588,7 @@ function showResult() {
         </div>
         <div class="stack-section-product">inference.local → flexible backend</div>
         <div class="routes" style="margin-top:0.3rem">
-          <span>OpenShift AI (vLLM, NIM)</span>
+          <span><span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
           <span>Cloud (Vertex, Anthropic, OpenAI)</span>
           <span>Local (Ollama, vLLM)</span>
         </div>
@@ -591,7 +598,7 @@ function showResult() {
           <span class="stack-section-label">Platform</span>
           <span class="info-icon">i<span class="tooltip">Red Hat OpenShift AI provides agent lifecycle (Kagenti/AgentRuntime), model serving (vLLM, KServe), MLflow tracing, and EvalHub. Kubernetes agent-sandbox manages pod lifecycle, warm pools, and optional Kata isolation via CRDs.</span></span>
         </div>
-        <div class="stack-section-product">${platformName}${kataNote}</div>
+        <div class="stack-section-product">${platformName.includes('Red Hat') ? platformName.replace('Red Hat', '<span class="rh-brand">Red Hat</span>') : platformName}${kataNote}</div>
       </div>
     </div>
     <div class="setup-path">${setupPath}</div>
