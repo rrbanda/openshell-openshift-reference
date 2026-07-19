@@ -59,14 +59,14 @@ body::before {
 .selected-agent span { color: #76b900; font-weight: 600; }
 
 /* Agent grid */
-.agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 0.6rem; }
+.agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 0.7rem; }
 
 .agent-card {
   backdrop-filter: blur(12px);
   background: rgba(22, 27, 34, 0.6);
   border: 1px solid rgba(230, 237, 243, 0.08);
   border-radius: 10px;
-  padding: 0.75rem;
+  padding: 0.9rem 0.8rem;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
@@ -99,8 +99,8 @@ body::before {
 
 .agent-card:active { transform: scale(0.97); }
 
-.agent-card h4 { font-size: 0.78rem; color: #e6edf3; margin-bottom: 0.15rem; font-weight: 600; }
-.agent-card p { font-size: 0.62rem; opacity: 0.5; }
+.agent-card h4 { font-size: 0.85rem; color: #e6edf3; margin-bottom: 0.2rem; font-weight: 600; }
+.agent-card p { font-size: 0.68rem; opacity: 0.5; line-height: 1.3; }
 
 /* NemoClaw badge */
 .agent-card .badge-nc {
@@ -273,6 +273,7 @@ body::before {
       <div class="agent-card" onclick="selectAgent('adk')"><h4>Google ADK</h4><p>Enterprise workflows</p></div>
       <div class="agent-card" onclick="selectAgent('langgraph')"><h4>LangGraph</h4><p>LangChain</p></div>
       <div class="agent-card" onclick="selectAgent('crewai')"><h4>CrewAI</h4><p>Multi-agent</p></div>
+      <div class="agent-card" onclick="selectAgent('strands')"><h4>Strands</h4><p>AWS (open-source)</p></div>
       <div class="agent-card nc-supported" onclick="selectAgent('openclaw')"><h4>OpenClaw</h4><p>Assistant</p><span class="badge-nc">NemoClaw</span></div>
       <div class="agent-card nc-supported" onclick="selectAgent('hermes')"><h4>Hermes</h4><p>Nous Research</p><span class="badge-nc">NemoClaw</span></div>
       <div class="agent-card nc-supported" onclick="selectAgent('deepagents')"><h4>Deep Agents</h4><p>LangChain dcode</p><span class="badge-nc">NemoClaw</span></div>
@@ -314,6 +315,7 @@ const agents = {
   adk: { name: 'Google ADK', by: 'Google', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Full framework: Runner, Sessions, Workflows, Memory, Ambient Agents. No built-in sandbox.' },
   langgraph: { name: 'LangGraph', by: 'LangChain', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Graph-based agent orchestration with durable execution, checkpointing, and state management' },
   crewai: { name: 'CrewAI', by: 'CrewAI', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Role-based multi-agent framework with task delegation, tool sharing, and parallel execution' },
+  strands: { name: 'Strands', by: 'AWS (open-source)', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'AWS open-source agent SDK with model-driven orchestration, tools, and sessions' },
   openclaw: { name: 'OpenClaw', by: 'Community', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Always-on personal assistant with multi-channel messaging, persistent memory, and heartbeat' },
   hermes: { name: 'Hermes', by: 'Nous Research', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Self-improving agent with learning loop, persistent skills, and cross-session memory' },
   deepagents: { name: 'LangChain Deep Agents Code', by: 'LangChain', type: 'coding', hasOwnSandbox: false, nemoclaw: true, desc: 'Full coding harness: filesystem, git, bash, context compaction, Ralph Loops, verification' },
@@ -417,8 +419,8 @@ function showResult() {
           <span class="stack-section-label">Platform</span>
           <span class="info-icon">i<span class="tooltip">The compute platform that schedules pods, manages networking, storage, and GPU resources. OpenShell deploys as a StatefulSet. Agent Sandbox controller watches Sandbox CRs and creates pods.</span></span>
         </div>
-        <div class="stack-section-product">OpenShift</div>
-        <div class="stack-section-desc">Compute, networking, storage, GPU scheduling</div>
+        <div class="stack-section-product">OpenShift + Red Hat build of Agent Sandbox</div>
+        <div class="stack-section-desc">Compute, networking, storage, GPU scheduling. Agent Sandbox controller manages sandbox pod lifecycle via Sandbox CRDs.</div>
       </div>
     </div>
     <div class="setup-path">${setupPath}</div>
