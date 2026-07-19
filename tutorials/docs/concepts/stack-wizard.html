@@ -40,7 +40,7 @@ body::before {
 @keyframes shimmer { to { background-position: 200% center; } }
 .header p { opacity: 0.6; font-size: 0.95rem; line-height: 1.5; }
 
-.container { max-width: 640px; width: 100%; position: relative; z-index: 1; }
+.container { max-width: 1060px; width: 100%; position: relative; z-index: 1; }
 
 /* Journey tabs */
 .journey-tabs {
@@ -62,7 +62,8 @@ body::before {
 .jtab.active { background: rgba(118,185,0,0.15); color: #76b900; }
 
 /* Use case grid */
-.usecase-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+.usecase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+@media (max-width: 600px) { .usecase-grid { grid-template-columns: 1fr; } }
 .usecase-card {
   backdrop-filter: blur(12px);
   background: rgba(22, 27, 34, 0.6);
@@ -179,6 +180,7 @@ body::before {
 .check-item label { font-size: 0.88rem; cursor: pointer; font-weight: 500; }
 .check-item .check-desc { font-size: 0.75rem; opacity: 0.55; margin-top: 0.1rem; line-height: 1.4; }
 
+@media (min-width: 768px) { .checks { grid-template-columns: 1fr 1fr 1fr; } }
 @media (max-width: 500px) { .checks { grid-template-columns: 1fr; } }
 
 /* Result */
@@ -192,7 +194,16 @@ body::before {
 }
 .result-title span { color: #76b900; }
 
-/* Stack diagram — single column */
+/* Result two-panel layout */
+.result-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.2rem;
+  align-items: start;
+}
+.result-sidebar { display: flex; flex-direction: column; gap: 0.8rem; }
+
+/* Stack diagram */
 .stack {
   backdrop-filter: blur(16px);
   background: rgba(16, 20, 26, 0.7);
@@ -200,7 +211,6 @@ body::before {
   border: 1px solid rgba(230,237,243,0.08);
   overflow: hidden;
   box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-  margin-bottom: 1.2rem;
 }
 
 .stack-section {
@@ -224,7 +234,7 @@ body::before {
 @keyframes layerIn { to { opacity: 1; transform: translateX(0); } }
 
 /* Color-coded layer borders */
-.stack-section.model-layer { border-left: 3px solid rgba(230,237,243,0.12); }
+.stack-section.model-layer { border-left: 3px solid rgba(230,237,243,0.12); padding: 0.8rem 1.2rem; }
 .stack-section.harness-layer { border-left: 3px solid rgba(230,237,243,0.25); }
 .stack-section.runtime-layer {
   border-left: 3px solid #76b900;
@@ -235,6 +245,7 @@ body::before {
 .stack-section.platform-layer {
   border-left: 3px solid #ee0000;
   background: rgba(238,0,0,0.03);
+  padding: 0.8rem 1.2rem;
 }
 
 /* Red Hat brand accent for product names */
@@ -312,6 +323,10 @@ body::before {
 .back-link { display: inline-block; margin-top: 1.5rem; color: rgba(230,237,243,0.3); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
 .back-link:hover { color: #76b900; }
 
+@media (max-width: 768px) {
+  .result-grid { grid-template-columns: 1fr; }
+  .usecase-grid { gap: 0.5rem; }
+}
 @media (max-width: 500px) {
   .agent-grid { grid-template-columns: repeat(2, 1fr); }
   .info-icon .tooltip { width: 200px; left: -80px; transform: none; }
@@ -554,58 +569,59 @@ function showResult() {
 
   const html = `
     <div class="result-title">Your stack for: <span>${resultName}</span></div>
-    <div class="stack">
-      <div class="stack-section model-layer">
-        <div class="stack-section-header">
-          <span class="stack-section-label">Model (the intelligence)</span>
-          <span class="info-icon">i<span class="tooltip">The LLM that reasons and decides what to do next. It outputs text — tool calls, code, plans. By itself it cannot execute anything, remember between calls, or access external systems.</span></span>
+    <div class="result-grid">
+      <div class="stack">
+        <div class="stack-section model-layer">
+          <div class="stack-section-header">
+            <span class="stack-section-label">Model (the intelligence)</span>
+            <span class="info-icon">i<span class="tooltip">The LLM that reasons and decides what to do next. It outputs text — tool calls, code, plans. By itself it cannot execute anything, remember between calls, or access external systems.</span></span>
+          </div>
+          <div class="stack-section-product">Your chosen LLM</div>
+          <div class="stack-section-desc">Claude, Gemini, GPT, Nemotron, Llama — accessed via inference.local or direct API</div>
         </div>
-        <div class="stack-section-product">Your chosen LLM</div>
-        <div class="stack-section-desc">Claude, Gemini, GPT, Nemotron, Llama — accessed via inference.local or direct API</div>
-      </div>
-      <div class="stack-section harness-layer">
-        <div class="stack-section-header">
-          <span class="stack-section-label">Harness (makes the model useful)</span>
-          <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning. It turns a text-generator into a working agent that can complete real tasks.</span></span>
-        </div>
-        <div class="stack-section-product">${harnessName}</div>
-        <div class="stack-section-desc">${harnessDesc}</div>
-      </div>${nemoclawLayer}
-      <div class="stack-section runtime-layer">
-        <div class="stack-section-header">
-          <span class="stack-section-label">Runtime (makes it safe) — OpenShell</span>
-          <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. The harness decides actions; the runtime enforces boundaries. Network isolation, credential masking, filesystem restrictions, and audit logging — regardless of which harness you use.</span></span>
-        </div>
-        <div class="stack-section-product"><span style="color:#76b900">NVIDIA</span> OpenShell</div>
-        <ul class="stack-features">
-          ${features.map(f => `<li class="${f.enabled ? 'enabled' : 'disabled'}">${f.label}</li>`).join('')}
-        </ul>
-      </div>${mcpLayer}${guardrailsLayer}
-      <div class="stack-section inference-layer">
-        <div class="stack-section-header">
-          <span class="stack-section-label">Inference Routing</span>
-          <span class="info-icon">i<span class="tooltip">All agent inference calls go through inference.local, which routes to the backend you configure — cloud providers, OpenShift AI, or local model servers. The agent never sees real API keys.</span></span>
-        </div>
-        <div class="stack-section-product">inference.local → flexible backend</div>
-        <div class="routes" style="margin-top:0.3rem">
-          <span><span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
-          <span>Cloud (Vertex, Anthropic, OpenAI)</span>
-          <span>Local (Ollama, vLLM)</span>
+        <div class="stack-section harness-layer">
+          <div class="stack-section-header">
+            <span class="stack-section-label">Harness (makes the model useful)</span>
+            <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning. It turns a text-generator into a working agent that can complete real tasks.</span></span>
+          </div>
+          <div class="stack-section-product">${harnessName}</div>
+          <div class="stack-section-desc">${harnessDesc}</div>
+        </div>${nemoclawLayer}
+        <div class="stack-section runtime-layer">
+          <div class="stack-section-header">
+            <span class="stack-section-label">Runtime (makes it safe) — OpenShell</span>
+            <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. The harness decides actions; the runtime enforces boundaries. Network isolation, credential masking, filesystem restrictions, and audit logging — regardless of which harness you use.</span></span>
+          </div>
+          <div class="stack-section-product"><span style="color:#76b900">NVIDIA</span> OpenShell</div>
+          <ul class="stack-features">
+            ${features.map(f => `<li class="${f.enabled ? 'enabled' : 'disabled'}">${f.label}</li>`).join('')}
+          </ul>
+        </div>${mcpLayer}${guardrailsLayer}
+        <div class="stack-section platform-layer">
+          <div class="stack-section-header">
+            <span class="stack-section-label">Platform</span>
+            <span class="info-icon">i<span class="tooltip">Red Hat OpenShift AI provides agent lifecycle (Kagenti/AgentRuntime), model serving (vLLM, KServe), MLflow tracing, and EvalHub. Kubernetes agent-sandbox manages pod lifecycle, warm pools, and optional Kata isolation via CRDs.</span></span>
+          </div>
+          <div class="stack-section-product">${platformName.includes('Red Hat') ? platformName.replace('Red Hat', '<span class="rh-brand">Red Hat</span>') : platformName}${kataNote}</div>
         </div>
       </div>
-      <div class="stack-section platform-layer">
-        <div class="stack-section-header">
-          <span class="stack-section-label">Platform</span>
-          <span class="info-icon">i<span class="tooltip">Red Hat OpenShift AI provides agent lifecycle (Kagenti/AgentRuntime), model serving (vLLM, KServe), MLflow tracing, and EvalHub. Kubernetes agent-sandbox manages pod lifecycle, warm pools, and optional Kata isolation via CRDs.</span></span>
+      <div class="result-sidebar">
+        <div class="setup-path" style="border-color:rgba(238,0,0,0.15)">
+          <h4>Inference Routing</h4>
+          <p>inference.local → flexible backend</p>
+          <div class="routes" style="margin-top:0.3rem">
+            <span><span class="rh-brand-subtle">OpenShift AI</span> (vLLM, NIM)</span>
+            <span>Cloud (Vertex, Anthropic, OpenAI)</span>
+            <span>Local (Ollama, vLLM)</span>
+          </div>
         </div>
-        <div class="stack-section-product">${platformName.includes('Red Hat') ? platformName.replace('Red Hat', '<span class="rh-brand">Red Hat</span>') : platformName}${kataNote}</div>
+        <div class="setup-path">${setupPath}</div>
+        <div class="actions">
+          <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
+          <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Concepts</a>
+          <button class="btn btn-secondary" onclick="restart()">Restart</button>
+        </div>
       </div>
-    </div>
-    <div class="setup-path">${setupPath}</div>
-    <div class="actions">
-      <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
-      <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Concepts</a>
-      <button class="btn btn-secondary" onclick="restart()">Restart</button>
     </div>
   `;
 
