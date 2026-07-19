@@ -2,8 +2,24 @@
 
 How AI agents are built, run, and secured — the components, the terminology, and how they fit together.
 
-[Find your stack :material-arrow-right:](stack-wizard.html){ .md-button .md-button--primary }
-Use the interactive wizard to get a personalized architecture recommendation.
+<div class="grid cards" markdown>
+
+-   :material-arrow-right-circle:{ .lg .middle } __See your personalized stack__
+
+    ---
+
+    Pick your agent, select your requirements, get your architecture in 30 seconds.
+
+    [:octicons-arrow-right-24: Interactive Wizard](stack-wizard.html)
+
+</div>
+
+!!! abstract "TL;DR"
+    | Layer | What it does | Example |
+    |---|---|---|
+    | **Model** | Reasons and decides | Claude, Gemini, GPT, Nemotron |
+    | **Harness** | Makes the model useful (tools, memory, loops, filesystem) | Claude Code, ADK, Deep Agents |
+    | **Runtime** | Makes it safe (isolation, policy, credential masking, audit) | OpenShell |
 
 ## The Formula
 

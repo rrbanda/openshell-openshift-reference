@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Stack Wizard | OpenShell on OpenShift</title>
+<title>Pick Your Agent. See Your Stack. | OpenShell on OpenShift</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0d1117;
-  color: rgba(230, 237, 243, 0.87);
+  background: #0a0e14;
+  color: rgba(230, 237, 243, 0.9);
   min-height: 100vh;
   padding: 2rem 1rem;
   display: flex;
@@ -18,132 +18,230 @@ body {
   align-items: center;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 2rem;
-  max-width: 600px;
+/* Subtle background gradient */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(118,185,0,0.03) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
 }
 
+.header { text-align: center; margin-bottom: 1.5rem; max-width: 560px; position: relative; z-index: 1; }
 .header h1 {
-  font-size: 1.6rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #76b900, #a0e030);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.7rem; font-weight: 800;
+  background: linear-gradient(135deg, #76b900 0%, #a0e030 50%, #76b900 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: shimmer 3s linear infinite;
   margin-bottom: 0.4rem;
 }
+@keyframes shimmer { to { background-position: 200% center; } }
+.header p { opacity: 0.6; font-size: 0.88rem; line-height: 1.5; }
 
-.header p { opacity: 0.7; font-size: 0.9rem; line-height: 1.5; }
+.container { max-width: 700px; width: 100%; position: relative; z-index: 1; }
 
-.container { max-width: 720px; width: 100%; }
+/* Progress dots */
+.progress-dots { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(230,237,243,0.15); transition: all 0.3s; }
+.dot.active { background: #76b900; box-shadow: 0 0 8px rgba(118,185,0,0.5); transform: scale(1.3); }
+.dot.done { background: rgba(118,185,0,0.4); }
 
 /* Steps */
-.step { display: none; animation: fadeIn 0.3s ease; }
+.step { display: none; animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
 .step.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-.step-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; margin-bottom: 0.3rem; }
-.question { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.2rem; }
+.step-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.35; margin-bottom: 0.3rem; }
+.question { font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem; }
+.selected-agent { font-size: 0.8rem; opacity: 0.5; margin-bottom: 1rem; }
+.selected-agent span { color: #76b900; font-weight: 600; }
 
 /* Agent grid */
-.agent-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.6rem;
-}
+.agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 0.6rem; }
 
 .agent-card {
-  border: 1px solid rgba(230, 237, 243, 0.12);
-  border-radius: 8px;
-  padding: 0.8rem;
+  backdrop-filter: blur(12px);
+  background: rgba(22, 27, 34, 0.6);
+  border: 1px solid rgba(230, 237, 243, 0.08);
+  border-radius: 10px;
+  padding: 0.75rem;
   cursor: pointer;
-  transition: all 0.15s;
-  background: #161b22;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: cardIn 0.3s ease forwards;
+  opacity: 0;
 }
 
-.agent-card:hover { border-color: #76b900; transform: translateY(-2px); box-shadow: 0 3px 12px rgba(118,185,0,0.12); }
-.agent-card h4 { font-size: 0.8rem; color: #76b900; margin-bottom: 0.2rem; }
-.agent-card p { font-size: 0.65rem; opacity: 0.6; line-height: 1.3; }
+.agent-card:nth-child(1) { animation-delay: 0.02s; }
+.agent-card:nth-child(2) { animation-delay: 0.04s; }
+.agent-card:nth-child(3) { animation-delay: 0.06s; }
+.agent-card:nth-child(4) { animation-delay: 0.08s; }
+.agent-card:nth-child(5) { animation-delay: 0.10s; }
+.agent-card:nth-child(6) { animation-delay: 0.12s; }
+.agent-card:nth-child(7) { animation-delay: 0.14s; }
+.agent-card:nth-child(8) { animation-delay: 0.16s; }
+.agent-card:nth-child(9) { animation-delay: 0.18s; }
+.agent-card:nth-child(10) { animation-delay: 0.20s; }
+.agent-card:nth-child(11) { animation-delay: 0.22s; }
+.agent-card:nth-child(12) { animation-delay: 0.24s; }
+
+@keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.agent-card:hover {
+  border-color: rgba(118, 185, 0, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 0 20px rgba(118, 185, 0, 0.1), 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.agent-card:active { transform: scale(0.97); }
+
+.agent-card h4 { font-size: 0.78rem; color: #e6edf3; margin-bottom: 0.15rem; font-weight: 600; }
+.agent-card p { font-size: 0.62rem; opacity: 0.5; }
+
+/* NemoClaw badge */
+.agent-card .badge-nc {
+  position: absolute; top: 5px; right: 5px;
+  background: rgba(118, 185, 0, 0.15); border: 1px solid rgba(118, 185, 0, 0.3);
+  color: #76b900; font-size: 0.5rem; font-weight: 700;
+  padding: 1px 5px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.agent-card.nc-supported { border-color: rgba(118, 185, 0, 0.15); }
+.agent-card.nc-supported:hover { border-color: rgba(118, 185, 0, 0.5); box-shadow: 0 0 25px rgba(118, 185, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.3); }
 
 /* Checkboxes */
 .checks { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.2rem; }
-.check-item { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.6rem 0.8rem; background: #161b22; border-radius: 6px; border: 1px solid rgba(230,237,243,0.08); }
-.check-item input { margin-top: 3px; accent-color: #76b900; }
-.check-item label { font-size: 0.85rem; cursor: pointer; }
-.check-item .check-desc { font-size: 0.7rem; opacity: 0.5; margin-top: 0.15rem; }
+.check-item {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  backdrop-filter: blur(10px);
+  background: rgba(22, 27, 34, 0.5);
+  border-radius: 8px;
+  border: 1px solid rgba(230,237,243,0.06);
+  transition: border-color 0.2s;
+}
+.check-item:hover { border-color: rgba(118,185,0,0.2); }
+.check-item input { margin-top: 3px; accent-color: #76b900; width: 15px; height: 15px; }
+.check-item label { font-size: 0.82rem; cursor: pointer; font-weight: 500; }
+.check-item .check-desc { font-size: 0.68rem; opacity: 0.45; margin-top: 0.1rem; line-height: 1.3; }
 
 /* Result */
-.result { display: none; animation: fadeIn 0.4s ease; }
+.result { display: none; animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 .result.active { display: block; }
 
-/* Stack */
-.stack { background: #161b22; border-radius: 10px; border: 1px solid rgba(230,237,243,0.1); overflow: hidden; margin-bottom: 1rem; }
-.stack-section { padding: 1rem 1.2rem; border-bottom: 1px solid rgba(230,237,243,0.06); }
+/* Stack diagram */
+.stack {
+  backdrop-filter: blur(16px);
+  background: rgba(16, 20, 26, 0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(230,237,243,0.08);
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+}
+
+.stack-section {
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid rgba(230,237,243,0.05);
+  animation: layerIn 0.4s ease forwards;
+  opacity: 0;
+  transform: translateX(-15px);
+}
+.stack-section:nth-child(1) { animation-delay: 0.1s; }
+.stack-section:nth-child(2) { animation-delay: 0.2s; }
+.stack-section:nth-child(3) { animation-delay: 0.3s; }
+.stack-section:nth-child(4) { animation-delay: 0.4s; }
+.stack-section:nth-child(5) { animation-delay: 0.5s; }
+.stack-section:nth-child(6) { animation-delay: 0.6s; }
 .stack-section:last-child { border-bottom: none; }
-.stack-section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
-.stack-section-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; }
-.stack-section-product { font-weight: 700; font-size: 0.95rem; }
-.stack-section-desc { font-size: 0.78rem; opacity: 0.7; line-height: 1.4; }
 
-.stack-features { margin-top: 0.5rem; }
-.stack-features li { font-size: 0.75rem; opacity: 0.8; padding: 0.15rem 0; list-style: none; }
-.stack-features li::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 0.5rem; vertical-align: middle; }
-.stack-features li.enabled::before { background: #76b900; }
-.stack-features li.disabled::before { background: rgba(230,237,243,0.2); }
+@keyframes layerIn { to { opacity: 1; transform: translateX(0); } }
 
-/* Info icon */
+/* Runtime section gets subtle green glow */
+.stack-section.runtime-layer {
+  background: linear-gradient(90deg, rgba(118,185,0,0.03) 0%, transparent 100%);
+  border-left: 2px solid rgba(118,185,0,0.4);
+}
+
+.stack-section.nemoclaw-layer {
+  background: rgba(118,185,0,0.02);
+  border-left: 2px solid rgba(118,185,0,0.25);
+}
+
+.stack-section-header { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; }
+.stack-section-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; }
+.stack-section-product { font-weight: 700; font-size: 0.92rem; }
+.stack-section-desc { font-size: 0.73rem; opacity: 0.6; line-height: 1.4; margin-top: 0.15rem; }
+
+.stack-features { margin-top: 0.4rem; padding: 0; }
+.stack-features li { font-size: 0.72rem; opacity: 0.8; padding: 0.12rem 0; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
+.stack-features li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.stack-features li.enabled::before { background: #76b900; box-shadow: 0 0 4px rgba(118,185,0,0.5); }
+.stack-features li.disabled::before { background: rgba(230,237,243,0.15); }
+
+/* Info icon with frosted tooltip */
 .info-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 16px; height: 16px; border-radius: 50%;
-  background: rgba(118,185,0,0.15); color: #76b900;
-  font-size: 0.6rem; font-weight: 700; cursor: help;
-  position: relative;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: rgba(118,185,0,0.1); color: #76b900;
+  font-size: 0.55rem; font-weight: 700; cursor: help;
+  position: relative; transition: background 0.2s;
 }
+.info-icon:hover { background: rgba(118,185,0,0.25); }
 
 .info-icon .tooltip {
   display: none; position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
-  background: #1f2937; border: 1px solid rgba(118,185,0,0.3); border-radius: 6px;
-  padding: 0.6rem 0.8rem; width: 240px; font-size: 0.7rem; font-weight: 400;
-  color: rgba(230,237,243,0.9); line-height: 1.4; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  backdrop-filter: blur(16px);
+  background: rgba(16, 22, 30, 0.9);
+  border: 1px solid rgba(118,185,0,0.2);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem; width: 250px;
+  font-size: 0.67rem; font-weight: 400;
+  color: rgba(230,237,243,0.9); line-height: 1.45;
+  z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
 }
-
 .info-icon:hover .tooltip { display: block; }
+
+/* Inference routes */
+.routes span { display: block; padding: 0.12rem 0; font-size: 0.72rem; opacity: 0.7; }
+.routes span::before { content: "→ "; color: #76b900; }
 
 /* Setup path */
 .setup-path {
-  background: #161b22; border-radius: 8px; padding: 0.8rem 1rem;
-  border: 1px solid rgba(118,185,0,0.2); margin-bottom: 1rem;
+  backdrop-filter: blur(10px);
+  background: rgba(22, 27, 34, 0.5);
+  border-radius: 8px; padding: 0.75rem 1rem;
+  border: 1px solid rgba(118,185,0,0.12);
+  margin-bottom: 1rem;
 }
-.setup-path h4 { font-size: 0.75rem; color: #76b900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
-.setup-path p { font-size: 0.8rem; opacity: 0.8; }
-.setup-path code { background: rgba(118,185,0,0.1); padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.75rem; }
-
-/* Inference box */
-.inference-box {
-  background: #161b22; border-radius: 8px; padding: 0.8rem 1rem;
-  border: 1px solid rgba(230,237,243,0.08); margin-bottom: 1rem;
-}
-.inference-box h4 { font-size: 0.7rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
-.inference-box .routes { font-size: 0.78rem; opacity: 0.8; }
-.inference-box .routes span { display: block; padding: 0.15rem 0; }
-.inference-box .routes span::before { content: "→ "; color: #76b900; }
+.setup-path h4 { font-size: 0.7rem; color: #76b900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem; }
+.setup-path p { font-size: 0.78rem; opacity: 0.75; line-height: 1.4; }
+.setup-path code { background: rgba(118,185,0,0.08); padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; }
 
 /* Buttons */
-.actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-.btn { display: inline-block; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; transition: all 0.15s; }
-.btn-primary { background: #76b900; color: #0d1117; }
-.btn-primary:hover { background: #8fcf00; transform: translateY(-1px); }
-.btn-secondary { background: transparent; color: rgba(230,237,243,0.7); border: 1px solid rgba(230,237,243,0.2); }
-.btn-secondary:hover { border-color: #76b900; color: #76b900; }
+.actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.btn {
+  display: inline-block; padding: 0.5rem 1rem; border-radius: 6px;
+  font-size: 0.78rem; font-weight: 600; text-decoration: none;
+  cursor: pointer; border: none; transition: all 0.15s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: #76b900; color: #0a0e14; }
+.btn-primary:hover { background: #8fcf00; box-shadow: 0 0 15px rgba(118,185,0,0.3); }
+.btn-secondary { background: rgba(230,237,243,0.04); color: rgba(230,237,243,0.7); border: 1px solid rgba(230,237,243,0.12); }
+.btn-secondary:hover { border-color: rgba(118,185,0,0.4); color: #76b900; }
 
-.back-link { display: inline-block; margin-top: 1.5rem; color: rgba(230,237,243,0.4); text-decoration: none; font-size: 0.75rem; }
+.back-link { display: inline-block; margin-top: 1.5rem; color: rgba(230,237,243,0.3); text-decoration: none; font-size: 0.72rem; transition: color 0.2s; }
 .back-link:hover { color: #76b900; }
 
 @media (max-width: 500px) {
   .agent-grid { grid-template-columns: repeat(2, 1fr); }
-  .info-icon .tooltip { width: 180px; left: 0; transform: none; }
+  .info-icon .tooltip { width: 200px; left: -80px; transform: none; }
+  .header h1 { font-size: 1.3rem; }
 }
 </style>
 </head>
@@ -156,9 +254,15 @@ body {
 
 <div class="container">
 
-  <!-- STEP 1: Pick your agent -->
+  <div class="progress-dots" id="progress">
+    <div class="dot active" id="dot1"></div>
+    <div class="dot" id="dot2"></div>
+    <div class="dot" id="dot3"></div>
+  </div>
+
+  <!-- STEP 1 -->
   <div class="step active" id="step1">
-    <div class="step-label">Step 1 of 2</div>
+    <div class="step-label">Step 1 — Choose your agent</div>
     <div class="question">I'm using (or plan to use)...</div>
     <div class="agent-grid">
       <div class="agent-card" onclick="selectAgent('claude')"><h4>Claude Code</h4><p>Anthropic</p></div>
@@ -166,41 +270,27 @@ body {
       <div class="agent-card" onclick="selectAgent('gemini')"><h4>Gemini CLI</h4><p>Google</p></div>
       <div class="agent-card" onclick="selectAgent('opencode')"><h4>OpenCode</h4><p>Open-source</p></div>
       <div class="agent-card" onclick="selectAgent('openhands')"><h4>OpenHands</h4><p>Open-source</p></div>
-      <div class="agent-card" onclick="selectAgent('adk')"><h4>Google ADK</h4><p>Workflows</p></div>
+      <div class="agent-card" onclick="selectAgent('adk')"><h4>Google ADK</h4><p>Enterprise workflows</p></div>
       <div class="agent-card" onclick="selectAgent('langgraph')"><h4>LangGraph</h4><p>LangChain</p></div>
       <div class="agent-card" onclick="selectAgent('crewai')"><h4>CrewAI</h4><p>Multi-agent</p></div>
-      <div class="agent-card" onclick="selectAgent('openclaw')"><h4>OpenClaw</h4><p>NemoClaw ✓</p></div>
-      <div class="agent-card" onclick="selectAgent('hermes')"><h4>Hermes</h4><p>NemoClaw ✓</p></div>
-      <div class="agent-card" onclick="selectAgent('deepagents')"><h4>Deep Agents</h4><p>NemoClaw ✓</p></div>
+      <div class="agent-card nc-supported" onclick="selectAgent('openclaw')"><h4>OpenClaw</h4><p>Assistant</p><span class="badge-nc">NemoClaw</span></div>
+      <div class="agent-card nc-supported" onclick="selectAgent('hermes')"><h4>Hermes</h4><p>Nous Research</p><span class="badge-nc">NemoClaw</span></div>
+      <div class="agent-card nc-supported" onclick="selectAgent('deepagents')"><h4>Deep Agents</h4><p>LangChain dcode</p><span class="badge-nc">NemoClaw</span></div>
       <div class="agent-card" onclick="selectAgent('custom')"><h4>Custom / Other</h4><p>My own agent</p></div>
     </div>
   </div>
 
-  <!-- STEP 2: Requirements -->
+  <!-- STEP 2 -->
   <div class="step" id="step2">
-    <div class="step-label">Step 2 of 2</div>
+    <div class="step-label">Step 2 — Runtime features</div>
+    <div class="selected-agent" id="selectedLabel">For: <span></span></div>
     <div class="question">What do you need from the runtime?</div>
     <div class="checks">
-      <div class="check-item">
-        <input type="checkbox" id="chk-network" checked>
-        <div><label for="chk-network">Network policy</label><div class="check-desc">Control which endpoints the agent can reach, per-binary, per-host, per-HTTP-method</div></div>
-      </div>
-      <div class="check-item">
-        <input type="checkbox" id="chk-creds" checked>
-        <div><label for="chk-creds">Credential masking</label><div class="check-desc">Agent calls inference.local — never sees real API keys. Switch providers without code changes.</div></div>
-      </div>
-      <div class="check-item">
-        <input type="checkbox" id="chk-audit" checked>
-        <div><label for="chk-audit">Audit trail</label><div class="check-desc">OCSF structured logs of every network decision — allow and deny — for compliance</div></div>
-      </div>
-      <div class="check-item">
-        <input type="checkbox" id="chk-fs" checked>
-        <div><label for="chk-fs">Filesystem isolation</label><div class="check-desc">Landlock LSM restricts which paths the agent can read/write</div></div>
-      </div>
-      <div class="check-item">
-        <input type="checkbox" id="chk-multi">
-        <div><label for="chk-multi">Multi-user / team isolation</label><div class="check-desc">OIDC authentication + workspace separation (coming soon in OpenShell)</div></div>
-      </div>
+      <div class="check-item"><input type="checkbox" id="chk-network" checked><div><label for="chk-network">Network policy</label><div class="check-desc">Control which endpoints the agent can reach — per-binary, per-host, per-HTTP-method</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-creds" checked><div><label for="chk-creds">Credential masking</label><div class="check-desc">Agent calls inference.local — never sees real API keys. Switch providers without code changes.</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-audit" checked><div><label for="chk-audit">Audit trail</label><div class="check-desc">OCSF structured logs of every network decision for compliance and debugging</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-fs" checked><div><label for="chk-fs">Filesystem isolation</label><div class="check-desc">Landlock LSM restricts which paths the agent can read/write inside the container</div></div></div>
+      <div class="check-item"><input type="checkbox" id="chk-multi"><div><label for="chk-multi">Multi-user / team isolation</label><div class="check-desc">OIDC authentication + workspace separation for shared deployments</div></div></div>
     </div>
     <div class="actions">
       <button class="btn btn-primary" onclick="showResult()">Show my architecture</button>
@@ -210,38 +300,46 @@ body {
 
   <!-- RESULT -->
   <div class="result" id="result"></div>
-
 </div>
 
 <a class="back-link" href="agent-architecture/">← Back to Agent Architecture concepts</a>
 
 <script>
 const agents = {
-  claude: { name: 'Claude Code', by: 'Anthropic', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness: planning, tools, memory, verification, git, context compaction' },
-  codex: { name: 'OpenAI Codex CLI', by: 'OpenAI', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness with own sandbox and code execution' },
-  gemini: { name: 'Gemini CLI', by: 'Google', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Terminal coding agent with Gemini models' },
-  opencode: { name: 'OpenCode', by: 'Open-source (187K stars)', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Model-agnostic terminal/desktop/IDE agent, 75+ LLM providers' },
-  openhands: { name: 'OpenHands', by: 'Open-source (78K stars)', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full AI software engineering platform with multi-agent SDK' },
-  adk: { name: 'Google ADK', by: 'Google', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Framework + partial harness: Runner, Sessions, Workflows, Ambient Agents' },
-  langgraph: { name: 'LangGraph', by: 'LangChain', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Graph-based agent orchestration with durable execution' },
-  crewai: { name: 'CrewAI', by: 'CrewAI', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Role-based multi-agent orchestration framework' },
-  openclaw: { name: 'OpenClaw', by: 'Community', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Always-on personal AI assistant with multi-channel messaging' },
-  hermes: { name: 'Hermes', by: 'Nous Research', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Self-improving agent with learning loop and persistent skills' },
-  deepagents: { name: 'LangChain Deep Agents Code', by: 'LangChain', type: 'coding', hasOwnSandbox: false, nemoclaw: true, desc: 'Terminal coding harness with full context management and Ralph Loops' },
-  custom: { name: 'Custom Agent', by: 'You', type: 'any', hasOwnSandbox: false, nemoclaw: false, desc: 'Your own agent packaged as a container image' }
+  claude: { name: 'Claude Code', by: 'Anthropic', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness: planning, tools, memory, verification, git, context compaction, Ralph Loops' },
+  codex: { name: 'OpenAI Codex CLI', by: 'OpenAI', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness with sandboxed code execution, tool dispatch, and verification' },
+  gemini: { name: 'Gemini CLI', by: 'Google', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Terminal coding agent with built-in code execution sandbox and Gemini models' },
+  opencode: { name: 'OpenCode', by: 'Open-source', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Model-agnostic coding agent — terminal, desktop, IDE. Supports 75+ LLM providers.' },
+  openhands: { name: 'OpenHands', by: 'Open-source', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full AI software engineering platform with Docker sandbox, multi-agent SDK, and Agent Canvas' },
+  adk: { name: 'Google ADK', by: 'Google', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Full framework: Runner, Sessions, Workflows, Memory, Ambient Agents. No built-in sandbox.' },
+  langgraph: { name: 'LangGraph', by: 'LangChain', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Graph-based agent orchestration with durable execution, checkpointing, and state management' },
+  crewai: { name: 'CrewAI', by: 'CrewAI', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Role-based multi-agent framework with task delegation, tool sharing, and parallel execution' },
+  openclaw: { name: 'OpenClaw', by: 'Community', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Always-on personal assistant with multi-channel messaging, persistent memory, and heartbeat' },
+  hermes: { name: 'Hermes', by: 'Nous Research', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Self-improving agent with learning loop, persistent skills, and cross-session memory' },
+  deepagents: { name: 'LangChain Deep Agents Code', by: 'LangChain', type: 'coding', hasOwnSandbox: false, nemoclaw: true, desc: 'Full coding harness: filesystem, git, bash, context compaction, Ralph Loops, verification' },
+  custom: { name: 'Custom Agent', by: 'You', type: 'any', hasOwnSandbox: false, nemoclaw: false, desc: 'Your own agent packaged as a container image — any language, any framework' }
 };
 
 let selectedAgent = null;
 
+function updateDots(step) {
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.className = 'dot' + (i < step ? ' done' : '') + (i === step ? ' active' : '');
+  });
+}
+
 function selectAgent(id) {
   selectedAgent = id;
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('selectedLabel').querySelector('span').textContent = agents[id].name;
+  document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
   document.getElementById('step2').classList.add('active');
+  updateDots(1);
 }
 
 function goBack() {
   document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
   document.getElementById('step1').classList.add('active');
+  updateDots(0);
 }
 
 function showResult() {
@@ -253,10 +351,10 @@ function showResult() {
   const chkMulti = document.getElementById('chk-multi').checked;
 
   const nemoclawLayer = a.nemoclaw ? `
-      <div class="stack-section" style="border-left: 3px solid #76b900;">
+      <div class="stack-section nemoclaw-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">NemoClaw (optional — one-command setup)</span>
-          <span class="info-icon">i<span class="tooltip">NemoClaw bundles OpenShell + inference routing + hardened blueprints into a single command. Only supports 3 agents: OpenClaw, Hermes, LangChain Deep Agents. For everything else, deploy OpenShell directly.</span></span>
+          <span class="info-icon">i<span class="tooltip">NemoClaw bundles OpenShell + inference routing + hardened blueprints into a single 'nemoclaw onboard' command. Only supports 3 agents: OpenClaw, Hermes, LangChain Deep Agents Code. For everything else, deploy OpenShell directly.</span></span>
         </div>
         <div class="stack-section-product">NVIDIA NemoClaw</div>
         <div class="stack-section-desc">Guided onboarding, versioned blueprints, managed inference config</div>
@@ -271,32 +369,31 @@ function showResult() {
   ];
 
   const setupPath = a.nemoclaw
-    ? `<h4>Setup path</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.7rem;opacity:0.6">Or deploy OpenShell directly via Helm if you prefer manual control.</p>`
-    : `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.7rem;opacity:0.6">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
+    ? `<h4>Setup path</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.68rem;opacity:0.5">Or deploy OpenShell directly via Helm if you prefer manual control.</p>`
+    : `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.68rem;opacity:0.5">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
 
   const html = `
     <div class="stack">
       <div class="stack-section">
         <div class="stack-section-header">
           <span class="stack-section-label">Model (the intelligence)</span>
-          <span class="info-icon">i<span class="tooltip">The LLM that reasons and decides. It takes in context, outputs text — tool calls, code, plans. By itself it cannot execute anything or remember between calls.</span></span>
+          <span class="info-icon">i<span class="tooltip">The LLM that reasons and decides what to do next. It outputs text — tool calls, code, plans. By itself it cannot execute anything, remember between calls, or access external systems.</span></span>
         </div>
         <div class="stack-section-product">Your chosen LLM</div>
-        <div class="stack-section-desc">Claude, Gemini, GPT, Nemotron, Llama — accessed via inference.local</div>
+        <div class="stack-section-desc">Claude, Gemini, GPT, Nemotron, Llama — accessed via inference.local or direct API</div>
       </div>
       <div class="stack-section">
         <div class="stack-section-header">
           <span class="stack-section-label">Harness (makes the model useful)</span>
-          <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning. It turns a text-generator into a working agent.</span></span>
+          <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning. It turns a text-generator into a working agent that can complete real tasks.</span></span>
         </div>
         <div class="stack-section-product">${a.name}</div>
         <div class="stack-section-desc">${a.desc}</div>
-      </div>
-      ${nemoclawLayer}
-      <div class="stack-section">
+      </div>${nemoclawLayer}
+      <div class="stack-section runtime-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">Runtime (makes it safe) — OpenShell</span>
-          <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. Network isolation, credential masking, filesystem restrictions, audit. The harness decides actions; the runtime enforces boundaries on those actions.</span></span>
+          <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. The harness decides actions; the runtime enforces boundaries. Network isolation, credential masking, filesystem restrictions, and audit logging — regardless of which harness you use.</span></span>
         </div>
         <div class="stack-section-product">NVIDIA OpenShell</div>
         <ul class="stack-features">
@@ -306,21 +403,19 @@ function showResult() {
       <div class="stack-section">
         <div class="stack-section-header">
           <span class="stack-section-label">Inference Routing</span>
-          <span class="info-icon">i<span class="tooltip">Your agent calls inference.local (a magic URL). The OpenShell gateway routes it to your configured model endpoint. Agent never sees API keys. You can switch providers without changing code.</span></span>
+          <span class="info-icon">i<span class="tooltip">Your agent calls inference.local (a magic URL inside the sandbox). The OpenShell gateway intercepts it and routes to your configured model endpoint. Agent never sees API keys or real URLs. Switch providers without changing agent code.</span></span>
         </div>
         <div class="stack-section-product">inference.local → flexible backend</div>
-        <div class="inference-box" style="border:none;padding:0.4rem 0 0 0;margin:0">
-          <div class="routes">
-            <span>OpenShift AI (vLLM, NIM — on-cluster GPU)</span>
-            <span>Cloud APIs (Vertex AI, Anthropic, OpenAI)</span>
-            <span>Local models (Ollama, vLLM standalone)</span>
-          </div>
+        <div class="routes">
+          <span>OpenShift AI (vLLM, NIM — on-cluster GPU)</span>
+          <span>Cloud APIs (Vertex AI, Anthropic, OpenAI)</span>
+          <span>Local models (Ollama, vLLM standalone)</span>
         </div>
       </div>
       <div class="stack-section">
         <div class="stack-section-header">
           <span class="stack-section-label">Platform</span>
-          <span class="info-icon">i<span class="tooltip">The compute platform that schedules pods, manages networking, storage, and GPU resources. OpenShell runs as a StatefulSet here.</span></span>
+          <span class="info-icon">i<span class="tooltip">The compute platform that schedules pods, manages networking, storage, and GPU resources. OpenShell deploys as a StatefulSet. Agent Sandbox controller watches Sandbox CRs and creates pods.</span></span>
         </div>
         <div class="stack-section-product">OpenShift</div>
         <div class="stack-section-desc">Compute, networking, storage, GPU scheduling</div>
@@ -328,7 +423,7 @@ function showResult() {
     </div>
     <div class="setup-path">${setupPath}</div>
     <div class="actions">
-      <a class="btn btn-primary" href="../quickstart/">Quickstart (10 min)</a>
+      <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart (10 min)</a>
       <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Learn: Harness vs Runtime</a>
       <button class="btn btn-secondary" onclick="restart()">Start over</button>
     </div>
@@ -338,6 +433,7 @@ function showResult() {
   const resultEl = document.getElementById('result');
   resultEl.innerHTML = html;
   resultEl.classList.add('active');
+  updateDots(2);
 }
 
 function restart() {
@@ -345,6 +441,7 @@ function restart() {
   document.getElementById('result').innerHTML = '';
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById('step1').classList.add('active');
+  updateDots(0);
 }
 </script>
 </body>
