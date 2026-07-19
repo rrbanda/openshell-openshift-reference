@@ -20,10 +20,13 @@ Both should return HTTP 200.
 Open a port-forward to the gRPC service:
 
 ```shell
-oc -n openshell port-forward svc/openshell 8080:8080
+oc -n openshell port-forward svc/openshell 8080:8080 &
 ```
 
-In a second terminal, register the gateway:
+!!! tip "Keep the port-forward running"
+    The `&` backgrounds the port-forward. It must stay alive for CLI commands to work. If it dies, restart it. For production without port-forward, see [Expose via Route](../production/expose-route.md).
+
+In the same or another terminal, register the gateway:
 
 ```shell
 openshell gateway add http://127.0.0.1:8080 --local --name openshift

@@ -8,7 +8,7 @@ Deploy a PostgreSQL instance alongside the gateway using the bundled Bitnami sub
 
 ```shell
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --set podSecurityContext.fsGroup=null \
   --set securityContext.runAsUser=null \
@@ -33,7 +33,7 @@ With PostgreSQL, you can run multiple gateway replicas:
 
 ```shell
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --reuse-values \
   --set replicaCount=2
@@ -52,7 +52,7 @@ oc -n openshell create secret generic pg-credentials \
 
 ```shell
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --set podSecurityContext.fsGroup=null \
   --set securityContext.runAsUser=null \
@@ -103,7 +103,7 @@ oc -n openshell create secret generic pg-credentials \
   --from-literal=uri="${PG_URI}"
 
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --reuse-values \
   --set server.externalDbSecret=pg-credentials

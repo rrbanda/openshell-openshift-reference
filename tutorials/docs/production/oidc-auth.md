@@ -36,7 +36,7 @@ ISSUER=$(oc get authentication.config.openshift.io cluster \
   -o jsonpath='{.spec.serviceAccountIssuer}')
 
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --reuse-values \
   --set server.oidc.issuer="${ISSUER}" \
@@ -60,7 +60,7 @@ The CLI will open a browser for the OAuth flow on first use.
 
 ```shell
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --reuse-values \
   --set server.oidc.issuer=https://keycloak.example.com/realms/openshell \
@@ -74,7 +74,7 @@ helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
 
 ```shell
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --reuse-values \
   --set server.oidc.issuer=https://login.microsoftonline.com/<tenant-id>/v2.0 \
@@ -93,7 +93,7 @@ oc -n openshell create configmap oidc-ca \
   --from-file=ca.crt=/path/to/issuer-ca.crt
 
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --reuse-values \
   --set server.oidc.caConfigMapName=oidc-ca

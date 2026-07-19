@@ -24,7 +24,7 @@ If no job exists, the hook may have been skipped. Manually trigger:
 
 ```shell
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> --namespace openshell --reuse-values
+  --version 0.0.80 --namespace openshell --reuse-values
 ```
 
 ---
@@ -164,8 +164,8 @@ Verify the gateway pod labels match the NetworkPolicy ingress selector.
 **Fix**: GHCR public packages should not require auth. If your cluster has a restrictive egress policy:
 
 ```shell
-helm pull oci://ghcr.io/nvidia/openshell/helm-chart --version <version>
-helm install openshell ./helm-chart-<version>.tgz -n openshell ...
+helm pull oci://ghcr.io/nvidia/openshell/helm-chart --version 0.0.80
+helm install openshell ./helm-chart-0.0.80.tgz -n openshell ...
 ```
 
 ---
@@ -179,7 +179,7 @@ helm install openshell ./helm-chart-<version>.tgz -n openshell ...
 ```shell
 oc -n openshell delete statefulset openshell --cascade=orphan
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> --namespace openshell --reuse-values
+  --version 0.0.80 --namespace openshell --reuse-values
 ```
 
 This recreates the StatefulSet without deleting the running pod.

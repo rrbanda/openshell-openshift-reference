@@ -110,9 +110,9 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Quickstart: quickstart.md
   - Concepts:
       - Agent Architecture: concepts/agent-architecture.md
-      - Agent Stack Decision Guide: agent-stack-decision-guide/index.html
   - Getting Started:
       - getting-started/index.md
       - Prerequisites: getting-started/prerequisites.md
@@ -122,6 +122,7 @@ nav:
   - Sandboxes:
       - sandboxes/index.md
       - Create Your First Sandbox: sandboxes/first-sandbox.md
+      - Inference Routing: sandboxes/inference-routing.md
       - Connect an Agent: sandboxes/connect-agent.md
       - Network Policies: sandboxes/network-policies.md
   - Production:

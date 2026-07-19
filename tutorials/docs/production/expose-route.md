@@ -12,7 +12,7 @@ Upgrade the Helm release with TLS enabled:
 
 ```shell
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --set podSecurityContext.fsGroup=null \
   --set securityContext.runAsUser=null
@@ -88,7 +88,7 @@ For more control, use the Kubernetes Gateway API:
 
 ```shell
 helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-  --version <version> \
+  --version 0.0.80 \
   --namespace openshell \
   --reuse-values \
   --set grpcRoute.enabled=true \

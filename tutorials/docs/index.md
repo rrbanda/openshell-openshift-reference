@@ -12,13 +12,40 @@ hide:
 
 # OpenShell on OpenShift
 
-<p class="subtitle">Deploy safe, sandboxed AI agent runtimes on Red Hat OpenShift — from first install to production-ready.</p>
+<p class="subtitle"><strong>OpenShell</strong> is NVIDIA's open-source agent runtime. It adds network isolation, credential masking, and audit to ANY AI agent — Claude Code, ADK, Gemini, or your own. Think of it as a security wrapper your agent runs inside.</p>
+
+<p class="subtitle">This site shows you how to deploy it on OpenShift.</p>
 
 <span class="badge badge-nvidia">NVIDIA OpenShell</span>
 <span class="badge badge-openshift">OpenShift 4.x</span>
 
-[Get Started :material-arrow-right:](getting-started/prerequisites.md){ .md-button .md-button--primary }
-[GitOps Path :material-git:](production/gitops.md){ .md-button }
+</div>
+
+<div class="grid cards" markdown>
+
+-   :material-rocket-launch:{ .lg .middle } __Quickstart (10 min)__
+
+    ---
+
+    Zero to running agent. One page, 10 steps, copy-paste.
+
+    [:octicons-arrow-right-24: Start now](quickstart.md)
+
+-   :material-book-open:{ .lg .middle } __Full Tutorial__
+
+    ---
+
+    Step-by-step with explanations for each component.
+
+    [:octicons-arrow-right-24: Getting Started](getting-started/index.md)
+
+-   :material-help-circle:{ .lg .middle } __What does OpenShell add to MY agent?__
+
+    ---
+
+    Interactive wizard — pick your agent, see the stack.
+
+    [:octicons-arrow-right-24: Stack Wizard](concepts/stack-wizard.html)
 
 </div>
 

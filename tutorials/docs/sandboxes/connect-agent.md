@@ -2,13 +2,78 @@
 
 OpenShell sandboxes are designed to host autonomous AI agents. This page shows how to run an agent inside a sandbox.
 
-## Run Claude Code in a Sandbox
+!!! warning "Required: Configure inference first"
+    Agents need to call LLMs. Before running any agent, you must:
 
-The default sandbox image includes common development tools. To run Claude Code:
+    1. **Configure inference routing** on the gateway (see [Inference Routing](inference-routing.md))
+    2. **Allow `inference.local`** in the sandbox policy:
 
-```shell
-openshell sandbox create --name agent-sandbox -- claude
-```
+    ```shell
+    openshell policy update <sandbox-name> --add-endpoint inference.local:443 --wait
+    ```
+
+    Without this, the agent will fail with `connection denied` when trying to call a model.
+
+## Run an Agent
+
+=== "Claude Code"
+
+    ```shell
+    openshell sandbox create --name agent-sandbox
+    ```
+
+    Inside the sandbox:
+
+    ```shell
+    ANTHROPIC_BASE_URL=https://inference.local \
+    ANTHROPIC_API_KEY=unused \
+    claude --bare
+    ```
+
+=== "Google ADK"
+
+    ```shell
+    openshell sandbox create --name agent-sandbox
+    ```
+
+    Inside the sandbox:
+
+    ```shell
+    BASE_URL=https://inference.local/v1 \
+    API_KEY=unused \
+    python agent.py
+    ```
+
+=== "OpenAI Codex"
+
+    ```shell
+    openshell sandbox create --name agent-sandbox
+    ```
+
+    Inside the sandbox:
+
+    ```shell
+    OPENAI_BASE_URL=https://inference.local/v1 \
+    OPENAI_API_KEY=unused \
+    codex
+    ```
+
+=== "Custom Agent"
+
+    ```shell
+    openshell sandbox create --name agent-sandbox \
+      --image registry.example.com/my-agent:latest \
+      -- python /app/agent.py
+    ```
+
+    Set `BASE_URL=https://inference.local/v1` in your agent's environment to use OpenShell inference routing.
+
+The agent runs with:
+
+- **Process isolation** — dropped privileges, seccomp
+- **Filesystem isolation** — Landlock LSM restricts file access
+- **Network isolation** — all egress routes through a policy-enforced proxy
+- **Credential masking** — agent calls `inference.local`, never sees real API keys
 
 This creates a sandbox and immediately launches `claude` as the entrypoint process. The agent runs with:
 
@@ -41,7 +106,7 @@ openshell sandbox create \
 
     ```shell
     helm upgrade openshell oci://ghcr.io/nvidia/openshell/helm-chart \
-      --version <version> \
+      --version 0.0.80 \
       --namespace openshell \
       --reuse-values \
       --set server.sandboxImagePullSecrets[0].name=regcred
