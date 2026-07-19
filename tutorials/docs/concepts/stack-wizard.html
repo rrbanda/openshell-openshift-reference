@@ -29,6 +29,14 @@ body::before {
 }
 
 .header { text-align: center; margin-bottom: 1.5rem; max-width: 560px; position: relative; z-index: 1; }
+.header-nav { position: absolute; top: 0; right: -80px; display: flex; gap: 0.4rem; }
+.header-nav a {
+  font-size: 0.72rem; font-weight: 600; text-decoration: none; padding: 0.3rem 0.7rem;
+  border-radius: 5px; border: 1px solid rgba(230,237,243,0.1);
+  color: rgba(230,237,243,0.5); transition: all 0.2s;
+}
+.header-nav a:hover { color: #76b900; border-color: rgba(118,185,0,0.3); }
+@media (max-width: 768px) { .header-nav { position: static; justify-content: center; margin-top: 0.5rem; } }
 .header h1 {
   font-size: 1.7rem; font-weight: 800;
   background: linear-gradient(135deg, #76b900 0%, #a0e030 50%, #76b900 100%);
@@ -349,6 +357,10 @@ body::before {
 <body>
 
 <div class="header">
+  <div class="header-nav">
+    <a href="../quickstart/">Quickstart</a>
+    <a href="agent-architecture/">Concepts</a>
+  </div>
   <h1>Pick Your Agent. See Your Stack.</h1>
   <p>OpenShell is the security runtime beneath every option. Select your agent to see how the pieces fit together on OpenShift.</p>
 </div>
@@ -566,8 +578,6 @@ function showResult() {
     <div class="result-header">
       <div class="result-title">Your stack for: <span>${resultName}</span></div>
       <div class="actions actions-sm">
-        <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
-        <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Concepts</a>
         <button class="btn btn-secondary" onclick="restart()">Restart</button>
       </div>
     </div>
