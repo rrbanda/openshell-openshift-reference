@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agent Stack Decision Guide</title>
+    <meta
+      name="description"
+      content="A structured decision guide for choosing workflows vs autonomous agents, OpenClaw vs Hermes, LangGraph vs Google ADK, and sandbox platforms."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #0e1512;
+        --ink-2: #16201b;
+        --panel: #1a2620;
+        --panel-2: #213028;
+        --line: rgba(212, 232, 196, 0.12);
+        --line-strong: rgba(212, 232, 196, 0.28);
+        --mist: #c8d6c0;
+        --mist-dim: #8fa18a;
+        --paper: #eef4e8;
+        --accent: #c8f06c;
+        --accent-2: #7dd3b0;
+        --warn: #f0c56c;
+        --danger: #ef8b7a;
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+        --radius: 18px;
+        --max: 1120px;
+        --font-sans: "Outfit", system-ui, sans-serif;
+        --font-serif: "Source Serif 4", Georgia, serif;
+        --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--paper);
+        font-family: var(--font-sans);
+        background:
+          radial-gradient(1200px 600px at 10% -10%, rgba(200, 240, 108, 0.12), transparent 55%),
+          radial-gradient(900px 500px at 90% 5%, rgba(125, 211, 176, 0.1), transparent 50%),
+          linear-gradient(180deg, #0b110e 0%, var(--ink) 40%, #101814 100%);
+        min-height: 100vh;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.35;
+        background-image:
+          linear-gradient(rgba(238, 244, 232, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(238, 244, 232, 0.03) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: linear-gradient(180deg, #000 0%, transparent 70%);
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .wrap {
+        width: min(var(--max), calc(100% - 2rem));
+        margin: 0 auto;
+      }
+
+      /* Top bar */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        backdrop-filter: blur(14px);
+        background: rgba(14, 21, 18, 0.78);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .brand-mark {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 9px;
+        background: linear-gradient(145deg, var(--accent), var(--accent-2));
+        box-shadow: 0 0 0 1px rgba(200, 240, 108, 0.35);
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 1rem;
+        font-size: 0.92rem;
+        color: var(--mist);
+      }
+
+      .nav a {
+        color: var(--mist);
+      }
+
+      .nav a:hover {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      /* Hero */
+      .hero {
+        padding: 4.5rem 0 3rem;
+        animation: rise 0.7s ease both;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.75rem;
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        color: var(--accent);
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgba(200, 240, 108, 0.06);
+      }
+
+      .hero h1 {
+        margin: 1.1rem 0 0.9rem;
+        max-width: 14ch;
+        font-family: var(--font-serif);
+        font-size: clamp(2.6rem, 6vw, 4.4rem);
+        line-height: 1.05;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .hero-lead {
+        max-width: 58ch;
+        color: var(--mist);
+        font-size: 1.15rem;
+        line-height: 1.55;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+      }
+
+      .btn {
+        appearance: none;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        padding: 0.8rem 1.25rem;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          background 0.15s ease,
+          border-color 0.15s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: var(--ink);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        border-color: var(--line-strong);
+        color: var(--paper);
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem 1.5rem;
+        margin-top: 2rem;
+        color: var(--mist-dim);
+        font-size: 0.9rem;
+      }
+
+      .meta-row strong {
+        color: var(--mist);
+        font-weight: 500;
+      }
+
+      /* Sections */
+      section {
+        padding: 3.25rem 0;
+        animation: rise 0.6s ease both;
+      }
+
+      section:nth-of-type(odd) {
+        animation-delay: 0.05s;
+      }
+
+      .section-kicker {
+        color: var(--accent-2);
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 0.6rem;
+      }
+
+      h2 {
+        margin: 0 0 0.75rem;
+        font-family: var(--font-serif);
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .section-intro {
+        max-width: 68ch;
+        color: var(--mist);
+        line-height: 1.6;
+        margin-bottom: 1.75rem;
+      }
+
+      /* Layer cards */
+      .layer-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.9rem;
+      }
+
+      @media (max-width: 900px) {
+        .layer-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 560px) {
+        .layer-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .nav {
+          display: none;
+        }
+      }
+
+      .layer-card {
+        position: relative;
+        padding: 1.15rem 1.15rem 1.25rem;
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, var(--panel) 0%, var(--ink-2) 100%);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition:
+          border-color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .layer-card:hover {
+        border-color: var(--line-strong);
+        transform: translateY(-2px);
+      }
+
+      .layer-card::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent), transparent);
+        opacity: 0.8;
+      }
+
+      .layer-num {
+        font-family: var(--font-mono);
+        color: var(--accent);
+        font-size: 0.8rem;
+        margin-bottom: 0.55rem;
+      }
+
+      .layer-card h3 {
+        margin: 0 0 0.45rem;
+        font-size: 1.05rem;
+      }
+
+      .layer-card p {
+        margin: 0;
+        color: var(--mist-dim);
+        font-size: 0.92rem;
+        line-height: 1.45;
+      }
+
+      /* Flow */
+      .flow {
+        display: grid;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+      }
+
+      .flow-step {
+        display: grid;
+        grid-template-columns: 3.2rem 1fr;
+        gap: 1rem;
+        align-items: start;
+        padding: 1.1rem 1.2rem;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: rgba(26, 38, 32, 0.75);
+      }
+
+      .flow-index {
+        width: 2.4rem;
+        height: 2.4rem;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: rgba(200, 240, 108, 0.12);
+        color: var(--accent);
+        font-family: var(--font-mono);
+        font-weight: 500;
+      }
+
+      .flow-step h3 {
+        margin: 0.15rem 0 0.35rem;
+        font-size: 1.05rem;
+      }
+
+      .flow-step p {
+        margin: 0;
+        color: var(--mist-dim);
+        line-height: 1.5;
+      }
+
+      /* Tables */
+      .table-shell {
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(22, 32, 27, 0.9);
+        box-shadow: var(--shadow);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 720px;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 0.95rem 1rem;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+        line-height: 1.45;
+      }
+
+      th {
+        position: sticky;
+        top: 0;
+        background: #1f2c25;
+        color: var(--accent);
+        font-size: 0.82rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      td:first-child {
+        color: var(--paper);
+        font-weight: 550;
+        white-space: nowrap;
+      }
+
+      td {
+        color: var(--mist);
+        font-size: 0.95rem;
+      }
+
+      td:not(:first-child) {
+        color: #d5e2cc;
+      }
+
+      /* Wizard */
+      .wizard {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 1.1rem;
+      }
+
+      @media (max-width: 900px) {
+        .wizard {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: linear-gradient(165deg, rgba(33, 48, 40, 0.95), rgba(18, 28, 23, 0.98));
+        box-shadow: var(--shadow);
+        padding: 1.35rem;
+      }
+
+      .panel h3 {
+        margin: 0 0 0.35rem;
+        font-size: 1.15rem;
+      }
+
+      .panel .hint {
+        color: var(--mist-dim);
+        margin: 0 0 1.1rem;
+        font-size: 0.92rem;
+        line-height: 1.45;
+      }
+
+      .progress {
+        display: flex;
+        gap: 0.35rem;
+        margin-bottom: 1.1rem;
+      }
+
+      .progress span {
+        flex: 1;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(238, 244, 232, 0.08);
+      }
+
+      .progress span.on {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      }
+
+      .q-label {
+        font-family: var(--font-serif);
+        font-size: 1.35rem;
+        margin: 0 0 1rem;
+        line-height: 1.25;
+      }
+
+      .choices {
+        display: grid;
+        gap: 0.65rem;
+      }
+
+      .choice {
+        text-align: left;
+        border: 1px solid var(--line);
+        background: rgba(14, 21, 18, 0.55);
+        color: var(--paper);
+        border-radius: 12px;
+        padding: 0.9rem 1rem;
+        font: inherit;
+        cursor: pointer;
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+
+      .choice:hover,
+      .choice.active {
+        border-color: rgba(200, 240, 108, 0.55);
+        background: rgba(200, 240, 108, 0.08);
+      }
+
+      .choice small {
+        display: block;
+        margin-top: 0.25rem;
+        color: var(--mist-dim);
+        line-height: 1.4;
+      }
+
+      .wizard-nav {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-top: 1.2rem;
+      }
+
+      .result-card {
+        min-height: 100%;
+      }
+
+      .result-pill {
+        display: inline-flex;
+        padding: 0.3rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(200, 240, 108, 0.12);
+        color: var(--accent);
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+      }
+
+      .result-title {
+        font-family: var(--font-serif);
+        font-size: 1.55rem;
+        margin: 0 0 0.6rem;
+      }
+
+      .result-body {
+        color: var(--mist);
+        line-height: 1.55;
+        margin: 0 0 1rem;
+      }
+
+      .stack-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.55rem;
+      }
+
+      .stack-list li {
+        display: grid;
+        grid-template-columns: 6.5rem 1fr;
+        gap: 0.75rem;
+        padding: 0.7rem 0.8rem;
+        border-radius: 10px;
+        background: rgba(14, 21, 18, 0.5);
+        border: 1px solid var(--line);
+        font-size: 0.92rem;
+      }
+
+      .stack-list strong {
+        color: var(--accent-2);
+        font-weight: 600;
+      }
+
+      /* Callouts */
+      .callout {
+        margin-top: 1.25rem;
+        padding: 1rem 1.15rem;
+        border-radius: 14px;
+        border: 1px solid rgba(240, 197, 108, 0.35);
+        background: rgba(240, 197, 108, 0.08);
+        color: #f6e5b8;
+        line-height: 1.5;
+      }
+
+      .callout strong {
+        color: var(--warn);
+      }
+
+      .callout.info {
+        border-color: rgba(125, 211, 176, 0.35);
+        background: rgba(125, 211, 176, 0.08);
+        color: #d7eee4;
+      }
+
+      .callout.info strong {
+        color: var(--accent-2);
+      }
+
+      /* Compare tabs */
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin-bottom: 1rem;
+      }
+
+      .tab {
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--mist);
+        border-radius: 999px;
+        padding: 0.45rem 0.9rem;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .tab.active {
+        background: rgba(200, 240, 108, 0.14);
+        border-color: rgba(200, 240, 108, 0.45);
+        color: var(--accent);
+      }
+
+      .tab-panel {
+        display: none;
+      }
+
+      .tab-panel.active {
+        display: block;
+        animation: rise 0.35s ease both;
+      }
+
+      /* Sources / footer */
+      .sources {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+      }
+
+      @media (max-width: 700px) {
+        .sources {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .source {
+        padding: 1rem;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(22, 32, 27, 0.7);
+      }
+
+      .source h4 {
+        margin: 0 0 0.35rem;
+        font-size: 0.98rem;
+      }
+
+      .source p {
+        margin: 0;
+        color: var(--mist-dim);
+        font-size: 0.88rem;
+        line-height: 1.45;
+      }
+
+      footer {
+        padding: 2.5rem 0 3.5rem;
+        border-top: 1px solid var(--line);
+        color: var(--mist-dim);
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+          color: #111;
+        }
+
+        .topbar,
+        .hero-actions,
+        .wizard,
+        .btn,
+        .tabs {
+          display: none !important;
+        }
+
+        .table-shell,
+        .panel,
+        .layer-card,
+        .flow-step {
+          box-shadow: none;
+          border-color: #ccc;
+          background: #fff;
+          color: #111;
+        }
+
+        td,
+        .section-intro,
+        .hero-lead {
+          color: #333;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>Agent Stack Decision Guide</span>
+        </div>
+        <nav class="nav" aria-label="Primary">
+          <a href="#layers">Layers</a>
+          <a href="#order">Order</a>
+          <a href="#wizard">Advisor</a>
+          <a href="#matrices">Matrices</a>
+          <a href="#sources">Sources</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <div class="eyebrow">Architecture · Runtime · Framework · Platform</div>
+          <h1>Choose the right agent stack</h1>
+          <p class="hero-lead">
+            OpenClaw, Hermes, Google ADK, LangGraph, and “autonomous agents” are not rivals on one
+            axis. Use this guide in order: decide the control pattern, then the product runtime or
+            build framework, then isolation. Wrong layer comparisons produce wrong picks.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#wizard">Run the decision advisor</a>
+            <a class="btn btn-ghost" href="#order">Follow the logical order</a>
+          </div>
+          <div class="meta-row">
+            <span><strong>Audience:</strong> architects &amp; platform leads</span>
+            <span><strong>Method:</strong> layered decision, not vendor ranking</span>
+            <span><strong>Publish:</strong> static GitHub Pages ready</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="layers">
+        <div class="wrap">
+          <div class="section-kicker">01 · Mental model</div>
+          <h2>Four layers, four decisions</h2>
+          <p class="section-intro">
+            Treat each option as belonging to a layer. A complete system often combines one choice
+            from several layers. Comparing LangGraph to OpenClaw without saying which layer you are
+            deciding is the most common failure mode.
+          </p>
+          <div class="layer-grid">
+            <article class="layer-card">
+              <div class="layer-num">Layer 0</div>
+              <h3>Control pattern</h3>
+              <p>Workflow · hybrid · autonomous loop · always-on presence</p>
+            </article>
+            <article class="layer-card">
+              <div class="layer-num">Layer 1</div>
+              <h3>Product runtime</h3>
+              <p>OpenClaw · Hermes · other always-on assistants</p>
+            </article>
+            <article class="layer-card">
+              <div class="layer-num">Layer 2</div>
+              <h3>Build framework</h3>
+              <p>LangGraph · Google ADK · internal orchestration</p>
+            </article>
+            <article class="layer-card">
+              <div class="layer-num">Layer 3</div>
+              <h3>Execution platform</h3>
+              <p>NemoClaw · OpenShell · cloud agent platform · bare host</p>
+            </article>
+          </div>
+          <div class="callout">
+            <strong>Rule:</strong> There is no single official matrix that ranks all five names
+            together. Good decisions compose layers. Bad decisions force a false either/or.
+          </div>
+        </div>
+      </section>
+
+      <section id="order">
+        <div class="wrap">
+          <div class="section-kicker">02 · Logical order</div>
+          <h2>Ask questions in this sequence</h2>
+          <p class="section-intro">
+            Do not start with a brand. Start with constraints that eliminate whole classes of
+            solutions. Each step narrows the next.
+          </p>
+          <div class="flow">
+            <div class="flow-step">
+              <div class="flow-index">1</div>
+              <div>
+                <h3>Is the path enumerable?</h3>
+                <p>
+                  If steps are known ahead of time, prefer a deterministic workflow or cron pipeline.
+                  Reserve agent loops for branches you cannot hardcode. Most production systems are
+                  hybrids: workflow shell, agent nodes only where uncertainty is real.
+                </p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-index">2</div>
+              <div>
+                <h3>Does it need unattended presence?</h3>
+                <p>
+                  Schedules, messaging reachability, and multi-day memory point to an always-on
+                  assistant product or a long-running service you operate. One-shot CLI sessions are
+                  a different product shape.
+                </p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-index">3</div>
+              <div>
+                <h3>Build vs adopt a runtime?</h3>
+                <p>
+                  Need chat channels and an assistant UX quickly → evaluate OpenClaw or Hermes (if
+                  approved). Need graph control, checkpoints, and app-owned orchestration → evaluate
+                  LangGraph or Google ADK.
+                </p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-index">4</div>
+              <div>
+                <h3>What does org policy allow?</h3>
+                <p>
+                  Runtime allowlists, cloud mandates, and data residency beat feature matrices. An
+                  unapproved OpenClaw is not fixed by NemoClaw packaging. A GCP mandate pushes toward
+                  ADK even if LangGraph is more flexible.
+                </p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-index">5</div>
+              <div>
+                <h3>What isolation boundary do you need?</h3>
+                <p>
+                  Credential proxying, egress allowlists, and sandbox process limits are platform
+                  concerns. NemoClaw is the NVIDIA reference path for OpenClaw/Hermes on OpenShell.
+                  Custom agents usually need OpenShell-alone or another sandbox you integrate.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="wizard">
+        <div class="wrap">
+          <div class="section-kicker">03 · Interactive advisor</div>
+          <h2>Answer five prompts, get a stack sketch</h2>
+          <p class="section-intro">
+            This advisor encodes the layered order above. It recommends a pattern and candidate
+            tools — not a vendor winner. Validate against your security and purchasing rules.
+          </p>
+          <div class="wizard">
+            <div class="panel">
+              <div class="progress" id="progress" aria-hidden="true"></div>
+              <p class="q-label" id="question"></p>
+              <div class="choices" id="choices"></div>
+              <div class="wizard-nav">
+                <button class="btn btn-ghost" id="prevBtn" type="button">Back</button>
+                <button class="btn btn-primary" id="nextBtn" type="button">Continue</button>
+              </div>
+            </div>
+            <div class="panel result-card">
+              <div class="result-pill">Recommended direction</div>
+              <h3 class="result-title" id="resultTitle">Complete the prompts</h3>
+              <p class="result-body" id="resultBody">
+                Your layered recommendation will appear here as you answer. Finish all five for a
+                full stack sketch.
+              </p>
+              <ul class="stack-list" id="resultStack"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="matrices">
+        <div class="wrap">
+          <div class="section-kicker">04 · Decision matrices</div>
+          <h2>Compare within a layer</h2>
+          <p class="section-intro">
+            Use the tab that matches the decision you are actually making. Cross-layer comparisons
+            (for example “LangGraph vs OpenClaw”) only make sense after you decide whether you are
+            buying a runtime or building an app.
+          </p>
+
+          <div class="tabs" role="tablist" aria-label="Matrices">
+            <button class="tab active" data-tab="pattern" type="button">Layer 0 · Pattern</button>
+            <button class="tab" data-tab="runtime" type="button">Layer 1 · Runtime</button>
+            <button class="tab" data-tab="framework" type="button">Layer 2 · Framework</button>
+            <button class="tab" data-tab="platform" type="button">Layer 3 · Platform</button>
+          </div>
+
+          <div class="tab-panel active" id="tab-pattern">
+            <div class="table-shell">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Choose</th>
+                    <th>When it fits</th>
+                    <th>Avoid when</th>
+                    <th>Primary risk</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Deterministic workflow / cron</td>
+                    <td>Steps known; auditability required; fixed recurring jobs</td>
+                    <td>Path depends on novel runtime judgment</td>
+                    <td>Brittle if requirements keep branching</td>
+                  </tr>
+                  <tr>
+                    <td>Hybrid workflow + agent nodes</td>
+                    <td>Most path fixed; one step needs model judgment</td>
+                    <td>You want unrestricted free-roaming tools</td>
+                    <td>Agent node scope creeps without gates</td>
+                  </tr>
+                  <tr>
+                    <td>Autonomous agent loop</td>
+                    <td>Open-ended goals; dynamic tool choice; unknown path</td>
+                    <td>Cost, latency, or error compounding dominate</td>
+                    <td>Unpredictable side effects and spend</td>
+                  </tr>
+                  <tr>
+                    <td>Always-on assistant product</td>
+                    <td>Unattended schedule, messaging presence, persistent context</td>
+                    <td>A session CLI or batch job is enough</td>
+                    <td>Larger blast radius if poorly sandboxed</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout info">
+              <strong>Canonical framing:</strong> Anthropic’s
+              <em>Building Effective Agents</em> — workflows orchestrate predefined paths; agents let
+              the model direct tool use. Prefer the simplest system that passes evaluation.
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-runtime">
+            <div class="table-shell">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Dimension</th>
+                    <th>Prefer OpenClaw</th>
+                    <th>Prefer Hermes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Primary bet</td>
+                    <td>Gateway / multi-channel orchestration + large ecosystem</td>
+                    <td>Learning loop, compounding skills, automation workbench</td>
+                  </tr>
+                  <tr>
+                    <td>Channels &amp; reach</td>
+                    <td>Broadest messaging surface and community skills day one</td>
+                    <td>Strong cron / CLI-first automation; narrower ecosystem</td>
+                  </tr>
+                  <tr>
+                    <td>Memory &amp; improvement</td>
+                    <td>Transparent, often hand-curated memory; marketplace plugins</td>
+                    <td>Persistent searchable memory; skill curator / self-improvement</td>
+                  </tr>
+                  <tr>
+                    <td>Org posture</td>
+                    <td>Need ecosystem and can fund hardening / plugin review</td>
+                    <td>Often chosen when security defaults and learning matter more</td>
+                  </tr>
+                  <tr>
+                    <td>Hard gate</td>
+                    <td>Must be on the org allowlist</td>
+                    <td>Must be on the org allowlist — not automatic</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout info">
+              <strong>Note:</strong> Third-party OpenClaw↔Hermes comparisons agree on
+              ecosystem-vs-learning as the main axis. Treat them as heuristics; run your own
+              security review.
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-framework">
+            <div class="table-shell">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Dimension</th>
+                    <th>Prefer LangGraph</th>
+                    <th>Prefer Google ADK</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Cloud fit</td>
+                    <td>Multi-cloud / model-agnostic control plane</td>
+                    <td>GCP / Vertex / Gemini-native platform services</td>
+                  </tr>
+                  <tr>
+                    <td>Orchestration style</td>
+                    <td>Explicit graphs, checkpoints, time-travel, HITL interrupts</td>
+                    <td>Hierarchical agents + managed session/memory/eval paths</td>
+                  </tr>
+                  <tr>
+                    <td>Who owns production</td>
+                    <td>Your app owns state, resume, approvals, observability</td>
+                    <td>Google Agent Platform reduces platform plumbing</td>
+                  </tr>
+                  <tr>
+                    <td>Best fit</td>
+                    <td>Complex stateful / regulated business pipelines</td>
+                    <td>GCP-standardized teams; multimodal; fast Vertex deploy</td>
+                  </tr>
+                  <tr>
+                    <td>What you still must build</td>
+                    <td>Channels, scheduling UX, and ops around the graph</td>
+                    <td>Same if you need always-on assistant product UX</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout info">
+              <strong>Default heuristic:</strong> LangGraph unless Google Agent Platform materially
+              reduces work you would otherwise own. Flip to ADK when GCP is already the control
+              plane.
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-platform">
+            <div class="table-shell">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Situation</th>
+                    <th>Prefer</th>
+                    <th>Why</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>OpenClaw/Hermes with NVIDIA reference onboard, policies, routed inference</td>
+                    <td>NemoClaw</td>
+                    <td>Opinionated blueprint + CLI on OpenShell</td>
+                  </tr>
+                  <tr>
+                    <td>Custom image or non-reference agent (LangGraph service, ADK app, internal bot)</td>
+                    <td>OpenShell alone (or other sandbox)</td>
+                    <td>You own integration; OpenShell stays the isolation engine</td>
+                  </tr>
+                  <tr>
+                    <td>Terminal coding harness only</td>
+                    <td>Deep Agents Code / similar CLI agents</td>
+                    <td>Different product shape from always-on assistants</td>
+                  </tr>
+                  <tr>
+                    <td>Managed cloud agent platform already selected</td>
+                    <td>That platform’s native runtime</td>
+                    <td>Avoid dual control planes without a clear boundary</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout info">
+              <strong>NemoClaw official matrix:</strong> NemoClaw vs OpenShell-alone, plus supported
+              agents OpenClaw / Hermes / Deep Agents. It does not position Google ADK or LangGraph as
+              first-class NemoClaw agents.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="anti-patterns">
+        <div class="wrap">
+          <div class="section-kicker">05 · Failure modes</div>
+          <h2>Decisions that look smart and fail</h2>
+          <div class="layer-grid" style="grid-template-columns: repeat(2, 1fr)">
+            <article class="layer-card">
+              <div class="layer-num">Anti-pattern</div>
+              <h3>“Pick the most autonomous agent”</h3>
+              <p>
+                Autonomy is a cost. If the path is known, a workflow with an LLM drafting step will
+                usually be cheaper, safer, and easier to audit.
+              </p>
+            </article>
+            <article class="layer-card">
+              <div class="layer-num">Anti-pattern</div>
+              <h3>“LangGraph vs OpenClaw”</h3>
+              <p>
+                Category error. One is a build framework; the other is an always-on product runtime.
+                You can use both in one architecture — or neither.
+              </p>
+            </article>
+            <article class="layer-card">
+              <div class="layer-num">Anti-pattern</div>
+              <h3>“Sandbox makes unapproved software approved”</h3>
+              <p>
+                Isolation reduces blast radius. It does not replace legal, security, or procurement
+                approval for the agent runtime itself.
+              </p>
+            </article>
+            <article class="layer-card">
+              <div class="layer-num">Anti-pattern</div>
+              <h3>“Feature checklist as strategy”</h3>
+              <p>
+                Channel count or star count can mislead. Dominant constraints — allowlist, cloud,
+                auditability, unattended presence — should decide first.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="sources">
+        <div class="wrap">
+          <div class="section-kicker">06 · Evidence base</div>
+          <h2>What this guide synthesizes</h2>
+          <p class="section-intro">
+            Use primary sources for final architecture reviews. Blog comparisons are directional,
+            not authoritative for enterprise risk.
+          </p>
+          <div class="sources">
+            <article class="source">
+              <h4>Pattern layer</h4>
+              <p>
+                Anthropic, <em>Building Effective Agents</em> — workflows vs agents; start simple;
+                hybrid production pattern.
+              </p>
+            </article>
+            <article class="source">
+              <h4>Runtime layer</h4>
+              <p>
+                Independent OpenClaw↔Hermes analyses (Composio, Firecrawl, xCloud, innFactory,
+                Alcazar) — ecosystem/orchestration vs learning-loop/automation.
+              </p>
+            </article>
+            <article class="source">
+              <h4>Framework layer</h4>
+              <p>
+                Enterprise ADK↔LangGraph guides (Atlan, DVNC, Altai, and others) — GCP-native
+                platform vs multi-cloud graph control.
+              </p>
+            </article>
+            <article class="source">
+              <h4>Platform layer</h4>
+              <p>
+                NemoClaw ecosystem documentation — NemoClaw vs OpenShell-alone; supported agents
+                OpenClaw, Hermes, Deep Agents Code.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <p>
+          Static decision guide for architecture discussions and GitHub Pages. Not an official
+          product endorsement. Recommendations are structural heuristics — confirm against your
+          organization’s security, legal, and platform standards before adoption.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      const steps = [
+        {
+          id: "path",
+          q: "Can you enumerate the main steps before the system runs?",
+          choices: [
+            {
+              id: "known",
+              label: "Yes — the path is mostly known",
+              detail: "Recurring jobs, fixed integrations, clear success criteria",
+            },
+            {
+              id: "mixed",
+              label: "Partly — most steps known, some need judgment",
+              detail: "Classic hybrid: workflow shell with bounded agent nodes",
+            },
+            {
+              id: "open",
+              label: "No — the path depends on runtime exploration",
+              detail: "Open-ended research, triage, or dynamic tool choice",
+            },
+          ],
+        },
+        {
+          id: "presence",
+          q: "Does it need to stay reachable or run unattended across days?",
+          choices: [
+            {
+              id: "always",
+              label: "Yes — schedules, messaging, or continuous ops",
+              detail: "Always-on assistant or long-running service",
+            },
+            {
+              id: "batch",
+              label: "Mostly batch / scheduled, no chat presence",
+              detail: "Cron, queues, or workflow runners are enough",
+            },
+            {
+              id: "session",
+              label: "Interactive sessions only",
+              detail: "Human starts it, works, then stops",
+            },
+          ],
+        },
+        {
+          id: "build",
+          q: "Are you adopting a ready assistant runtime or building app logic?",
+          choices: [
+            {
+              id: "runtime",
+              label: "Adopt an always-on assistant runtime",
+              detail: "Channels, memory, skills, operator UX matter now",
+            },
+            {
+              id: "framework",
+              label: "Build with a framework / graph runtime",
+              detail: "You own the product surface and orchestration",
+            },
+            {
+              id: "either",
+              label: "Either could work — optimize for constraints",
+              detail: "Let allowlist and cloud mandate decide",
+            },
+          ],
+        },
+        {
+          id: "constraint",
+          q: "What is the strongest institutional constraint?",
+          choices: [
+            {
+              id: "allowlist",
+              label: "Runtime allowlist / security review",
+              detail: "Only approved agent products may run",
+            },
+            {
+              id: "gcp",
+              label: "Standardize on Google Cloud / Vertex",
+              detail: "Platform services should absorb ops burden",
+            },
+            {
+              id: "multicloud",
+              label: "Multi-cloud or vendor-neutral control",
+              detail: "Avoid a single cloud agent control plane",
+            },
+            {
+              id: "nvidia",
+              label: "NVIDIA OpenShell / NemoClaw reference path",
+              detail: "Want sandboxed OpenClaw or Hermes with routed inference",
+            },
+          ],
+        },
+        {
+          id: "isolation",
+          q: "How hard must the credential and egress boundary be?",
+          choices: [
+            {
+              id: "sandbox",
+              label: "Strong sandbox + policy + credential proxy",
+              detail: "Unattended tools touching sensitive systems",
+            },
+            {
+              id: "platform",
+              label: "Managed platform identity is enough",
+              detail: "Cloud agent platform owns secrets and networking",
+            },
+            {
+              id: "app",
+              label: "App-level secrets and VPC controls",
+              detail: "Traditional service deployment model",
+            },
+          ],
+        },
+      ];
+
+      const state = {
+        index: 0,
+        answers: {},
+      };
+
+      const questionEl = document.getElementById("question");
+      const choicesEl = document.getElementById("choices");
+      const progressEl = document.getElementById("progress");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const resultTitle = document.getElementById("resultTitle");
+      const resultBody = document.getElementById("resultBody");
+      const resultStack = document.getElementById("resultStack");
+
+      function renderProgress() {
+        progressEl.innerHTML = steps
+          .map((_, i) => `<span class="${i <= state.index ? "on" : ""}"></span>`)
+          .join("");
+      }
+
+      function renderStep() {
+        const step = steps[state.index];
+        questionEl.textContent = step.q;
+        choicesEl.innerHTML = "";
+        step.choices.forEach((choice) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "choice" + (state.answers[step.id] === choice.id ? " active" : "");
+          btn.innerHTML = `<span>${choice.label}</span><small>${choice.detail}</small>`;
+          btn.addEventListener("click", () => {
+            state.answers[step.id] = choice.id;
+            renderStep();
+            renderResult();
+          });
+          choicesEl.appendChild(btn);
+        });
+        prevBtn.disabled = state.index === 0;
+        nextBtn.textContent = state.index === steps.length - 1 ? "Finish" : "Continue";
+        renderProgress();
+        renderResult();
+      }
+
+      function recommend() {
+        const a = state.answers;
+        const answered = Object.keys(a).length;
+        if (!answered) {
+          return {
+            title: "Complete the prompts",
+            body: "Your layered recommendation will appear here as you answer.",
+            stack: [],
+          };
+        }
+
+        let pattern = "Hybrid workflow with bounded agent nodes";
+        if (a.path === "known") pattern = "Deterministic workflow / scheduled pipeline";
+        if (a.path === "open") pattern = "Autonomous agent loop (tightly gated tools)";
+
+        let runtime = "Not the primary decision yet";
+        let framework = "Not required if a product runtime covers the need";
+        let platform = "Match isolation to risk";
+
+        if (a.build === "runtime" || (a.presence === "always" && a.build !== "framework")) {
+          if (a.constraint === "allowlist") {
+            runtime = "Only an allowlisted always-on runtime (OpenClaw or Hermes if approved)";
+          } else if (a.constraint === "nvidia") {
+            runtime = "OpenClaw or Hermes via NemoClaw (if approved)";
+          } else {
+            runtime =
+              "OpenClaw for multi-channel orchestration; Hermes for learning-loop automation — if approved";
+          }
+        }
+
+        if (a.build === "framework" || a.constraint === "gcp" || a.constraint === "multicloud") {
+          if (a.constraint === "gcp") {
+            framework = "Google ADK on Vertex / Google Agent Platform";
+          } else if (a.constraint === "multicloud" || a.build === "framework") {
+            framework = "LangGraph (or equivalent graph runtime) for owned control flow";
+          }
+        }
+
+        if (a.build === "either") {
+          if (a.constraint === "gcp") framework = "Lean Google ADK";
+          if (a.constraint === "multicloud") framework = "Lean LangGraph";
+          if (a.constraint === "nvidia") runtime = "Evaluate OpenClaw/Hermes on NemoClaw";
+        }
+
+        if (a.isolation === "sandbox") {
+          if (a.constraint === "nvidia" || a.build === "runtime") {
+            platform = "NemoClaw on OpenShell for OpenClaw/Hermes; OpenShell-alone for custom agents";
+          } else {
+            platform = "Strong sandbox (OpenShell or equivalent) around the chosen runtime/app";
+          }
+        } else if (a.isolation === "platform") {
+          platform = "Managed cloud agent platform identity and networking";
+        } else if (a.isolation === "app") {
+          platform = "Conventional service deployment with app-managed secrets";
+        }
+
+        if (a.presence === "session" && a.path !== "open") {
+          runtime = "Session CLI / interactive harness may be enough";
+        }
+
+        const title =
+          a.path === "known" && a.presence !== "always"
+            ? "Lean workflow-first"
+            : a.presence === "always" && a.build === "runtime"
+              ? "Always-on runtime path"
+              : a.build === "framework" || a.constraint === "gcp" || a.constraint === "multicloud"
+                ? "Framework-built agentic app"
+                : "Compose a layered stack";
+
+        const body =
+          "Recommendations below follow the five-step order: pattern → presence → build/adopt → institutional constraint → isolation. Re-check allowlists before committing.";
+
+        return {
+          title,
+          body,
+          stack: [
+            ["Pattern", pattern],
+            ["Runtime", runtime],
+            ["Framework", framework],
+            ["Platform", platform],
+          ],
+        };
+      }
+
+      function renderResult() {
+        const rec = recommend();
+        resultTitle.textContent = rec.title;
+        resultBody.textContent = rec.body;
+        resultStack.innerHTML = rec.stack
+          .map(([k, v]) => `<li><strong>${k}</strong><span>${v}</span></li>`)
+          .join("");
+      }
+
+      prevBtn.addEventListener("click", () => {
+        if (state.index > 0) {
+          state.index -= 1;
+          renderStep();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        const step = steps[state.index];
+        if (!state.answers[step.id]) {
+          choicesEl.querySelector(".choice")?.focus();
+          return;
+        }
+        if (state.index < steps.length - 1) {
+          state.index += 1;
+          renderStep();
+          return;
+        }
+        document.getElementById("resultTitle").scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+          document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+          tab.classList.add("active");
+          document.getElementById(`tab-${tab.dataset.tab}`).classList.add("active");
+        });
+      });
+
+      renderStep();
+    </script>
+  </body>
+</html>

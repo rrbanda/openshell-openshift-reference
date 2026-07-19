@@ -112,6 +112,7 @@ nav:
   - Home: index.md
   - Concepts:
       - Agent Architecture: concepts/agent-architecture.md
+      - Agent Stack Decision Guide: agent-stack-decision-guide/index.html
   - Getting Started:
       - getting-started/index.md
       - Prerequisites: getting-started/prerequisites.md

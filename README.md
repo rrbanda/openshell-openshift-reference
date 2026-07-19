@@ -13,6 +13,7 @@ Production-grade deployment of [NVIDIA OpenShell](https://github.com/NVIDIA/Open
 | `infra/vault/` | Vault server ArgoCD Application (Helm chart) |
 | `infra/vault-config/` | Vault configuration Job (auth, policies, JWT keygen) |
 | `tutorials/` | MkDocs Material tutorial site (published to GH Pages) |
+| `tutorials/docs/agent-stack-decision-guide/` | Interactive agent stack decision guide (workflow vs agent, OpenClaw/Hermes, LangGraph/ADK) |
 | `scripts/hooks/` | Pre-commit secrets scanner |
 | `.github/workflows/` | GH Pages publish workflow |
 

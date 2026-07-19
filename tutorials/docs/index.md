@@ -60,6 +60,15 @@ flowchart LR
 
     [:octicons-arrow-right-24: GitOps deployment](production/gitops.md)
 
+
+-   :material-sitemap:{ .lg .middle } __Choose an agent stack__
+
+    ---
+
+    Decision guide for workflows vs agents, OpenClaw/Hermes, LangGraph/ADK, and sandbox platforms.
+
+    [:octicons-arrow-right-24: Open the guide](agent-stack-decision-guide/index.html)
+
 -   :material-server:{ .lg .middle } __Production ready__
 
     ---
