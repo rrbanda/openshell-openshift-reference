@@ -23,14 +23,13 @@
   --radius: 10px;
   --font: "Inter", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-  --page-pad: 0.65rem 0.9rem;
-  --tile-h: 2.65rem;
+  --page-pad: 1rem 1.15rem;
+  --cap-min-h: 3.4rem;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
-  height: 100%;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -39,10 +38,9 @@ body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--ink);
-  min-height: 100%;
   min-height: 100dvh;
   padding: var(--page-pad);
-  padding-bottom: 0.75rem;
+  padding-bottom: 2.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -68,15 +66,15 @@ body::before {
 
 .header {
   text-align: center;
-  margin-bottom: 0.4rem;
-  max-width: 920px;
+  margin-bottom: 0.65rem;
+  max-width: 1040px;
   width: 100%;
   position: relative;
   z-index: 1;
   flex-shrink: 0;
 }
 .header h1 {
-  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  font-size: clamp(1.25rem, 2.6vw, 1.55rem);
   font-weight: 800;
   background: linear-gradient(135deg, #76b900 0%, #a0e030 50%, #76b900 100%);
   background-size: 200% auto;
@@ -96,10 +94,10 @@ body::before {
   flex-wrap: wrap;
 }
 .header .tagline {
-  margin: 0.15rem 0 0;
-  opacity: 0.55;
-  font-size: 0.72rem;
-  line-height: 1.3;
+  margin: 0.25rem 0 0;
+  opacity: 0.6;
+  font-size: 0.8rem;
+  line-height: 1.35;
 }
 .header details {
   margin: 0.25rem auto 0;
@@ -122,7 +120,7 @@ body::before {
 
 
 .container {
-  max-width: 980px;
+  max-width: 1040px;
   width: 100%;
   position: relative;
   z-index: 1;
@@ -133,27 +131,27 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.4rem;
-  margin-bottom: 0.35rem;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
   flex-wrap: wrap;
 }
-.top-nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+.top-nav { display: flex; gap: 0.3rem; flex-wrap: wrap; }
 .top-nav a {
-  font-size: 0.68rem; font-weight: 600; text-decoration: none;
-  padding: 0.22rem 0.55rem; border-radius: 5px; border: 1px solid var(--line);
+  font-size: 0.72rem; font-weight: 600; text-decoration: none;
+  padding: 0.3rem 0.7rem; border-radius: 5px; border: 1px solid var(--line);
   color: var(--muted); transition: color 0.2s, border-color 0.2s;
 }
 .top-nav a:hover, .top-nav a:focus-visible { color: var(--nv); border-color: rgba(118,185,0,0.35); outline: none; }
 
 .journey-tabs {
-  display: inline-flex; gap: 0.2rem;
+  display: inline-flex; gap: 0.25rem;
   background: rgba(22, 27, 34, 0.55);
-  border-radius: 7px; padding: 0.18rem;
+  border-radius: 8px; padding: 0.22rem;
   border: 1px solid rgba(230,237,243,0.06);
 }
 .jtab {
-  padding: 0.32rem 0.8rem; border-radius: 5px; border: none;
-  font-size: 0.74rem; font-weight: 600; cursor: pointer;
+  padding: 0.4rem 1rem; border-radius: 6px; border: none;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
   background: transparent; color: var(--muted); transition: background 0.2s, color 0.2s;
 }
 .jtab:hover { color: rgba(230,237,243,0.85); }
@@ -161,15 +159,15 @@ body::before {
 .jtab.active { background: var(--nv-dim); color: var(--nv); }
 
 .progress {
-  display: flex; justify-content: center; gap: 0.55rem; margin-bottom: 0.4rem;
+  display: flex; justify-content: center; gap: 0.7rem; margin-bottom: 0.65rem;
   flex-wrap: wrap;
 }
 .progress-item {
-  display: flex; align-items: center; gap: 0.28rem;
-  font-size: 0.62rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em;
+  display: flex; align-items: center; gap: 0.35rem;
+  font-size: 0.68rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em;
 }
 .progress-item .dot {
-  width: 6px; height: 6px; border-radius: 50%;
+  width: 7px; height: 7px; border-radius: 50%;
   background: rgba(230,237,243,0.15);
 }
 .progress-item.active { color: var(--nv); }
@@ -180,31 +178,27 @@ body::before {
 .step { display: none; }
 .step.active { display: block; }
 
-.step-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.45; margin: 0 0 0.15rem; }
-.question { font-size: 0.92rem; font-weight: 600; margin: 0 0 0.25rem; }
-.hint { font-size: 0.7rem; color: var(--muted); margin: 0 0 0.4rem; line-height: 1.35; }
-.hint.compact { display: none; }
-@media (min-width: 1100px) {
-  .hint.compact { display: block; }
-}
+.step-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.3px; opacity: 0.5; margin: 0 0 0.25rem; }
+.question { font-size: 1rem; font-weight: 600; margin: 0 0 0.35rem; }
+.hint { font-size: 0.76rem; color: var(--muted); margin: 0 0 0.65rem; line-height: 1.4; }
 
 /* ---- Grids: stretch equal-height cells; never clip ---- */
 .agent-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-  gap: 0.4rem;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 0.65rem;
   align-items: stretch;
-  margin: 0;
+  margin: 0 0 0.5rem;
 }
 .usecase-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.4rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
   align-items: stretch;
-  margin: 0;
+  margin: 0 0 0.5rem;
 }
-@media (max-width: 900px) {
-  .usecase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 1100px) {
+  .usecase-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
   .usecase-grid { grid-template-columns: 1fr; }
@@ -215,24 +209,25 @@ body::before {
   -webkit-appearance: none;
   background: var(--panel);
   border: 1px solid rgba(230, 237, 243, 0.1);
-  border-radius: 8px;
-  padding: 0.5rem 0.55rem;
+  border-radius: var(--radius);
+  padding: 0.8rem 0.85rem;
   cursor: pointer;
   text-align: left;
   color: inherit;
   font: inherit;
   width: 100%;
-  min-height: 4.85rem;
+  min-height: 6.5rem;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.15rem;
+  gap: 0.25rem;
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  overflow: visible;
 }
 .card:hover {
   border-color: rgba(118, 185, 0, 0.45);
-  box-shadow: 0 0 0 1px rgba(118,185,0,0.2), 0 6px 18px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 0 0 1px rgba(118,185,0,0.2), 0 10px 28px rgba(0, 0, 0, 0.28);
 }
 .card:focus-visible {
   outline: 2px solid var(--nv);
@@ -240,30 +235,28 @@ body::before {
 }
 .card.selected {
   border-color: rgba(118, 185, 0, 0.7);
-  box-shadow: 0 0 0 1px rgba(118,185,0,0.4), 0 6px 18px rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 1px rgba(118,185,0,0.4), 0 8px 24px rgba(0,0,0,0.3);
   background: rgba(118, 185, 0, 0.08);
 }
 .card h4 {
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   font-weight: 600;
   margin: 0;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 .card p {
-  font-size: 0.68rem;
+  font-size: 0.74rem;
   color: var(--muted);
-  line-height: 1.25;
+  line-height: 1.3;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex: 1 1 auto;
 }
 .card .meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.2rem;
+  gap: 0.28rem;
   margin-top: auto;
-  padding-top: 0.3rem;
+  padding-top: 0.45rem;
   align-content: flex-start;
 }
 
@@ -285,53 +278,53 @@ body::before {
 .badge-owner-addon { background: rgba(126,184,255,0.1); color: var(--addon); border-color: rgba(126,184,255,0.3); }
 
 .selected-bar {
-  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
-  flex-wrap: wrap; margin-bottom: 0.35rem;
-  padding: 0.35rem 0.55rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 0.65rem;
+  flex-wrap: wrap; margin-bottom: 0.55rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid rgba(118,185,0,0.25);
   background: rgba(118,185,0,0.06);
-  border-radius: 7px;
-  font-size: 0.78rem;
+  border-radius: 8px;
+  font-size: 0.84rem;
 }
 .selected-bar strong { color: var(--nv); }
 .selected-bar button {
   background: transparent; border: 1px solid var(--line); color: var(--muted);
-  border-radius: 5px; padding: 0.18rem 0.45rem; font-size: 0.68rem; cursor: pointer;
+  border-radius: 5px; padding: 0.28rem 0.6rem; font-size: 0.72rem; cursor: pointer;
 }
 .selected-bar button:hover, .selected-bar button:focus-visible { color: var(--nv); border-color: rgba(118,185,0,0.4); outline: none; }
 
 .cap-legend {
-  display: flex; flex-wrap: wrap; gap: 0.35rem 0.65rem; margin: 0 0 0.35rem;
-  font-size: 0.65rem; color: var(--muted);
+  display: flex; flex-wrap: wrap; gap: 0.4rem 0.75rem; margin: 0 0 0.55rem;
+  font-size: 0.72rem; color: var(--muted);
 }
-.cap-legend span { display: inline-flex; align-items: center; gap: 0.25rem; }
+.cap-legend span { display: inline-flex; align-items: center; gap: 0.28rem; }
 
 .checks {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.35rem;
-  margin-bottom: 0.55rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
   align-items: stretch;
 }
-@media (max-width: 980px) { .checks { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 700px) { .checks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 420px) { .checks { grid-template-columns: 1fr; } }
 
-/* Compact equal-height capability chips — detail lives in (i) */
+/* Equal-height capability tiles — detail lives in (i) */
 .check-item {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.45rem;
-  min-height: var(--tile-h);
-  height: var(--tile-h);
-  background: rgba(22, 27, 34, 0.72);
-  border-radius: 8px;
+  gap: 0.5rem;
+  padding: 0.65rem 0.7rem;
+  min-height: var(--cap-min-h);
+  height: 100%;
+  background: linear-gradient(165deg, rgba(28, 34, 42, 0.92), rgba(18, 22, 28, 0.88));
+  border-radius: 10px;
   border: 1px solid rgba(230,237,243,0.1);
   border-left-width: 3px;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  overflow: visible;
 }
 .check-item[data-owner="openshell"] { border-left-color: var(--nv); }
 .check-item[data-owner="platform"] { border-left-color: #ff6b6b; }
@@ -351,11 +344,11 @@ body::before {
 .check-item input {
   appearance: none;
   -webkit-appearance: none;
-  width: 15px;
-  height: 15px;
+  width: 17px;
+  height: 17px;
   margin: 0;
   border: 1.5px solid rgba(230,237,243,0.35);
-  border-radius: 3px;
+  border-radius: 4px;
   background: rgba(0,0,0,0.25);
   flex-shrink: 0;
   cursor: pointer;
@@ -368,8 +361,8 @@ body::before {
 .check-item input:checked::after {
   content: "";
   position: absolute;
-  left: 4px; top: 1px;
-  width: 3px; height: 7px;
+  left: 5px; top: 1px;
+  width: 4px; height: 8px;
   border: solid #0a0e14;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
@@ -377,22 +370,19 @@ body::before {
 .check-title {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.25;
   color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .check-foot {
   display: flex;
   flex-wrap: nowrap;
-  gap: 0.2rem;
+  gap: 0.25rem;
   align-items: center;
   flex-shrink: 0;
 }
-.check-foot .badge { font-size: 0.5rem; padding: 1px 4px; }
+.check-foot .badge { font-size: 0.54rem; padding: 2px 5px; }
 .badge-maturity {
   background: rgba(230,184,77,0.1);
   border-color: rgba(230,184,77,0.35);
@@ -404,11 +394,11 @@ body::before {
   color: #a0e030;
 }
 
-.actions { display: flex; gap: 0.35rem; flex-wrap: wrap; margin: 0; align-items: center; }
+.actions { display: flex; gap: 0.45rem; flex-wrap: wrap; margin: 0; align-items: center; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
-  padding: 0.42rem 0.9rem; border-radius: 6px;
-  font-size: 0.78rem; font-weight: 600; text-decoration: none;
+  padding: 0.55rem 1.1rem; border-radius: 6px;
+  font-size: 0.84rem; font-weight: 600; text-decoration: none;
   cursor: pointer; border: none; transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
 .btn:focus-visible { outline: 2px solid var(--nv); outline-offset: 2px; }
@@ -421,75 +411,138 @@ body::before {
 .btn-secondary:hover { border-color: rgba(118,185,0,0.4); color: var(--nv); }
 .actions-sm .btn { padding: 0.35rem 0.75rem; font-size: 0.74rem; }
 
-.result { display: none; margin-bottom: 0.5rem; }
+.result { display: none; margin-bottom: 0; padding-bottom: 0.5rem; }
 .result.active { display: block; }
 
 .result-header {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.35rem;
+  margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;
 }
-.result-title { font-size: 1rem; font-weight: 700; color: rgba(230,237,243,0.88); margin: 0; }
+.result-title { font-size: 1.15rem; font-weight: 700; color: rgba(230,237,243,0.9); margin: 0; }
 .result-title span { color: var(--nv); }
 
-.result-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.4rem;
-  align-items: stretch;
+/* Vertical layered cake — never clip layer borders */
+.cake {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  overflow: visible;
+  border: 1px solid rgba(230,237,243,0.12);
+  border-radius: 14px;
+  background: rgba(10, 14, 20, 0.4);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.35);
 }
-.result-card {
-  border-radius: 8px;
-  border: 1px solid rgba(230,237,243,0.08);
-  padding: 0.55rem 0.65rem;
-  min-width: 0;
-}
-.result-wide { grid-column: 1 / -1; }
-
-.result-card.model-layer {
-  background: linear-gradient(135deg, rgba(16,20,26,0.85) 0%, rgba(22,27,34,0.65) 100%);
-  border-left: 3px solid rgba(230,237,243,0.18);
-}
-.result-card.harness-layer {
-  background: linear-gradient(135deg, rgba(18,22,28,0.85) 0%, rgba(26,31,38,0.65) 100%);
-  border-left: 3px solid rgba(230,237,243,0.3);
-}
-.result-card.runtime-layer {
-  background: linear-gradient(135deg, rgba(118,185,0,0.07) 0%, rgba(16,20,26,0.85) 100%);
-  border-left: 4px solid var(--nv);
-}
-.result-card.platform-layer {
-  background: linear-gradient(135deg, rgba(238,0,0,0.05) 0%, rgba(16,20,26,0.85) 100%);
-  border-left: 4px solid var(--rh);
-}
-.result-card.next-layer {
+.cake-layer {
+  position: relative;
+  overflow: visible;
+  padding: 0.9rem 1.05rem 1rem;
+  border-bottom: 1px solid rgba(230,237,243,0.1);
+  border-left: 4px solid transparent;
   background: rgba(22, 27, 34, 0.55);
-  border-color: rgba(118,185,0,0.2);
 }
-
-.stack-section-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.45; }
-.stack-section-header { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.1rem; }
-.stack-section-product { font-weight: 700; font-size: 0.86rem; margin-top: 0; word-break: break-word; }
-.stack-section-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.35; margin-top: 0.15rem; }
-
-.stack-features {
-  margin: 0.25rem 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 0.4rem;
+.cake-layer:first-child { border-radius: 14px 14px 0 0; }
+.cake-layer:last-child {
+  border-bottom: none;
+  border-radius: 0 0 14px 14px;
 }
-.stack-features li {
-  font-size: 0.7rem; padding: 0.08rem 0; list-style: none;
-  display: flex; align-items: flex-start; gap: 0.3rem; line-height: 1.3;
+.cake-layer.layer-model {
+  border-left-color: rgba(230,237,243,0.35);
+  background: linear-gradient(90deg, rgba(230,237,243,0.04), rgba(22,27,34,0.55) 40%);
+}
+.cake-layer.layer-harness {
+  border-left-color: rgba(230,237,243,0.55);
+  background: linear-gradient(90deg, rgba(230,237,243,0.06), rgba(22,27,34,0.55) 40%);
+}
+.cake-layer.layer-openshell {
+  border-left-color: var(--nv);
+  background: linear-gradient(90deg, rgba(118,185,0,0.1), rgba(16,20,26,0.75) 45%);
+}
+.cake-layer.layer-platform {
+  border-left-color: var(--rh);
+  background: linear-gradient(90deg, rgba(238,0,0,0.08), rgba(16,20,26,0.75) 45%);
+}
+.cake-layer.layer-safety {
+  border-left-color: var(--addon);
+  background: linear-gradient(90deg, rgba(126,184,255,0.1), rgba(16,20,26,0.75) 45%);
+}
+.cake-layer.layer-next {
+  border-left-color: rgba(118,185,0,0.45);
+  background: rgba(22, 27, 34, 0.72);
+}
+.cake-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-bottom: 0.35rem;
+}
+.cake-index {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+}
+.cake-layer.layer-openshell .cake-index { color: rgba(118,185,0,0.75); }
+.cake-layer.layer-platform .cake-index { color: rgba(255,107,107,0.85); }
+.cake-layer.layer-safety .cake-index { color: rgba(126,184,255,0.85); }
+.cake-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
   min-width: 0;
 }
-.stack-features li::before {
-  content: ""; width: 6px; height: 6px; border-radius: 50%;
-  margin-top: 0.4rem; flex-shrink: 0;
+.cake-product {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.25;
+  word-break: break-word;
 }
-.stack-features li.enabled::before { background: var(--nv); box-shadow: 0 0 4px rgba(118,185,0,0.5); }
-.stack-features li.disabled { opacity: 0.4; }
-.stack-features li.disabled::before { background: rgba(230,237,243,0.15); }
+.cake-blurb {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+  margin: 0.15rem 0 0.45rem;
+  max-width: 72ch;
+}
+.cake-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cake-chips li {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.22rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(230,237,243,0.12);
+  background: rgba(0,0,0,0.22);
+  color: rgba(230,237,243,0.82);
+}
+.cake-chips li.on {
+  border-color: rgba(118,185,0,0.4);
+  background: rgba(118,185,0,0.12);
+  color: #c8e86a;
+}
+.cake-chips li.off {
+  opacity: 0.4;
+}
+.cake-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+  margin-top: 0.45rem;
+}
 
 .callout {
   margin-top: 0.55rem; padding: 0.55rem 0.7rem; border-radius: 7px;
@@ -514,10 +567,10 @@ body::before {
 
 .info-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 16px; height: 16px; border-radius: 50%;
+  width: 18px; height: 18px; border-radius: 50%;
   background: rgba(118,185,0,0.12); color: var(--nv);
   border: 1px solid rgba(118,185,0,0.28);
-  font-size: 0.6rem; font-weight: 700; cursor: help; position: relative;
+  font-size: 0.65rem; font-weight: 700; cursor: help; position: relative;
   flex-shrink: 0; line-height: 1; padding: 0;
   font-family: inherit;
 }
@@ -571,19 +624,15 @@ body::before {
 .card-top h4 { flex: 1 1 auto; }
 
 .footer-note {
-  margin: 1rem auto 0;
+  margin: 1.25rem auto 0;
   font-size: 0.74rem; color: var(--dim); line-height: 1.45;
-  text-align: center; max-width: 720px;
-}
-.back-link {
-  display: none;
+  text-align: center; max-width: 760px;
+  padding-bottom: 0.5rem;
 }
 
 @media (max-width: 768px) {
-  .result-grid { grid-template-columns: 1fr; }
-  .result-wide { grid-column: 1; }
-  .stack-features { grid-template-columns: 1fr; }
-  :root { --tile-h: 2.85rem; }
+  .cake-product { font-size: 0.92rem; }
+  .agent-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 }
 </style>
 </head>
@@ -619,17 +668,17 @@ body::before {
 
   <!-- STEP 1: By Agent -->
   <div class="step active" id="step1" role="tabpanel">
-    <div class="step-label">Step 1 — Agent</div>
-    <div class="question">I'm using… <span style="font-weight:500;color:var(--muted);font-size:0.72rem">Tap <strong>i</strong> for detail · amber = not fully ready</span></div>
-    <p class="hint compact">Pattern 1 = whole-agent. Pattern 2 = harness-native (OpenClaw shipped; Hermes announced). Gemini not in base matrix yet.</p>
+    <div class="step-label">Step 1 — Choose your agent</div>
+    <div class="question">I'm using (or plan to use)…</div>
+    <p class="hint">Tap <strong>i</strong> for detail. Amber badges = not fully ready. Pattern 1 = whole-agent; Pattern 2 = harness-native (OpenClaw shipped; Hermes announced). Gemini is not in the base-image matrix yet.</p>
     <div class="agent-grid" id="agentGrid"></div>
   </div>
 
   <!-- STEP 1: By Use Case -->
   <div class="step" id="step1uc" role="tabpanel">
-    <div class="step-label">Step 1 — Use case</div>
-    <div class="question">What are you building? <span style="font-weight:500;color:var(--muted);font-size:0.72rem">Tap <strong>i</strong> for isolation detail</span></div>
-    <p class="hint compact">Profiles: Permissive → OpenShell Typical → OpenShell+Kata → Confidential.</p>
+    <div class="step-label">Step 1 — Choose your use case</div>
+    <div class="question">What are you building?</div>
+    <p class="hint">Tap <strong>i</strong> for isolation detail. Profiles: Permissive → OpenShell Typical → OpenShell+Kata → Confidential.</p>
     <div class="usecase-grid" id="usecaseGrid"></div>
   </div>
 
@@ -638,15 +687,16 @@ body::before {
   <div class="step" id="step2" role="tabpanel">
     <div class="step-label">Step 2 — Capabilities</div>
     <div class="selected-bar" id="selectedBar">
-      <div>Selected: <strong id="selectedName"></strong> <span id="selectedMeta" style="color:var(--muted);font-size:0.72rem"></span></div>
-      <button type="button" onclick="goBack()">Change</button>
+      <div>Selected: <strong id="selectedName"></strong> <span id="selectedMeta" style="color:var(--muted);font-size:0.8rem"></span></div>
+      <button type="button" onclick="goBack()">Change selection</button>
     </div>
-    <div class="question">What do you need? <span style="font-weight:500;color:var(--muted);font-size:0.72rem">Left edge = owner · <strong>i</strong> = detail · amber = not ready</span></div>
+    <div class="question">What do you need?</div>
+    <p class="hint">Left edge = owner. Tap <strong>i</strong> for technical detail. Amber = not fully ready or platform-target.</p>
     <div class="cap-legend">
-      <span><span class="badge badge-owner-os">OpenShell</span></span>
-      <span><span class="badge badge-owner-plat">Platform</span></span>
-      <span><span class="badge badge-owner-addon">Safety</span></span>
-      <span><span class="badge badge-maturity">Platform target / gap</span></span>
+      <span><span class="badge badge-owner-os">OpenShell</span> app sandbox</span>
+      <span><span class="badge badge-owner-plat">Platform</span> OpenShift AI</span>
+      <span><span class="badge badge-owner-addon">Safety</span> add-ons</span>
+      <span><span class="badge badge-maturity">Target / gap</span></span>
     </div>
     <div class="checks" id="capChecks"></div>
     <div class="actions">
@@ -1264,7 +1314,7 @@ function suggestAgentsHtml(ids) {
     if (!a) return "";
     return `<button type="button" class="btn btn-secondary" style="margin:0.15rem 0.15rem 0 0" onclick="setJourney('agent');selectAgent('${id}')">${a.name}</button>`;
   }).join("");
-  return `<div style="margin-top:0.45rem"><div class="stack-section-label">Suggested agents</div><div>${chips}</div></div>`;
+  return `<div style="margin-top:0.45rem"><div class="cake-index">Suggested agents</div><div style="margin-top:0.3rem">${chips}</div></div>`;
 }
 
 function syncUrl(caps) {
@@ -1346,6 +1396,30 @@ function showResult() {
 
   syncUrl(caps);
 
+  const chip = (label, on) => `<li class="${on ? "on" : "off"}">${label}</li>`;
+  const openshellChips = openshellFeatures.map((f) => chip(f.label, f.enabled)).join("");
+  const platformChips = [
+    ...platformFeatures.map((f) => chip(f.label, f.enabled)),
+    chip("OSC node eligibility", !!caps.kata),
+    chip("vLLM / llm-d", true),
+  ].join("");
+  const safetyChips = [
+    chip("NeMo Guardrails", !!caps.guardrails),
+    chip("Garak", !!caps.guardrails),
+    chip("EvalHub", !!caps.guardrails),
+    chip("MLflow / OTEL", !!caps.mlflow),
+  ].join("");
+  const platformTitle = (String(platformName).includes("Red Hat") || String(platformName).includes("OpenShift"))
+    ? `${rhHat}<span class="rh-brand">${platformName}</span>`
+    : platformName;
+  const modelTip = "Inference via inference.local (OpenShell cred masking) and/or platform gateways. Red Hat AI captures Completions, Responses/ogx, planned Anthropic Messages & Google Interactions so agents move to vLLM/llm-d without rewrites. Direct provider hosts still need explicit OpenShell network allows.";
+  const openshellTip = "OpenShell is the application-level sandbox (Mode 1 whole-agent; composes with Mode 2). Landlock, seccomp, netns, OPA L4/L7 (MCP-aware), inference.local, OCSF. Does not replace Kata, MCP Gateway, or MLflow. Alpha · RHOAI DP/TP target 3.5/3.6.";
+  const platformTip = `${computeLine} NetworkPolicy + optional UDN + egress proxy. SPIFFE/SPIRE on OpenShift layers with sandbox JWT. OSC needs RHCOS workers, virt/NFD kata label.`;
+  const safetyTip = addonItems.length
+    ? addonItems.join(" · ")
+    : "None selected — OpenShell OCSF + OPA remain the security baseline. Add MLflow/EvalHub/Garak via OpenShift AI Agent Ops when you need product tracing and eval.";
+  const harnessMaturity = a ? maturityBadge(agentMaturity(a)) : "";
+
   const html = `
     <div class="result-header">
       <div class="result-title">Your stack for: <span>${resultName}</span></div>
@@ -1354,68 +1428,107 @@ function showResult() {
         <button type="button" class="btn btn-secondary" onclick="restart()">Restart</button>
       </div>
     </div>
-    <div class="result-grid">
-      <div class="result-card model-layer">
-        <div class="stack-section-label">Model & APIs</div>
-        <div class="stack-section-product">BYOM — frontier or self-hosted</div>
-        <div class="stack-section-desc">Inference via <code>inference.local</code> (OpenShell cred masking) and/or platform gateways. Red Hat AI captures Completions, Responses/<strong>ogx</strong>, planned Anthropic Messages & Google Interactions so agents move to vLLM/llm-d without rewrites. Direct provider hosts still need explicit OpenShell network allows.</div>
-        ${caps.ogx ? `<div class="callout callout-info"><strong>ogx selected:</strong> Mode 2 platform API path enabled — distinct from Mode 1 whole-agent OpenShell.</div>` : ""}
-      </div>
-      <div class="result-card harness-layer">
-        <div class="stack-section-label">Harness (BYOA)</div>
-        <div class="stack-section-product">${harnessName}</div>
-        <div class="stack-section-desc">${harnessDesc}</div>
-        <div class="callout callout-dim" style="margin-top:0.4rem">${entryLine}</div>
-        ${a ? `<div class="meta" style="margin-top:0.45rem">${policyBadge(a.policy)}${a.nemoclaw ? ' <span class="badge badge-nc">NemoClaw</span>' : ""}</div>` : ""}
+
+    <div class="cake" role="list" aria-label="Architecture layers">
+      <section class="cake-layer layer-model" role="listitem">
+        <div class="cake-top">
+          <div class="cake-title-row">
+            <span class="cake-index">01 · Model &amp; APIs</span>
+            <div class="cake-product">BYOM — frontier or self-hosted</div>
+            ${maturityBadge(caps.ogx ? "platform-target" : null)}
+            ${infoButton(modelTip, "About model and APIs")}
+          </div>
+        </div>
+        <p class="cake-blurb">Route inference through <code>inference.local</code> and/or platform gateways — not conflated with OpenShell policy.</p>
+        <ul class="cake-chips">
+          ${chip("inference.local", !!caps.creds)}
+          ${chip("ogx / Responses (Mode 2)", !!caps.ogx)}
+          ${chip("Direct provider allows", true)}
+        </ul>
+        ${caps.ogx ? `<div class="callout callout-info"><strong>ogx selected:</strong> Mode 2 platform API path — distinct from Mode 1 whole-agent OpenShell.</div>` : ""}
+      </section>
+
+      <section class="cake-layer layer-harness" role="listitem">
+        <div class="cake-top">
+          <div class="cake-title-row">
+            <span class="cake-index">02 · Harness (BYOA)</span>
+            <div class="cake-product">${harnessName}</div>
+            ${harnessMaturity}
+            ${infoButton(harnessDesc || entryLine, "About harness")}
+          </div>
+        </div>
+        <p class="cake-blurb">${entryLine}</p>
+        <div class="cake-meta">
+          ${a ? `${policyBadge(a.policy)}${a.nemoclaw ? ' <span class="badge badge-nc">NemoClaw</span>' : ""}` : ""}
+        </div>
         ${policyCallout(a)}
         ${suggestAgentsHtml(uc?.suggestedAgents)}
-      </div>
-      <div class="result-card runtime-layer result-wide">
-        <div class="stack-section-header">
-          <span class="stack-section-label">Runtime — NVIDIA OpenShell</span>
-          <span class="info-icon" tabindex="0" role="img" aria-label="About OpenShell">i
-            <span class="tooltip">OpenShell is the application-level sandbox (Mode 1 whole-agent, and composes with Mode 2). It enforces Landlock, seccomp, netns, OPA L4/L7 (MCP-aware), inference.local credential injection, and OCSF audit. It does not replace Kata, MCP Gateway, or MLflow. Kagenti (SPIRE AuthBridge, AgentCard) was Dev Preview and converged here — story unchanged, infrastructure upgraded.</span>
-          </span>
+      </section>
+
+      <section class="cake-layer layer-openshell" role="listitem">
+        <div class="cake-top">
+          <div class="cake-title-row">
+            <span class="cake-index">03 · Runtime</span>
+            <div class="cake-product"><span style="color:var(--nv)">NVIDIA</span> OpenShell</div>
+            ${maturityBadge("alpha")}
+            ${infoButton(openshellTip, "About OpenShell")}
+          </div>
         </div>
-        <div class="stack-section-product"><span style="color:var(--nv)">NVIDIA</span> OpenShell <span style="font-size:0.75rem;opacity:0.5;font-weight:500">alpha · RHOAI DP/TP target 3.5/3.6</span></div>
-        <div class="callout callout-info" style="margin-top:0.35rem"><strong>Isolation profile:</strong> ${profile.name} (${profile.layers}) — ${profile.blurb}</div>
-        <ul class="stack-features">
-          ${openshellFeatures.map((f) => `<li class="${f.enabled ? "enabled" : "disabled"}" title="${f.tip}">${f.label}</li>`).join("")}
-        </ul>
-        <div class="callout callout-dim"><strong>Hot-reload vs recreate:</strong> network + inference can update live (<code>openshell policy set</code>). Landlock/seccomp/process identity require a new sandbox. <strong>Compose:</strong> Kata (L5) ∪ OpenShell (L1 policy) ∪ agent-sandbox (lifecycle).</div>
-      </div>
-      <div class="result-card platform-layer">
-        <div class="stack-section-label">Platform — OpenShift / OpenShift AI</div>
-        <div class="stack-section-product">${String(platformName).includes("Red Hat") || String(platformName).includes("OpenShift") ? rhHat + `<span class="rh-brand">${platformName}</span>` : platformName}</div>
-        <div class="stack-section-desc">${computeLine}</div>
-        <ul class="stack-features" style="margin-top:0.45rem">
-          ${platformFeatures.map((f) => `<li class="${f.enabled ? "enabled" : "disabled"}">${f.label}</li>`).join("")}
-          <li class="${caps.kata ? "enabled" : "disabled"}">OSC node eligibility: RHCOS workers, virt/NFD kata label, nested virt caveats</li>
-          <li class="enabled">vLLM / llm-d inference for agentic tool-calling (Theme 4)</li>
-        </ul>
-        <div class="routes" style="margin-top:0.4rem">
-          <span>NetworkPolicy + optional UDN + egress proxy (composable with OpenShell proxy)</span>
-          <span>SPIFFE/SPIRE on OpenShift for cluster workload identity (layers with sandbox JWT)</span>
+        <p class="cake-blurb"><strong>${profile.name}</strong> (${profile.layers}) — ${profile.blurb}</p>
+        <ul class="cake-chips">${openshellChips}</ul>
+        <div class="callout callout-dim"><strong>Compose:</strong> Kata (L5) ∪ OpenShell (app policy) ∪ agent-sandbox (lifecycle). Network/inference hot-reload; Landlock/seccomp need recreate.</div>
+      </section>
+
+      <section class="cake-layer layer-platform" role="listitem">
+        <div class="cake-top">
+          <div class="cake-title-row">
+            <span class="cake-index">04 · Platform</span>
+            <div class="cake-product">${platformTitle}</div>
+            ${caps.kata ? maturityBadge("ga") : ""}
+            ${infoButton(platformTip, "About platform layer")}
+          </div>
         </div>
-      </div>
-      <div class="result-card platform-layer">
-        <div class="stack-section-label">Safety & Agent Ops add-ons</div>
-        <div class="stack-section-desc">${addonItems.length ? addonItems.map((g) => `● ${g}`).join("<br>") : "None selected — OpenShell OCSF + OPA remain the security baseline. Add MLflow/EvalHub/Garak via OpenShift AI Agent Ops when you need product tracing and eval."}</div>
-      </div>
-      <div class="result-card next-layer result-wide">
-        <div class="stack-section-label">Next steps</div>
+        <p class="cake-blurb">${computeLine}</p>
+        <ul class="cake-chips">${platformChips}</ul>
+        <div class="routes" style="margin-top:0.45rem">
+          <span>NetworkPolicy + optional UDN + egress proxy</span>
+          <span>SPIFFE/SPIRE on OpenShift (layers with sandbox JWT)</span>
+        </div>
+      </section>
+
+      <section class="cake-layer layer-safety" role="listitem">
+        <div class="cake-top">
+          <div class="cake-title-row">
+            <span class="cake-index">05 · Safety &amp; Agent Ops</span>
+            <div class="cake-product">Add-ons (do not replace OpenShell)</div>
+            ${(caps.guardrails || caps.mlflow) ? maturityBadge("platform-target") : ""}
+            ${infoButton(safetyTip, "About safety add-ons")}
+          </div>
+        </div>
+        <p class="cake-blurb">${addonItems.length ? "Selected portfolio capabilities from OpenShift AI / NeMo." : "None selected — OpenShell OCSF + OPA remain the security baseline."}</p>
+        <ul class="cake-chips">${safetyChips}</ul>
+      </section>
+
+      <section class="cake-layer layer-next" role="listitem">
+        <div class="cake-top">
+          <div class="cake-title-row">
+            <span class="cake-index">Next steps</span>
+            <div class="cake-product">Commands &amp; maturity</div>
+          </div>
+        </div>
         <div class="cmd-list">
           ${commands.map((c) => `<code class="cmd">${c}</code>`).join("")}
         </div>
-        <div class="callout callout-warn" style="margin-top:0.55rem"><strong>Auth / maturity:</strong> ${authNote} OpenShell is alpha (single-player-first). Privileged SCC for sandbox netns is intentionally powerful.</div>
+        <div class="callout callout-warn"><strong>Auth / maturity:</strong> ${authNote} OpenShell is alpha (single-player-first). Privileged SCC for sandbox netns is intentionally powerful.</div>
         <div class="actions actions-sm" style="margin-top:0.65rem">
           <a class="btn btn-primary" href="../quickstart/">Open Quickstart</a>
           <a class="btn btn-secondary" href="../sandboxes/network-policies/">Network policies</a>
           <a class="btn btn-secondary" href="../agent-stack-decision-guide/">Decision Guide</a>
           <a class="btn btn-secondary" href="https://docs.nvidia.com/openshell/latest/about/supported-agents.html" target="_blank" rel="noopener">Supported agents</a>
         </div>
-      </div>
+      </section>
     </div>
+
     <p class="footer-note">Field positioning: <em>Kagenti → OpenShell</em> — BYOA unchanged; infrastructure is OpenShell + OpenShift AI platform layers (Kata, MCP Gateway, ogx, MLflow, SPIFFE). Do not market OpenShell as replacing OSC or MCP Gateway. Vault <em>dev mode</em> and eval TLS/unauth flags in this reference repo are for learning only.</p>
   `;
 
