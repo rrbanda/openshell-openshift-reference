@@ -12,7 +12,7 @@ body {
   background: #0a0e14;
   color: rgba(230, 237, 243, 0.9);
   min-height: 100vh;
-  padding: 1.2rem 1rem;
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,7 +40,7 @@ body::before {
 @keyframes shimmer { to { background-position: 200% center; } }
 .header p { opacity: 0.6; font-size: 0.88rem; line-height: 1.5; }
 
-.container { max-width: 700px; width: 100%; position: relative; z-index: 1; }
+.container { max-width: 640px; width: 100%; position: relative; z-index: 1; }
 
 /* Progress dots */
 .progress-dots { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.8rem; }
@@ -135,11 +135,14 @@ body::before {
 .result { display: none; animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 .result.active { display: block; }
 
-/* Result layout — two columns */
-.result-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 0.7rem; margin-bottom: 0.7rem; }
-@media (max-width: 700px) { .result-grid { grid-template-columns: 1fr; } }
+/* Result title */
+.result-title {
+  font-size: 1.25rem; font-weight: 700; margin-bottom: 1.2rem;
+  color: rgba(230,237,243,0.85);
+}
+.result-title span { color: #76b900; }
 
-/* Stack diagram */
+/* Stack diagram — single column */
 .stack {
   backdrop-filter: blur(16px);
   background: rgba(16, 20, 26, 0.7);
@@ -147,13 +150,13 @@ body::before {
   border: 1px solid rgba(230,237,243,0.08);
   overflow: hidden;
   box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+  margin-bottom: 1.2rem;
 }
 
-.right-panel { display: flex; flex-direction: column; gap: 0.5rem; }
-
 .stack-section {
-  padding: 0.55rem 1rem;
+  padding: 1.2rem 1.4rem;
   border-bottom: 1px solid rgba(230,237,243,0.05);
+  border-left: 3px solid rgba(230,237,243,0.1);
   animation: layerIn 0.4s ease forwards;
   opacity: 0;
   transform: translateX(-15px);
@@ -164,28 +167,35 @@ body::before {
 .stack-section:nth-child(4) { animation-delay: 0.4s; }
 .stack-section:nth-child(5) { animation-delay: 0.5s; }
 .stack-section:nth-child(6) { animation-delay: 0.6s; }
+.stack-section:nth-child(7) { animation-delay: 0.7s; }
+.stack-section:nth-child(8) { animation-delay: 0.8s; }
 .stack-section:last-child { border-bottom: none; }
 
 @keyframes layerIn { to { opacity: 1; transform: translateX(0); } }
 
-/* Runtime section gets subtle green glow */
+/* Color-coded layer borders */
+.stack-section.model-layer { border-left: 3px solid rgba(230,237,243,0.12); }
+.stack-section.harness-layer { border-left: 3px solid rgba(230,237,243,0.25); }
 .stack-section.runtime-layer {
-  background: linear-gradient(90deg, rgba(118,185,0,0.03) 0%, transparent 100%);
-  border-left: 2px solid rgba(118,185,0,0.4);
+  border-left: 3px solid #76b900;
+  background: rgba(118,185,0,0.04);
 }
+.stack-section.addon-layer { border-left: 3px solid rgba(118,185,0,0.35); }
+.stack-section.inference-layer { border-left: 3px solid rgba(230,237,243,0.12); }
+.stack-section.platform-layer { border-left: 3px solid rgba(230,237,243,0.12); }
 
 .stack-section.nemoclaw-layer {
   background: rgba(118,185,0,0.02);
-  border-left: 2px solid rgba(118,185,0,0.25);
+  border-left: 3px solid rgba(118,185,0,0.25);
 }
 
-.stack-section-header { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem; }
-.stack-section-label { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; }
-.stack-section-product { font-weight: 700; font-size: 0.85rem; }
-.stack-section-desc { font-size: 0.68rem; opacity: 0.6; line-height: 1.3; margin-top: 0.1rem; }
+.stack-section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+.stack-section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; }
+.stack-section-product { font-weight: 700; font-size: 1rem; }
+.stack-section-desc { font-size: 0.85rem; opacity: 0.6; line-height: 1.45; margin-top: 0.2rem; }
 
-.stack-features { margin-top: 0.25rem; padding: 0; }
-.stack-features li { font-size: 0.67rem; opacity: 0.8; padding: 0.08rem 0; list-style: none; display: flex; align-items: center; gap: 0.35rem; }
+.stack-features { margin-top: 0.4rem; padding: 0; }
+.stack-features li { font-size: 0.82rem; opacity: 0.8; padding: 0.15rem 0; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
 .stack-features li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .stack-features li.enabled::before { background: #76b900; box-shadow: 0 0 4px rgba(118,185,0,0.5); }
 .stack-features li.disabled::before { background: rgba(230,237,243,0.15); }
@@ -214,20 +224,20 @@ body::before {
 .info-icon:hover .tooltip { display: block; }
 
 /* Inference routes */
-.routes span { display: block; padding: 0.06rem 0; font-size: 0.67rem; opacity: 0.7; }
+.routes span { display: block; padding: 0.1rem 0; font-size: 0.82rem; opacity: 0.7; }
 .routes span::before { content: "→ "; color: #76b900; }
 
 /* Setup path */
 .setup-path {
   backdrop-filter: blur(10px);
   background: rgba(22, 27, 34, 0.5);
-  border-radius: 8px; padding: 0.5rem 0.9rem;
+  border-radius: 10px; padding: 1.2rem 1.4rem;
   border: 1px solid rgba(118,185,0,0.12);
-  margin-bottom: 0.7rem;
+  margin-bottom: 1rem;
 }
-.setup-path h4 { font-size: 0.65rem; color: #76b900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.15rem; }
-.setup-path p { font-size: 0.72rem; opacity: 0.75; line-height: 1.3; }
-.setup-path code { background: rgba(118,185,0,0.08); padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; }
+.setup-path h4 { font-size: 0.75rem; color: #76b900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
+.setup-path p { font-size: 0.85rem; opacity: 0.75; line-height: 1.45; }
+.setup-path code { background: rgba(118,185,0,0.08); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; }
 
 /* Buttons */
 .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
@@ -387,7 +397,7 @@ function showResult() {
   ];
 
   const mcpLayer = chkMcp ? `
-      <div class="stack-section">
+      <div class="stack-section addon-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">Tool Governance — MCP Gateway</span>
           <span class="info-icon">i<span class="tooltip">When agents call tools, requests go through the MCP Gateway. It performs OAuth2 token exchange, swapping the agent's identity for downstream access tokens. Authorization is by token claims, not prompts — prompt injection cannot bypass it.</span></span>
@@ -397,7 +407,7 @@ function showResult() {
       </div>` : '';
 
   const guardrailsLayer = chkGuardrails ? `
-      <div class="stack-section">
+      <div class="stack-section addon-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">Safety Guardrails</span>
           <span class="info-icon">i<span class="tooltip">Programmable safety rails at the inference boundary. NeMo Guardrails for conversation control, Guardrails Orchestrator for policy enforcement, Garak for pre-production adversarial scanning.</span></span>
@@ -413,9 +423,9 @@ function showResult() {
     : `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.68rem;opacity:0.5">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
 
   const html = `
-    <div class="result-grid">
+    <div class="result-title">Your stack for: <span>${a.name}</span></div>
     <div class="stack">
-      <div class="stack-section">
+      <div class="stack-section model-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">Model (the intelligence)</span>
           <span class="info-icon">i<span class="tooltip">The LLM that reasons and decides what to do next. It outputs text — tool calls, code, plans. By itself it cannot execute anything, remember between calls, or access external systems.</span></span>
@@ -423,14 +433,14 @@ function showResult() {
         <div class="stack-section-product">Your chosen LLM</div>
         <div class="stack-section-desc">Claude, Gemini, GPT, Nemotron, Llama — accessed via inference.local or direct API</div>
       </div>
-      <div class="stack-section">
+      <div class="stack-section harness-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">Harness (makes the model useful)</span>
           <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning. It turns a text-generator into a working agent that can complete real tasks.</span></span>
         </div>
         <div class="stack-section-product">${a.name}</div>
         <div class="stack-section-desc">${a.desc}</div>
-      </div>${nemoclawLayer}${mcpLayer}${guardrailsLayer}
+      </div>${nemoclawLayer}
       <div class="stack-section runtime-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">Runtime (makes it safe) — OpenShell</span>
@@ -440,8 +450,20 @@ function showResult() {
         <ul class="stack-features">
           ${features.map(f => `<li class="${f.enabled ? 'enabled' : 'disabled'}">${f.label}</li>`).join('')}
         </ul>
+      </div>${mcpLayer}${guardrailsLayer}
+      <div class="stack-section inference-layer">
+        <div class="stack-section-header">
+          <span class="stack-section-label">Inference Routing</span>
+          <span class="info-icon">i<span class="tooltip">All agent inference calls go through inference.local, which routes to the backend you configure — cloud providers, OpenShift AI, or local model servers. The agent never sees real API keys.</span></span>
+        </div>
+        <div class="stack-section-product">inference.local → flexible backend</div>
+        <div class="routes" style="margin-top:0.3rem">
+          <span>OpenShift AI (vLLM, NIM)</span>
+          <span>Cloud (Vertex, Anthropic, OpenAI)</span>
+          <span>Local (Ollama, vLLM)</span>
+        </div>
       </div>
-      <div class="stack-section">
+      <div class="stack-section platform-layer">
         <div class="stack-section-header">
           <span class="stack-section-label">Platform</span>
           <span class="info-icon">i<span class="tooltip">OpenShift + Red Hat build of Agent Sandbox. Compute, networking, storage, GPU scheduling. Agent Sandbox controller manages pod lifecycle via CRDs.</span></span>
@@ -449,23 +471,11 @@ function showResult() {
         <div class="stack-section-product">OpenShift${kataNote}</div>
       </div>
     </div>
-    <div class="right-panel">
-      <div class="setup-path">${setupPath}</div>
-      <div class="setup-path" style="border-color: rgba(230,237,243,0.08);">
-        <h4>Inference routing</h4>
-        <p style="font-size:0.68rem;opacity:0.6">inference.local → flexible backend</p>
-        <div class="routes" style="margin-top:0.2rem">
-          <span>OpenShift AI (vLLM, NIM)</span>
-          <span>Cloud (Vertex, Anthropic, OpenAI)</span>
-          <span>Local (Ollama, vLLM)</span>
-        </div>
-      </div>
-      <div class="actions" style="margin-top:auto">
-        <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
-        <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Concepts</a>
-        <button class="btn btn-secondary" onclick="restart()">Restart</button>
-      </div>
-    </div>
+    <div class="setup-path">${setupPath}</div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
+      <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Concepts</a>
+      <button class="btn btn-secondary" onclick="restart()">Restart</button>
     </div>
   `;
 
