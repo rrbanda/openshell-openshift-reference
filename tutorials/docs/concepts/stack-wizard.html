@@ -702,7 +702,7 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
 
 <div class="header">
   <div class="header-row"><h1>Pick Your Agent. See Your Stack.</h1></div>
-  <p class="tagline">BYOA on Red Hat OpenShift AI · product at the base · capabilities above</p>
+  <p class="tagline">Agent = Model + Harness · BYOA on Red Hat OpenShift AI · product at the base</p>
   <details>
     <summary>About · sources · layering</summary>
     <strong>Product (base of the stack):</strong> Red Hat OpenShift AI — the AI services layer. You bring the agent (BYOA); it runs on that product. Numbered rows are <strong>capabilities</strong> (not separate products): OpenShell app sandbox (NVIDIA collab; planned Developer Preview in OpenShift AI 3.5, targeting Tech Preview in 3.6), OpenShift Sandboxed Containers / Kata (GA layered), MCP Gateway, ogx / Open Responses, safety portfolio (NeMo Guardrails, EvalHub, Garak), MLflow/OTEL. OpenShift Container Platform sits under OpenShift AI as the cluster platform (outside this agent-capability diagram). Aligned to Red Hat AI Enterprise / OpenShift AI architecture and Kagenti→OpenShell field guide.
@@ -1498,6 +1498,8 @@ function showResult() {
     return (el.textContent || "").replace(/\s+/g, " ").trim();
   })();
   const harnessTip = [
+    "Agent = Model + Harness (LangChain): if you're not the model, you're the harness — tools, skills/MCP, orchestration, filesystem, hooks.",
+    "BYOA: you bring this layer; OpenShift AI does not pick a winning framework.",
     harnessDesc,
     entryLine,
     policyTip,
@@ -1547,30 +1549,11 @@ function showResult() {
     </div>
 
     <div class="result-pane active" id="pane-arch" role="tabpanel">
-      <p class="cake-hint">Top → bottom: BYOA agent on OpenShift AI capabilities · sole product at the base · tap <strong>i</strong> for detail</p>
-      <div class="cake" role="list" aria-label="BYOA agent capabilities on Red Hat OpenShift AI">
-        <section class="cake-layer layer-harness" role="listitem">
-          <div class="cake-top">
-            <span class="cake-index">01 · Agent</span>
-            <div class="cake-title-row">
-              <div class="cake-product">${harnessName}</div>
-              <span class="badge badge-bundled">BYOA</span>
-              ${harnessMaturity}
-              ${a ? policyBadge(a.policy) : ""}
-              ${a?.nemoclaw ? '<span class="badge badge-nc">NemoClaw</span>' : ""}
-              ${infoButton(harnessTip, "About BYOA harness")}
-            </div>
-          </div>
-          <ul class="cake-chips">
-            ${chipOn(a?.entry === "harness" ? "Pattern 2" : "Pattern 1")}
-            ${a?.nemoclaw ? chipOn("NemoClaw path") : chipOn("BYOA image")}
-          </ul>
-          ${suggestAgentsHtml(uc?.suggestedAgents)}
-        </section>
-
+      <p class="cake-hint">Agent = Model + Harness · runtime &amp; platform capabilities below · sole product at the base · tap <strong>i</strong> for detail</p>
+      <div class="cake" role="list" aria-label="Model, harness, and OpenShift AI capabilities">
         <section class="cake-layer layer-model" role="listitem">
           <div class="cake-top">
-            <span class="cake-index">02 · Model</span>
+            <span class="cake-index">01 · Model</span>
             <div class="cake-title-row">
               <div class="cake-product">Inference &amp; APIs</div>
               ${caps.ogx ? maturityBadge("platform-target") : ""}
@@ -1582,6 +1565,25 @@ function showResult() {
             ${caps.ogx ? chipOn("ogx / Mode 2") : ""}
             ${chipOn("Provider allows")}
           </ul>
+        </section>
+
+        <section class="cake-layer layer-harness" role="listitem">
+          <div class="cake-top">
+            <span class="cake-index">02 · Harness</span>
+            <div class="cake-title-row">
+              <div class="cake-product">${harnessName}</div>
+              <span class="badge badge-bundled">BYOA</span>
+              ${harnessMaturity}
+              ${a ? policyBadge(a.policy) : ""}
+              ${a?.nemoclaw ? '<span class="badge badge-nc">NemoClaw</span>' : ""}
+              ${infoButton(harnessTip, "About harness (Agent = Model + Harness)")}
+            </div>
+          </div>
+          <ul class="cake-chips">
+            ${chipOn(a?.entry === "harness" ? "Pattern 2" : "Pattern 1")}
+            ${a?.nemoclaw ? chipOn("NemoClaw path") : chipOn("BYOA image")}
+          </ul>
+          ${suggestAgentsHtml(uc?.suggestedAgents)}
         </section>
 
         <section class="cake-layer layer-openshell" role="listitem">

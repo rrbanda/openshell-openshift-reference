@@ -284,11 +284,12 @@ For this reference architecture (BYOA on Red Hat AI):
 
 ```
 ┌─────────────────────────────────────────┐
-│ Your Agent (BYOA harness / framework)   │  ← You bring this (runs on RHOAI)
+│ Model — Inference & APIs                │  ← Intelligence (weights / APIs)
+├─────────────────────────────────────────┤
+│ Harness — BYOA (tools, loops, FS, …)    │  ← Agent = Model + Harness
 ├─────────────────────────────────────────┤
 │ OpenShift AI capabilities (not products)│
-│  · Inference & APIs (ogx, providers)    │
-│  · OpenShell (app sandbox)              │  ← OPA, Landlock, seccomp,
+│  · OpenShell (app sandbox runtime)      │  ← OPA, Landlock, seccomp,
 │  · Isolation / tenancy / MCP Gateway    │     inference.local, OCSF
 │  · Safety & eval (TrustyAI portfolio)   │  ← Guardrails, EvalHub, Garak,
 │                                         │     MLflow/OTEL
