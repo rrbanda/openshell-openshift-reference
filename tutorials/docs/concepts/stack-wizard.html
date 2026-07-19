@@ -53,9 +53,9 @@ body::before {
 .step.active { display: block; }
 @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-.step-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.35; margin-bottom: 0.3rem; }
-.question { font-size: 1.15rem; font-weight: 600; margin-bottom: 1rem; }
-.selected-agent { font-size: 0.8rem; opacity: 0.5; margin-bottom: 1rem; }
+.step-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.35; margin-bottom: 0.2rem; }
+.question { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.6rem; }
+.selected-agent { font-size: 0.75rem; opacity: 0.5; margin-bottom: 0.5rem; }
 .selected-agent span { color: #76b900; font-weight: 600; }
 
 /* Agent grid */
@@ -114,20 +114,22 @@ body::before {
 .agent-card.nc-supported:hover { border-color: rgba(118, 185, 0, 0.5); box-shadow: 0 0 25px rgba(118, 185, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.3); }
 
 /* Checkboxes */
-.checks { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.2rem; }
+.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; margin-bottom: 0.8rem; }
 .check-item {
-  display: flex; align-items: flex-start; gap: 0.6rem;
-  padding: 0.6rem 0.8rem;
+  display: flex; align-items: flex-start; gap: 0.4rem;
+  padding: 0.35rem 0.5rem;
   backdrop-filter: blur(10px);
   background: rgba(22, 27, 34, 0.5);
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid rgba(230,237,243,0.06);
   transition: border-color 0.2s;
 }
 .check-item:hover { border-color: rgba(118,185,0,0.2); }
-.check-item input { margin-top: 3px; accent-color: #76b900; width: 15px; height: 15px; }
-.check-item label { font-size: 0.82rem; cursor: pointer; font-weight: 500; }
-.check-item .check-desc { font-size: 0.68rem; opacity: 0.45; margin-top: 0.1rem; line-height: 1.3; }
+.check-item input { margin-top: 2px; accent-color: #76b900; width: 13px; height: 13px; flex-shrink: 0; }
+.check-item label { font-size: 0.7rem; cursor: pointer; font-weight: 500; }
+.check-item .check-desc { font-size: 0.58rem; opacity: 0.4; margin-top: 0.05rem; line-height: 1.2; }
+
+@media (max-width: 500px) { .checks { grid-template-columns: 1fr; } }
 
 /* Result */
 .result { display: none; animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
