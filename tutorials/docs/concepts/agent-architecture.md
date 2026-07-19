@@ -2,6 +2,9 @@
 
 How AI agents are built, run, and secured — the components, the terminology, and how they fit together.
 
+[Find your stack :material-arrow-right:](stack-wizard.html){ .md-button .md-button--primary }
+Use the interactive wizard to get a personalized architecture recommendation.
+
 ## The Formula
 
 ```
