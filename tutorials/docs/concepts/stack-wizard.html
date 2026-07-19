@@ -187,9 +187,13 @@ body::before {
 .result { display: none; animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 .result.active { display: block; }
 
-/* Result title */
+/* Result header — title + actions inline */
+.result-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+}
 .result-title {
-  font-size: 1.25rem; font-weight: 700; margin-bottom: 1.2rem;
+  font-size: 1.25rem; font-weight: 700;
   color: rgba(230,237,243,0.85);
 }
 .result-title span { color: #76b900; }
@@ -536,13 +540,15 @@ function showResult() {
 
   const kataNote = chkKata ? ' + Kata Containers (hardware-isolated VM)' : '';
 
-  let setupPath;
+  let setupPathShort;
   if (isUC) {
-    setupPath = `<h4>Setup path</h4><p>Deploy using the <strong>${uc.profile}</strong> isolation profile on ${uc.platform}.</p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">${uc.desc}</p>`;
+    setupPathShort = `Deploy using <strong>${uc.profile}</strong> profile. ${uc.desc}`;
   } else if (a.nemoclaw) {
-    setupPath = `<h4>Setup path</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">Or deploy OpenShell directly via Helm if you prefer manual control.</p>`;
+    setupPathShort = `<code style="font-size:0.75rem">nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code> or deploy OpenShell via Helm`;
   } else {
-    setupPath = `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on Red Hat OpenShift AI. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.78rem;opacity:0.55">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
+    setupPathShort = a.hasOwnSandbox
+      ? `Deploy via Helm. ${a.name} has its own sandbox — OpenShell adds network policy and credential masking on top.`
+      : `Deploy OpenShell via Helm chart. Package your agent as a container.`;
   }
 
   const resultName = isUC ? uc.name : a.name;
@@ -551,29 +557,35 @@ function showResult() {
   const platformName = isUC ? uc.platform : 'Red Hat OpenShift AI';
 
   const html = `
-    <div class="result-title">Your stack for: <span>${resultName}</span></div>
+    <div class="result-header">
+      <div class="result-title">Your stack for: <span>${resultName}</span></div>
+      <div class="actions">
+        <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
+        <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Concepts</a>
+        <button class="btn btn-secondary" onclick="restart()">Restart</button>
+      </div>
+    </div>
     <div class="result-grid">
       <div class="stack">
         <div class="stack-section model-layer">
           <div class="stack-section-header">
-            <span class="stack-section-label">Model (the intelligence)</span>
+            <span class="stack-section-label">Model</span>
             <span class="info-icon">i<span class="tooltip">The LLM that reasons and decides what to do next. It outputs text — tool calls, code, plans. By itself it cannot execute anything, remember between calls, or access external systems.</span></span>
           </div>
           <div class="stack-section-product">Your chosen LLM</div>
-          <div class="stack-section-desc">Claude, Gemini, GPT, Nemotron, Llama — accessed via inference.local or direct API</div>
         </div>
         <div class="stack-section harness-layer">
           <div class="stack-section-header">
-            <span class="stack-section-label">Harness (makes the model useful)</span>
-            <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning. It turns a text-generator into a working agent that can complete real tasks.</span></span>
+            <span class="stack-section-label">Harness</span>
+            <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning.</span></span>
           </div>
           <div class="stack-section-product">${harnessName}</div>
           <div class="stack-section-desc">${harnessDesc}</div>
         </div>
         <div class="stack-section runtime-layer">
           <div class="stack-section-header">
-            <span class="stack-section-label">Runtime (makes it safe) — OpenShell</span>
-            <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. The harness decides actions; the runtime enforces boundaries. Network isolation, credential masking, filesystem restrictions, and audit logging — regardless of which harness you use.</span></span>
+            <span class="stack-section-label">Runtime — OpenShell</span>
+            <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. Network isolation, credential masking, filesystem restrictions, and audit logging — regardless of which harness you use.</span></span>
           </div>
           <div class="stack-section-product"><span style="color:#76b900">NVIDIA</span> OpenShell</div>
           <ul class="stack-features">
@@ -583,9 +595,10 @@ function showResult() {
         <div class="stack-section platform-layer">
           <div class="stack-section-header">
             <span class="stack-section-label">Platform</span>
-            <span class="info-icon">i<span class="tooltip">Red Hat OpenShift AI provides agent lifecycle (Kagenti/AgentRuntime), model serving (vLLM, KServe), MLflow tracing, and EvalHub. Kubernetes agent-sandbox manages pod lifecycle, warm pools, and optional Kata isolation via CRDs.</span></span>
+            <span class="info-icon">i<span class="tooltip">Red Hat OpenShift AI: Kagenti/AgentRuntime, model serving (vLLM, KServe), MLflow tracing, EvalHub. Kubernetes agent-sandbox manages pod lifecycle and optional Kata isolation.</span></span>
           </div>
           <div class="stack-section-product">${platformName.includes('Red Hat') ? platformName.replace('Red Hat', rhHat + '<span class="rh-brand">Red Hat</span>') : platformName}${kataNote}</div>
+          <div class="stack-section-desc" style="font-size:0.78rem;opacity:0.5;margin-top:0.15rem">${setupPathShort}</div>
         </div>
       </div>
       <div class="result-sidebar">
@@ -597,12 +610,6 @@ function showResult() {
             <span>Cloud (Vertex, Anthropic, OpenAI)</span>
             <span>Local (Ollama, vLLM)</span>
           </div>${governanceSection}
-        </div>
-        <div class="setup-path sidebar-card">${setupPath}</div>
-        <div class="actions">
-          <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
-          <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Concepts</a>
-          <button class="btn btn-secondary" onclick="restart()">Restart</button>
         </div>
       </div>
     </div>
