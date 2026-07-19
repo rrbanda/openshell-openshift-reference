@@ -438,15 +438,17 @@ body::before {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.65rem 1.05rem;
-  border-bottom: 1px solid rgba(230,237,243,0.12);
-  background: linear-gradient(90deg, rgba(238,0,0,0.1), rgba(22,27,34,0.9) 55%);
-  border-radius: 14px 14px 0 0;
+  padding: 0.7rem 1.05rem;
+  border-top: 1px solid rgba(238,0,0,0.35);
+  background: linear-gradient(90deg, rgba(238,0,0,0.14), rgba(22,27,34,0.95) 55%);
+  border-radius: 0 0 14px 14px;
   font-size: 0.86rem;
 }
 .cake-product-bar strong { font-size: 0.95rem; }
-.cake-product-bar .muted { color: var(--muted); font-size: 0.72rem; }
-.cake > .cake-layer:first-of-type { border-radius: 0; }
+.cake-product-bar .muted { color: var(--muted); font-size: 0.72rem; line-height: 1.35; }
+.cake > .cake-layer:first-of-type {
+  border-radius: 14px 14px 0 0;
+}
 .cake-layer {
   position: relative;
   overflow: visible;
@@ -456,9 +458,8 @@ body::before {
   border-left: 4px solid transparent;
   background: rgba(22, 27, 34, 0.55);
 }
-.cake-layer:last-child {
+.cake-layer:last-of-type {
   border-bottom: none;
-  border-radius: 0 0 14px 14px;
 }
 .cake-layer.layer-model {
   border-left-color: rgba(230,237,243,0.35);
@@ -480,8 +481,7 @@ body::before {
   border-left-color: var(--addon);
   background: linear-gradient(90deg, rgba(126,184,255,0.11), rgba(16,20,26,0.78) 48%);
 }
-.cake-layer.layer-safety:last-child {
-  border-radius: 0 0 14px 14px;
+.cake-layer.layer-safety {
   border-bottom: none;
 }
 .cake-top {
@@ -702,10 +702,10 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
 
 <div class="header">
   <div class="header-row"><h1>Pick Your Agent. See Your Stack.</h1></div>
-  <p class="tagline">Product: OpenShift AI · BYOA · capabilities compose the stack</p>
+  <p class="tagline">BYOA on Red Hat OpenShift AI · product at the base · capabilities above</p>
   <details>
     <summary>About · sources · layering</summary>
-    <strong>Product:</strong> Red Hat OpenShift AI (Red Hat AI portfolio). You bring the agent (BYOA); the product operationalizes it. <strong>Capabilities</strong> (not separate products): OpenShell app sandbox (NVIDIA collab; planned Developer Preview in OpenShift AI 3.5, targeting Tech Preview in 3.6), OpenShift Sandboxed Containers / Kata (GA layered), MCP Gateway, ogx / Open Responses, safety portfolio (NeMo Guardrails, EvalHub, Garak), MLflow/OTEL. Aligned to Red Hat AI Agentic Strategy 2026 and Kagenti→OpenShell field guide.
+    <strong>Product (base of the stack):</strong> Red Hat OpenShift AI — the AI services layer. You bring the agent (BYOA); it runs on that product. Numbered rows are <strong>capabilities</strong> (not separate products): OpenShell app sandbox (NVIDIA collab; planned Developer Preview in OpenShift AI 3.5, targeting Tech Preview in 3.6), OpenShift Sandboxed Containers / Kata (GA layered), MCP Gateway, ogx / Open Responses, safety portfolio (NeMo Guardrails, EvalHub, Garak), MLflow/OTEL. OpenShift Container Platform sits under OpenShift AI as the cluster platform (outside this agent-capability diagram). Aligned to Red Hat AI Enterprise / OpenShift AI architecture and Kagenti→OpenShell field guide.
   </details>
 </div>
 
@@ -1547,16 +1547,30 @@ function showResult() {
     </div>
 
     <div class="result-pane active" id="pane-arch" role="tabpanel">
-      <p class="cake-hint">Only product: <strong>Red Hat OpenShift AI</strong> · numbered rows are capability groups · tap <strong>i</strong> for detail</p>
-      <div class="cake" role="list" aria-label="OpenShift AI capability layers">
-        <div class="cake-product-bar">
-          <span class="badge badge-owner-plat">Product</span>
-          <strong class="rh-brand">${rhHat}Red Hat OpenShift AI</strong>
-          <span class="muted">only product in this diagram · BYOA</span>
-        </div>
+      <p class="cake-hint">Top → bottom: BYOA agent on OpenShift AI capabilities · sole product at the base · tap <strong>i</strong> for detail</p>
+      <div class="cake" role="list" aria-label="BYOA agent capabilities on Red Hat OpenShift AI">
+        <section class="cake-layer layer-harness" role="listitem">
+          <div class="cake-top">
+            <span class="cake-index">01 · Agent</span>
+            <div class="cake-title-row">
+              <div class="cake-product">${harnessName}</div>
+              <span class="badge badge-bundled">BYOA</span>
+              ${harnessMaturity}
+              ${a ? policyBadge(a.policy) : ""}
+              ${a?.nemoclaw ? '<span class="badge badge-nc">NemoClaw</span>' : ""}
+              ${infoButton(harnessTip, "About BYOA harness")}
+            </div>
+          </div>
+          <ul class="cake-chips">
+            ${chipOn(a?.entry === "harness" ? "Pattern 2" : "Pattern 1")}
+            ${a?.nemoclaw ? chipOn("NemoClaw path") : chipOn("BYOA image")}
+          </ul>
+          ${suggestAgentsHtml(uc?.suggestedAgents)}
+        </section>
+
         <section class="cake-layer layer-model" role="listitem">
           <div class="cake-top">
-            <span class="cake-index">01 · Model</span>
+            <span class="cake-index">02 · Model</span>
             <div class="cake-title-row">
               <div class="cake-product">Inference &amp; APIs</div>
               ${caps.ogx ? maturityBadge("platform-target") : ""}
@@ -1568,25 +1582,6 @@ function showResult() {
             ${caps.ogx ? chipOn("ogx / Mode 2") : ""}
             ${chipOn("Provider allows")}
           </ul>
-        </section>
-
-        <section class="cake-layer layer-harness" role="listitem">
-          <div class="cake-top">
-            <span class="cake-index">02 · Harness</span>
-            <div class="cake-title-row">
-              <div class="cake-product">${harnessName}</div>
-              <span class="badge badge-bundled">BYOA</span>
-              ${harnessMaturity}
-              ${a ? policyBadge(a.policy) : ""}
-              ${a?.nemoclaw ? '<span class="badge badge-nc">NemoClaw</span>' : ""}
-              ${infoButton(harnessTip, "About harness")}
-            </div>
-          </div>
-          <ul class="cake-chips">
-            ${chipOn(a?.entry === "harness" ? "Pattern 2" : "Pattern 1")}
-            ${a?.nemoclaw ? chipOn("NemoClaw path") : chipOn("BYOA image")}
-          </ul>
-          ${suggestAgentsHtml(uc?.suggestedAgents)}
         </section>
 
         <section class="cake-layer layer-openshell" role="listitem">
@@ -1626,6 +1621,12 @@ function showResult() {
           </div>
           <ul class="cake-chips">${safetyChips}</ul>
         </section>
+
+        <div class="cake-product-bar" role="listitem" aria-label="Product base: Red Hat OpenShift AI">
+          <span class="badge badge-owner-plat">Product</span>
+          <strong class="rh-brand">${rhHat}Red Hat OpenShift AI</strong>
+          <span class="muted">only product in this diagram · everything above runs on it · BYOA</span>
+        </div>
       </div>
     </div>
 
@@ -1647,7 +1648,7 @@ function showResult() {
       </div>
     </div>
 
-    <p class="footer-note">Only product in this diagram: <strong>Red Hat OpenShift AI</strong>. OpenShell, Kata/OSC, MCP Gateway, ogx, EvalHub, NeMo Guardrails, Garak, and MLflow are <em>capabilities</em> (or GA layered isolation for Kata/OSC) delivered in that portfolio — not peer products. Vault <em>dev mode</em> / eval TLS flags in this reference are for learning only.</p>
+    <p class="footer-note">Sole product (base of the stack): <strong>Red Hat OpenShift AI</strong> — AI services layer for enterprise agents. Rows above are BYOA + portfolio <em>capabilities</em> (OpenShell, Kata/OSC, MCP Gateway, ogx, EvalHub, NeMo Guardrails, Garak, MLflow), not peer products. OpenShift Container Platform is the underlying cluster platform outside this agent-capability view. Vault <em>dev mode</em> / eval TLS flags in this reference are for learning only.</p>
   `;
 
   document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));

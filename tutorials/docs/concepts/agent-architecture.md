@@ -284,18 +284,22 @@ For this reference architecture (BYOA on Red Hat AI):
 
 ```
 ┌─────────────────────────────────────────┐
-│ Your Agent (BYOA harness / framework)   │  ← You bring this
+│ Your Agent (BYOA harness / framework)   │  ← You bring this (runs on RHOAI)
 ├─────────────────────────────────────────┤
-│ Red Hat OpenShift AI (the product)      │
-│  · Safety & eval: Guardrails, EvalHub,  │
-│    Garak, MLflow/OTEL                   │
-│  · Connectivity: MCP Gateway, ogx       │
-│  · OpenShell (app sandbox capability)   │  ← OPA, Landlock, seccomp,
-│  · OSC / Kata (GA layered isolation)    │     inference.local, OCSF; L5
-│  · agent-sandbox controller             │  ← Sandbox CR lifecycle
+│ OpenShift AI capabilities (not products)│
+│  · Inference & APIs (ogx, providers)    │
+│  · OpenShell (app sandbox)              │  ← OPA, Landlock, seccomp,
+│  · Isolation / tenancy / MCP Gateway    │     inference.local, OCSF
+│  · Safety & eval (TrustyAI portfolio)   │  ← Guardrails, EvalHub, Garak,
+│                                         │     MLflow/OTEL
 ├─────────────────────────────────────────┤
-│ OpenShift (cluster platform)            │  ← SCC/RBAC, NetworkPolicy/UDN,
-│                                         │     SPIFFE/SPIRE, scheduling
+│ Red Hat OpenShift AI (the product)      │  ← Everything above runs on this
+└─────────────────────────────────────────┘
+         │ sits on
+         ▼
+┌─────────────────────────────────────────┐
+│ Red Hat OpenShift (cluster platform)    │  ← Outside this agent diagram:
+│                                         │     SCC/RBAC, operators, GPUs
 └─────────────────────────────────────────┘
 ```
 
