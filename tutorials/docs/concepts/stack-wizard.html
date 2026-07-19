@@ -744,7 +744,7 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
     <div class="cap-legend">
       <span><span class="badge badge-owner-os">OpenShell</span> app sandbox</span>
       <span><span class="badge badge-owner-plat">Platform</span> OpenShift AI</span>
-      <span><span class="badge badge-owner-addon">Safety</span> add-ons</span>
+      <span><span class="badge badge-owner-addon">OpenShift AI</span> Agent Ops</span>
       <span><span class="badge badge-maturity">Target / gap</span></span>
     </div>
     <div class="checks" id="capChecks"></div>
@@ -1114,15 +1114,15 @@ const capabilities = [
     id: "guardrails",
     owner: "addon",
     maturity: "platform-target",
-    label: "Guardrails",
-    desc: "NeMo Guardrails / Guardrails Orchestrator (runtime), Garak (pre-prod adversarial), EvalHub via TrustyAI. Complements OpenShell egress policy; does not replace it. Portfolio availability depends on your OpenShift AI / NeMo stack.",
+    label: "RHOAI Guardrails / EvalHub",
+    desc: "OpenShift AI (TrustyAI) portfolio — not OpenShell: NeMo Guardrails / Guardrails Orchestrator (runtime; 3.5 TP includes MCP Gateway tool-call enforcement), EvalHub orchestration with Garak and other providers for adversarial/capability eval. Complements OpenShell OPA/OCSF; does not replace them. Requires OpenShift AI Agent Ops / TrustyAI enablement.",
   },
 ];
 
 const OWNER_BADGE = {
   openshell: { cls: "badge-owner-os", text: "OS" },
   platform: { cls: "badge-owner-plat", text: "Plat" },
-  addon: { cls: "badge-owner-addon", text: "Safety" },
+  addon: { cls: "badge-owner-addon", text: "OpenShift AI" },
 };
 
 const rhHat = `<img class="rh-hat" src="redhat-hat.png" alt="">`;
@@ -1408,9 +1408,9 @@ function showResult() {
 
   const addonItems = [];
   if (caps.guardrails) {
-    addonItems.push("NeMo Guardrails / Guardrails Orchestrator — runtime conversation rails");
-    addonItems.push("Garak — pre-production adversarial scanning (TrustyAI / EvalHub path)");
-    addonItems.push("EvalHub — online LLM-as-judge / regression datasets (RHOAI Agent Ops)");
+    addonItems.push("NeMo Guardrails — OpenShift AI / TrustyAI runtime rails (3.5 TP: MCP Gateway tool-call enforcement)");
+    addonItems.push("EvalHub — OpenShift AI evaluation hub (orchestrates Garak and other providers)");
+    addonItems.push("Garak — adversarial / vulnerability scanning via EvalHub providers");
   }
   if (a?.nemoclaw) addonItems.push(`NemoClaw / Pattern 2: <code>${a.command}</code>`);
 
@@ -1498,11 +1498,13 @@ function showResult() {
 
   const safetyTip = addonItems.length
     ? addonItems.join(" · ")
-    : "None selected — OpenShell OCSF + OPA remain the security baseline. Add MLflow/EvalHub/Garak via OpenShift AI Agent Ops when you need product tracing and eval.";
+    : "None selected — OpenShell OCSF + OPA remain the security baseline. Enable OpenShift AI Agent Ops / TrustyAI (EvalHub, Garak, NeMo Guardrails, MLflow) when you need product safety and eval.";
 
   const harnessMaturity = a ? maturityBadge(agentMaturity(a)) : "";
   const safetyTipFull = [
-    "Safety & Agent Ops are OpenShift AI / NeMo portfolio add-ons — they complement OpenShell and do not replace Landlock, OPA egress, or OCSF.",
+    "Layer 05 is OpenShift AI Agent Ops / TrustyAI — not an OpenShell subsystem.",
+    "NeMo Guardrails (runtime rails; OpenShift AI 3.5 TP includes MCP Gateway tool-call enforcement), EvalHub (evaluation hub with Garak and other providers), and MLflow/OTEL tracing ship with OpenShift AI.",
+    "Compose with OpenShell: these complement Landlock/OPA/OCSF and do not replace them.",
     safetyTip,
   ].join(" ");
 
@@ -1584,11 +1586,12 @@ function showResult() {
 
         <section class="cake-layer layer-safety" role="listitem">
           <div class="cake-top">
-            <span class="cake-index">05 · Safety</span>
+            <span class="cake-index">05 · OpenShift AI</span>
             <div class="cake-title-row">
-              <div class="cake-product">Safety &amp; Agent Ops</div>
+              <div class="cake-product">Agent Ops — Guardrails · EvalHub · Garak</div>
+              <span class="badge badge-owner-addon">OpenShift AI</span>
               ${(caps.guardrails || caps.mlflow) ? maturityBadge("platform-target") : ""}
-              ${infoButton(safetyTipFull, "About safety and Agent Ops")}
+              ${infoButton(safetyTipFull, "About OpenShift AI Agent Ops")}
             </div>
           </div>
           <ul class="cake-chips">${safetyChips}</ul>
