@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agent Stack Decision Wizard | OpenShell on OpenShift</title>
+<title>Agent Stack Wizard | OpenShell on OpenShift</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -12,719 +12,318 @@ body {
   background: #0d1117;
   color: rgba(230, 237, 243, 0.87);
   min-height: 100vh;
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1rem;
 }
 
 .header {
   text-align: center;
   margin-bottom: 2rem;
+  max-width: 600px;
 }
 
 .header h1 {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
   background: linear-gradient(135deg, #76b900, #a0e030);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
-.header p {
-  opacity: 0.7;
-  font-size: 0.95rem;
+.header p { opacity: 0.7; font-size: 0.9rem; line-height: 1.5; }
+
+.container { max-width: 720px; width: 100%; }
+
+/* Steps */
+.step { display: none; animation: fadeIn 0.3s ease; }
+.step.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.step-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; margin-bottom: 0.3rem; }
+.question { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.2rem; }
+
+/* Agent grid */
+.agent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
 }
 
-.wizard-container {
-  max-width: 700px;
-  width: 100%;
-}
-
-.step {
-  display: none;
-  animation: fadeIn 0.3s ease;
-}
-
-.step.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.question {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+.agent-card {
+  border: 1px solid rgba(230, 237, 243, 0.12);
+  border-radius: 8px;
+  padding: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: #161b22;
   text-align: center;
 }
 
-.options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+.agent-card:hover { border-color: #76b900; transform: translateY(-2px); box-shadow: 0 3px 12px rgba(118,185,0,0.12); }
+.agent-card h4 { font-size: 0.8rem; color: #76b900; margin-bottom: 0.2rem; }
+.agent-card p { font-size: 0.65rem; opacity: 0.6; line-height: 1.3; }
+
+/* Checkboxes */
+.checks { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.2rem; }
+.check-item { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.6rem 0.8rem; background: #161b22; border-radius: 6px; border: 1px solid rgba(230,237,243,0.08); }
+.check-item input { margin-top: 3px; accent-color: #76b900; }
+.check-item label { font-size: 0.85rem; cursor: pointer; }
+.check-item .check-desc { font-size: 0.7rem; opacity: 0.5; margin-top: 0.15rem; }
+
+/* Result */
+.result { display: none; animation: fadeIn 0.4s ease; }
+.result.active { display: block; }
+
+/* Stack */
+.stack { background: #161b22; border-radius: 10px; border: 1px solid rgba(230,237,243,0.1); overflow: hidden; margin-bottom: 1rem; }
+.stack-section { padding: 1rem 1.2rem; border-bottom: 1px solid rgba(230,237,243,0.06); }
+.stack-section:last-child { border-bottom: none; }
+.stack-section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.stack-section-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.4; }
+.stack-section-product { font-weight: 700; font-size: 0.95rem; }
+.stack-section-desc { font-size: 0.78rem; opacity: 0.7; line-height: 1.4; }
+
+.stack-features { margin-top: 0.5rem; }
+.stack-features li { font-size: 0.75rem; opacity: 0.8; padding: 0.15rem 0; list-style: none; }
+.stack-features li::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 0.5rem; vertical-align: middle; }
+.stack-features li.enabled::before { background: #76b900; }
+.stack-features li.disabled::before { background: rgba(230,237,243,0.2); }
+
+/* Info icon */
+.info-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: rgba(118,185,0,0.15); color: #76b900;
+  font-size: 0.6rem; font-weight: 700; cursor: help;
+  position: relative;
 }
+
+.info-icon .tooltip {
+  display: none; position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+  background: #1f2937; border: 1px solid rgba(118,185,0,0.3); border-radius: 6px;
+  padding: 0.6rem 0.8rem; width: 240px; font-size: 0.7rem; font-weight: 400;
+  color: rgba(230,237,243,0.9); line-height: 1.4; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.info-icon:hover .tooltip { display: block; }
+
+/* Setup path */
+.setup-path {
+  background: #161b22; border-radius: 8px; padding: 0.8rem 1rem;
+  border: 1px solid rgba(118,185,0,0.2); margin-bottom: 1rem;
+}
+.setup-path h4 { font-size: 0.75rem; color: #76b900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
+.setup-path p { font-size: 0.8rem; opacity: 0.8; }
+.setup-path code { background: rgba(118,185,0,0.1); padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.75rem; }
+
+/* Inference box */
+.inference-box {
+  background: #161b22; border-radius: 8px; padding: 0.8rem 1rem;
+  border: 1px solid rgba(230,237,243,0.08); margin-bottom: 1rem;
+}
+.inference-box h4 { font-size: 0.7rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
+.inference-box .routes { font-size: 0.78rem; opacity: 0.8; }
+.inference-box .routes span { display: block; padding: 0.15rem 0; }
+.inference-box .routes span::before { content: "→ "; color: #76b900; }
+
+/* Buttons */
+.actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.btn { display: inline-block; padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-primary { background: #76b900; color: #0d1117; }
+.btn-primary:hover { background: #8fcf00; transform: translateY(-1px); }
+.btn-secondary { background: transparent; color: rgba(230,237,243,0.7); border: 1px solid rgba(230,237,243,0.2); }
+.btn-secondary:hover { border-color: #76b900; color: #76b900; }
+
+.back-link { display: inline-block; margin-top: 1.5rem; color: rgba(230,237,243,0.4); text-decoration: none; font-size: 0.75rem; }
+.back-link:hover { color: #76b900; }
 
 @media (max-width: 500px) {
-  .options { grid-template-columns: 1fr; }
+  .agent-grid { grid-template-columns: repeat(2, 1fr); }
+  .info-icon .tooltip { width: 180px; left: 0; transform: none; }
 }
-
-.option {
-  border: 1px solid rgba(230, 237, 243, 0.15);
-  border-radius: 10px;
-  padding: 1.2rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: #161b22;
-}
-
-.option:hover {
-  border-color: #76b900;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(118, 185, 0, 0.15);
-}
-
-.option h3 {
-  font-size: 0.95rem;
-  margin-bottom: 0.3rem;
-  color: #76b900;
-}
-
-.option p {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  line-height: 1.4;
-}
-
-.result {
-  display: none;
-  animation: fadeIn 0.4s ease;
-}
-
-.result.active {
-  display: block;
-}
-
-.result-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  text-align: center;
-  color: #76b900;
-}
-
-.result-desc {
-  text-align: center;
-  opacity: 0.8;
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-}
-
-.stack-diagram {
-  background: #161b22;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-  border: 1px solid rgba(230, 237, 243, 0.1);
-}
-
-.stack-layer {
-  padding: 1rem 1.2rem;
-  border-bottom: 1px solid rgba(230, 237, 243, 0.08);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  animation: slideIn 0.3s ease forwards;
-  opacity: 0;
-}
-
-.stack-layer:last-child { border-bottom: none; }
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.stack-layer .layer-name {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.5;
-}
-
-.stack-layer .layer-product {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.stack-layer .layer-desc {
-  font-size: 0.75rem;
-  opacity: 0.6;
-  text-align: right;
-  max-width: 50%;
-}
-
-.extras {
-  background: #161b22;
-  border-radius: 10px;
-  padding: 1rem 1.2rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid rgba(230, 237, 243, 0.1);
-}
-
-.extras h4 {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  opacity: 0.5;
-  margin-bottom: 0.5rem;
-}
-
-.extras ul {
-  list-style: none;
-  padding: 0;
-}
-
-.extras li {
-  font-size: 0.85rem;
-  padding: 0.3rem 0;
-  opacity: 0.8;
-}
-
-.extras li::before {
-  content: "→ ";
-  color: #76b900;
-}
-
-.actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.btn {
-  display: inline-block;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s;
-  cursor: pointer;
-  border: none;
-}
-
-.btn-primary {
-  background: #76b900;
-  color: #0d1117;
-}
-
-.btn-primary:hover {
-  background: #8fcf00;
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: rgba(230, 237, 243, 0.8);
-  border: 1px solid rgba(230, 237, 243, 0.2);
-}
-
-.btn-secondary:hover {
-  border-color: #76b900;
-  color: #76b900;
-}
-
-.breadcrumb {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-size: 0.75rem;
-  opacity: 0.5;
-}
-
-.back-link {
-  display: inline-block;
-  margin-top: 2rem;
-  color: rgba(230, 237, 243, 0.5);
-  text-decoration: none;
-  font-size: 0.8rem;
-}
-
-.back-link:hover { color: #76b900; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>Agent Stack Decision Wizard</h1>
-  <p>Answer a few questions to find the right architecture for your AI agent on OpenShift.</p>
+  <h1>What Does OpenShell Add to Your Agent?</h1>
+  <p>You already have an agent. OpenShell is the runtime layer that makes it safe to run in production. Pick your agent below to see how it fits.</p>
 </div>
 
-<div class="wizard-container">
-  <!-- Step 1: Agent Type -->
+<div class="container">
+
+  <!-- STEP 1: Pick your agent -->
   <div class="step active" id="step1">
-    <div class="question">What type of agent are you building?</div>
-    <div class="options">
-      <div class="option" onclick="goTo('step2a')">
-        <h3>Coding Agent</h3>
-        <p>Writes code, runs tests, pushes PRs, installs packages</p>
-      </div>
-      <div class="option" onclick="goTo('step2b')">
-        <h3>Workflow / Enterprise Agent</h3>
-        <p>Processes data, calls APIs, orchestrates business logic</p>
-      </div>
-      <div class="option" onclick="goTo('step2c')">
-        <h3>Personal Assistant</h3>
-        <p>Responds to messages, manages tasks, learns preferences</p>
-      </div>
-      <div class="option" onclick="goTo('step2d')">
-        <h3>Multi-Agent System</h3>
-        <p>Multiple specialized agents collaborating on tasks</p>
-      </div>
+    <div class="step-label">Step 1 of 2</div>
+    <div class="question">I'm using (or plan to use)...</div>
+    <div class="agent-grid">
+      <div class="agent-card" onclick="selectAgent('claude')"><h4>Claude Code</h4><p>Anthropic</p></div>
+      <div class="agent-card" onclick="selectAgent('codex')"><h4>Codex CLI</h4><p>OpenAI</p></div>
+      <div class="agent-card" onclick="selectAgent('gemini')"><h4>Gemini CLI</h4><p>Google</p></div>
+      <div class="agent-card" onclick="selectAgent('opencode')"><h4>OpenCode</h4><p>Open-source</p></div>
+      <div class="agent-card" onclick="selectAgent('openhands')"><h4>OpenHands</h4><p>Open-source</p></div>
+      <div class="agent-card" onclick="selectAgent('adk')"><h4>Google ADK</h4><p>Workflows</p></div>
+      <div class="agent-card" onclick="selectAgent('langgraph')"><h4>LangGraph</h4><p>LangChain</p></div>
+      <div class="agent-card" onclick="selectAgent('crewai')"><h4>CrewAI</h4><p>Multi-agent</p></div>
+      <div class="agent-card" onclick="selectAgent('openclaw')"><h4>OpenClaw</h4><p>NemoClaw ✓</p></div>
+      <div class="agent-card" onclick="selectAgent('hermes')"><h4>Hermes</h4><p>NemoClaw ✓</p></div>
+      <div class="agent-card" onclick="selectAgent('deepagents')"><h4>Deep Agents</h4><p>NemoClaw ✓</p></div>
+      <div class="agent-card" onclick="selectAgent('custom')"><h4>Custom / Other</h4><p>My own agent</p></div>
     </div>
   </div>
 
-  <!-- Step 2a: Coding agent - which harness -->
-  <div class="step" id="step2a">
-    <div class="breadcrumb">Coding Agent →</div>
-    <div class="question">Which coding agent harness?</div>
-    <div class="options">
-      <div class="option" onclick="showResult('R_claude')">
-        <h3>Claude Code</h3>
-        <p>Anthropic's agent — most popular, full harness built-in</p>
+  <!-- STEP 2: Requirements -->
+  <div class="step" id="step2">
+    <div class="step-label">Step 2 of 2</div>
+    <div class="question">What do you need from the runtime?</div>
+    <div class="checks">
+      <div class="check-item">
+        <input type="checkbox" id="chk-network" checked>
+        <div><label for="chk-network">Network policy</label><div class="check-desc">Control which endpoints the agent can reach, per-binary, per-host, per-HTTP-method</div></div>
       </div>
-      <div class="option" onclick="showResult('R_codex')">
-        <h3>OpenAI Codex CLI</h3>
-        <p>OpenAI's coding agent with built-in sandbox</p>
+      <div class="check-item">
+        <input type="checkbox" id="chk-creds" checked>
+        <div><label for="chk-creds">Credential masking</label><div class="check-desc">Agent calls inference.local — never sees real API keys. Switch providers without code changes.</div></div>
       </div>
-      <div class="option" onclick="showResult('R_gemini')">
-        <h3>Gemini CLI</h3>
-        <p>Google's coding agent for terminal</p>
+      <div class="check-item">
+        <input type="checkbox" id="chk-audit" checked>
+        <div><label for="chk-audit">Audit trail</label><div class="check-desc">OCSF structured logs of every network decision — allow and deny — for compliance</div></div>
       </div>
-      <div class="option" onclick="showResult('R_opencode')">
-        <h3>OpenCode</h3>
-        <p>Open-source (187K stars), model-agnostic, terminal/desktop/IDE</p>
+      <div class="check-item">
+        <input type="checkbox" id="chk-fs" checked>
+        <div><label for="chk-fs">Filesystem isolation</label><div class="check-desc">Landlock LSM restricts which paths the agent can read/write</div></div>
       </div>
-      <div class="option" onclick="showResult('R_openhands')">
-        <h3>OpenHands</h3>
-        <p>Open-source AI software engineer (78K stars), full platform</p>
-      </div>
-      <div class="option" onclick="showResult('R6')">
-        <h3>LangChain Deep Agents / Hermes</h3>
-        <p>NemoClaw-supported — one-command setup with OpenShell</p>
+      <div class="check-item">
+        <input type="checkbox" id="chk-multi">
+        <div><label for="chk-multi">Multi-user / team isolation</label><div class="check-desc">OIDC authentication + workspace separation (coming soon in OpenShell)</div></div>
       </div>
     </div>
-  </div>
-
-  <!-- Step 2b: Enterprise - external APIs -->
-  <div class="step" id="step2b">
-    <div class="breadcrumb">Enterprise Agent →</div>
-    <div class="question">Does it call external APIs?</div>
-    <div class="options">
-      <div class="option" onclick="goTo('step3b')">
-        <h3>Yes</h3>
-        <p>GitHub, Slack, databases, third-party services</p>
-      </div>
-      <div class="option" onclick="showResult('R2')">
-        <h3>No — internal only</h3>
-        <p>Only talks to services inside our cluster</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 2c: Assistant - always-on -->
-  <div class="step" id="step2c">
-    <div class="breadcrumb">Personal Assistant →</div>
-    <div class="question">Does it need to run 24/7?</div>
-    <div class="options">
-      <div class="option" onclick="goTo('step3c')">
-        <h3>Yes — always-on</h3>
-        <p>Persistent, learns over time, responds when I message it</p>
-      </div>
-      <div class="option" onclick="showResult('R4')">
-        <h3>No — on-demand</h3>
-        <p>Runs when triggered, handles a request, exits</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 2d: Multi-agent - team -->
-  <div class="step" id="step2d">
-    <div class="breadcrumb">Multi-Agent System →</div>
-    <div class="question">Is this for a team or solo use?</div>
-    <div class="options">
-      <div class="option" onclick="showResult('R5')">
-        <h3>Team / Enterprise</h3>
-        <p>Multiple engineers, need isolation between projects</p>
-      </div>
-      <div class="option" onclick="goTo('step3a')">
-        <h3>Solo developer</h3>
-        <p>Just me running multiple agents on one gateway</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 3a: Long-running - multi-tenant -->
-  <div class="step" id="step3a">
-    <div class="breadcrumb">Long-running →</div>
-    <div class="question">Do you need multi-tenant isolation?</div>
-    <div class="options">
-      <div class="option" onclick="showResult('R5')">
-        <h3>Yes</h3>
-        <p>Multiple teams or users sharing infrastructure</p>
-      </div>
-      <div class="option" onclick="showResult('R6')">
-        <h3>No — single user</h3>
-        <p>Just me or my team on a shared gateway</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 3b: External APIs - credential masking -->
-  <div class="step" id="step3b">
-    <div class="breadcrumb">Enterprise + External APIs →</div>
-    <div class="question">Do you need credential masking?</div>
-    <div class="options">
-      <div class="option" onclick="showResult('R7')">
-        <h3>Yes — agent should never see API keys</h3>
-        <p>Keys managed by gateway, routed via inference.local</p>
-      </div>
-      <div class="option" onclick="showResult('R8')">
-        <h3>No — just need network policy</h3>
-        <p>Control which endpoints the agent can reach</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 3c: Always-on - type -->
-  <div class="step" id="step3c">
-    <div class="breadcrumb">Always-on →</div>
-    <div class="question">What kind of always-on agent?</div>
-    <div class="options">
-      <div class="option" onclick="showResult('R3')">
-        <h3>Personal assistant with memory</h3>
-        <p>Self-improving, learns preferences, multi-channel messaging</p>
-      </div>
-      <div class="option" onclick="showResult('R9')">
-        <h3>Enterprise event-driven</h3>
-        <p>Responds to Pub/Sub, webhooks, cron — no human trigger</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Results -->
-  <div class="result" id="R_claude">
-    <div class="result-title">Claude Code + OpenShell</div>
-    <div class="result-desc">Anthropic's coding agent with enterprise-grade sandboxing</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">Claude Code (full built-in harness)</div></div><div class="layer-desc">Planning, tools, memory, verification, git</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Network policy + credential masking</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + persistent workspace</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>Claude Code includes the full harness (no separate harness needed)</li>
-      <li>OpenShell adds: network policy, credential masking via inference.local, audit trail</li>
-      <li>ANTHROPIC_BASE_URL=https://inference.local — keys never exposed to agent</li>
-      <li>NemoClaw does NOT support Claude Code — use OpenShell directly</li>
-    </ul></div>
     <div class="actions">
-      <a class="btn btn-primary" href="../getting-started/prerequisites/">Deploy on OpenShift</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
+      <button class="btn btn-primary" onclick="showResult()">Show my architecture</button>
+      <button class="btn btn-secondary" onclick="goBack()">← Back</button>
     </div>
   </div>
 
-  <div class="result" id="R_codex">
-    <div class="result-title">OpenAI Codex + OpenShell</div>
-    <div class="result-desc">OpenAI's coding agent with sandboxed execution</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">OpenAI Codex CLI (full built-in harness)</div></div><div class="layer-desc">Planning, tools, code execution, verification</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Network policy + isolation</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + persistent workspace</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>Codex has its own sandbox — OpenShell adds network-level policy on top</li>
-      <li>OpenShell controls which endpoints Codex can reach</li>
-      <li>OPENAI_BASE_URL=https://inference.local for credential masking</li>
-      <li>NemoClaw does NOT support Codex — use OpenShell directly</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="../getting-started/prerequisites/">Deploy on OpenShift</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
+  <!-- RESULT -->
+  <div class="result" id="result"></div>
 
-  <div class="result" id="R_gemini">
-    <div class="result-title">Gemini CLI + OpenShell</div>
-    <div class="result-desc">Google's coding agent with policy-enforced sandboxing</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">Gemini CLI (built-in harness)</div></div><div class="layer-desc">Google's terminal coding agent</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Network policy + credential masking</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + persistent workspace</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>Gemini CLI connects to Gemini models natively</li>
-      <li>OpenShell adds: egress control, per-binary policy, audit</li>
-      <li>inference.local can route to Vertex AI or other providers</li>
-      <li>NemoClaw does NOT support Gemini CLI — use OpenShell directly</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="../getting-started/prerequisites/">Deploy on OpenShift</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R_opencode">
-    <div class="result-title">OpenCode + OpenShell</div>
-    <div class="result-desc">Open-source, model-agnostic coding agent (187K stars)</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">OpenCode (full harness, any model)</div></div><div class="layer-desc">Terminal + desktop + IDE, 75+ LLM providers</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Network policy + credential masking</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + persistent workspace</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>Model-agnostic — works with any LLM provider</li>
-      <li>Open-source (MIT), privacy-first, no data stored</li>
-      <li>OpenShell adds: network isolation, inference routing, audit</li>
-      <li>Listed in NVIDIA Agent Toolkit diagram as supported harness</li>
-      <li>NemoClaw does NOT support OpenCode directly — use OpenShell directly</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="https://opencode.ai">OpenCode docs</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R_openhands">
-    <div class="result-title">OpenHands + OpenShell</div>
-    <div class="result-desc">Open-source AI software engineer platform (78K stars)</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent + Harness</div><div class="layer-product">OpenHands (full platform + harness)</div></div><div class="layer-desc">Multi-agent, SDK, CLI, Agent Canvas</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell (adds policy layer)</div></div><div class="layer-desc">OpenHands has own sandbox; OpenShell adds network policy</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Enterprise self-hosted deployment</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>OpenHands has its own Docker sandbox (code exec isolation)</li>
-      <li>OpenShell adds network-level policy on top (egress control, audit)</li>
-      <li>Model-agnostic via Agent Client Protocol</li>
-      <li>Enterprise tier available for VPC/K8s deployment</li>
-      <li>Listed in NVIDIA Agent Toolkit diagram as supported harness</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="https://www.openhands.dev">OpenHands docs</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R2">
-    <div class="result-title">Internal Workflow Agent</div>
-    <div class="result-desc">No external API calls — minimal sandbox overhead</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">Google ADK</div></div><div class="layer-desc">Workflow orchestration</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">ADK Runner + Sessions</div></div><div class="layer-desc">Persistence + event loop</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">Standard K8s Pod</div></div><div class="layer-desc">No sandbox needed (internal only)</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">NetworkPolicy for internal routing</div></div>
-    </div>
-    <div class="extras"><h4>Why no OpenShell?</h4><ul>
-      <li>Agent only talks to internal services — no exfiltration risk</li>
-      <li>K8s NetworkPolicy is sufficient for internal-only traffic</li>
-      <li>Add OpenShell later if requirements change</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="https://adk.dev/deploy/gke/">ADK deploy docs</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R3">
-    <div class="result-title">Always-On Personal Assistant</div>
-    <div class="result-desc">Self-improving agent with memory and messaging</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">OpenClaw or Hermes</div></div><div class="layer-desc">Always-on, multi-channel</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">Built-in (gateway + heartbeat + memory)</div></div><div class="layer-desc">Learning loop + skills</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell via NemoClaw</div></div><div class="layer-desc">Sandboxed, one-command setup</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">Your machine / DGX / RTX PC</div></div><div class="layer-desc">Persistent compute</div></div>
-    </div>
-    <div class="extras"><h4>NemoClaw supports exactly 3 agents</h4><ul>
-      <li><strong>OpenClaw</strong> — personal assistant (default)</li>
-      <li><strong>Hermes</strong> — self-improving agent with learning loop</li>
-      <li><strong>LangChain Deep Agents Code</strong> — terminal coding harness</li>
-    </ul><h4 style="margin-top:0.8rem">Key features</h4><ul>
-      <li>nemoclaw onboard — one command to set up everything</li>
-      <li>inference.local routes to Nemotron, Ollama, or cloud</li>
-      <li>Persistent memory across sessions</li>
-      <li>Messaging: WhatsApp, Slack, Telegram (OpenClaw/Hermes)</li>
-    </ul></div>
-    <div class="extras" style="margin-top:0.75rem; border-color: rgba(238,0,0,0.2)"><h4>Not supported by NemoClaw CLI</h4><ul>
-      <li>Google ADK — use OpenShell directly instead</li>
-      <li>CrewAI — use OpenShell directly instead</li>
-      <li>LangGraph standalone — use OpenShell directly instead</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="https://docs.nvidia.com/nemoclaw/latest/">NemoClaw docs</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R4">
-    <div class="result-title">On-Demand Assistant</div>
-    <div class="result-desc">Triggered by request, sandboxed execution, exits when done</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">Google ADK</div></div><div class="layer-desc">Request/response agent</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">ADK Runner + Memory</div></div><div class="layer-desc">Sessions persist across calls</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Policy-controlled sandbox</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + scheduling</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>Agent starts on demand, stops when idle</li>
-      <li>DatabaseSessionService for persistence</li>
-      <li>Network policy controls API access</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="../getting-started/prerequisites/">Get started</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R5">
-    <div class="result-title">Multi-Team Enterprise Platform</div>
-    <div class="result-desc">Isolated workspaces, managed credentials, team governance</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">Any framework (ADK, LangGraph, etc.)</div></div><div class="layer-desc">Per-team agent definitions</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">Framework-provided (ADK Runner, etc.)</div></div><div class="layer-desc">Sessions + workflows</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell (workspaces for isolation)</div></div><div class="layer-desc">Per-workspace sandbox + OIDC auth</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + RBAC + networking</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>OpenShell workspaces for team isolation (coming)</li>
-      <li>OIDC authentication (Keycloak, Entra ID, Okta)</li>
-      <li>Managed credentials via OpenShell providers</li>
-      <li>Separate gateway per team (current model)</li>
-      <li>OCSF audit trail per user</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="../production/gitops/">GitOps deployment</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R6">
-    <div class="result-title">Long-Running Coding Agent (Solo)</div>
-    <div class="result-desc">Hours/days of autonomous coding with full harness</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">LangChain Deep Agents Code (dcode)</div></div><div class="layer-desc">Autonomous coding tasks</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">Deep Agents harness (full)</div></div><div class="layer-desc">Filesystem, git, compaction, Ralph Loops, verification</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell via NemoClaw</div></div><div class="layer-desc">Sandbox + network + credential masking</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift or local machine</div></div><div class="layer-desc">Persistent PVC + GPU access</div></div>
-    </div>
-    <div class="extras"><h4>NemoClaw-supported path</h4><ul>
-      <li>nemo-deepagents onboard — one command setup</li>
-      <li>Full coding harness (filesystem, git, bash, verification)</li>
-      <li>Context compaction for long sessions</li>
-      <li>inference.local with Nemotron or cloud models</li>
-      <li>Persistent workspace survives restarts</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="https://docs.nvidia.com/nemoclaw/user-guide/deepagents/get-started/quickstart">Deep Agents quickstart</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R7">
-    <div class="result-title">Enterprise Workflow + Credential Masking</div>
-    <div class="result-desc">Agent calls external APIs but never sees the keys</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">Google ADK</div></div><div class="layer-desc">Workflow with tool calls</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">ADK Runner + DatabaseSessionService</div></div><div class="layer-desc">Persistent sessions + workflows</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">inference.local + credential injection</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">PostgreSQL for sessions</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>Agent code uses BASE_URL=https://inference.local/v1</li>
-      <li>Gateway injects real credentials transparently</li>
-      <li>Switch LLM providers without code changes</li>
-      <li>Full OCSF audit of every API call</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="../getting-started/prerequisites/">Get started</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R8">
-    <div class="result-title">Enterprise Workflow + Policy Only</div>
-    <div class="result-desc">Control which endpoints the agent can reach</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">Google ADK</div></div><div class="layer-desc">Workflow with direct API access</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">ADK Runner</div></div><div class="layer-desc">Standard orchestration</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell (policy enforcement)</div></div><div class="layer-desc">Network policy per-binary, per-host</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Compute + scheduling</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>Agent calls APIs directly (keys in env vars)</li>
-      <li>OpenShell blocks unauthorized destinations</li>
-      <li>L7 rules: allow GET but block POST per endpoint</li>
-      <li>Per-binary restrictions (only python can reach API X)</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="../sandboxes/network-policies/">Policy guide</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
-
-  <div class="result" id="R9">
-    <div class="result-title">Enterprise Event-Driven (Always-On)</div>
-    <div class="result-desc">ADK ambient agent triggered by events, sandboxed execution</div>
-    <div class="stack-diagram">
-      <div class="stack-layer" style="animation-delay: 0.1s"><div><div class="layer-name">Agent</div><div class="layer-product">Google ADK (Ambient Agent)</div></div><div class="layer-desc">Event-driven, no human trigger</div></div>
-      <div class="stack-layer" style="animation-delay: 0.2s"><div><div class="layer-name">Harness</div><div class="layer-product">ADK Runner + Workflows + Sessions</div></div><div class="layer-desc">Pub/Sub triggers, pause/resume, checkpoints</div></div>
-      <div class="stack-layer" style="animation-delay: 0.3s"><div><div class="layer-name">Runtime</div><div class="layer-product">OpenShell</div></div><div class="layer-desc">Sandbox + credential masking</div></div>
-      <div class="stack-layer" style="animation-delay: 0.4s"><div><div class="layer-name">Platform</div><div class="layer-product">OpenShift</div></div><div class="layer-desc">Persistent + event infrastructure</div></div>
-    </div>
-    <div class="extras"><h4>Key features</h4><ul>
-      <li>Responds to Pub/Sub, webhooks, cron schedules</li>
-      <li>Durable state machine — pauses days, resumes exactly</li>
-      <li>DatabaseSessionService for checkpoints</li>
-      <li>Scale to zero when idle, wake on event</li>
-    </ul></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="https://adk.dev/runtime/ambient-agents/">ADK Ambient docs</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
-    </div>
-  </div>
 </div>
 
 <a class="back-link" href="agent-architecture/">← Back to Agent Architecture concepts</a>
 
 <script>
-function goTo(stepId) {
-  document.querySelectorAll('.step, .result').forEach(el => {
-    el.classList.remove('active');
-  });
-  document.getElementById(stepId).classList.add('active');
+const agents = {
+  claude: { name: 'Claude Code', by: 'Anthropic', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness: planning, tools, memory, verification, git, context compaction' },
+  codex: { name: 'OpenAI Codex CLI', by: 'OpenAI', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full built-in harness with own sandbox and code execution' },
+  gemini: { name: 'Gemini CLI', by: 'Google', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Terminal coding agent with Gemini models' },
+  opencode: { name: 'OpenCode', by: 'Open-source (187K stars)', type: 'coding', hasOwnSandbox: false, nemoclaw: false, desc: 'Model-agnostic terminal/desktop/IDE agent, 75+ LLM providers' },
+  openhands: { name: 'OpenHands', by: 'Open-source (78K stars)', type: 'coding', hasOwnSandbox: true, nemoclaw: false, desc: 'Full AI software engineering platform with multi-agent SDK' },
+  adk: { name: 'Google ADK', by: 'Google', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Framework + partial harness: Runner, Sessions, Workflows, Ambient Agents' },
+  langgraph: { name: 'LangGraph', by: 'LangChain', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Graph-based agent orchestration with durable execution' },
+  crewai: { name: 'CrewAI', by: 'CrewAI', type: 'workflow', hasOwnSandbox: false, nemoclaw: false, desc: 'Role-based multi-agent orchestration framework' },
+  openclaw: { name: 'OpenClaw', by: 'Community', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Always-on personal AI assistant with multi-channel messaging' },
+  hermes: { name: 'Hermes', by: 'Nous Research', type: 'assistant', hasOwnSandbox: false, nemoclaw: true, desc: 'Self-improving agent with learning loop and persistent skills' },
+  deepagents: { name: 'LangChain Deep Agents Code', by: 'LangChain', type: 'coding', hasOwnSandbox: false, nemoclaw: true, desc: 'Terminal coding harness with full context management and Ralph Loops' },
+  custom: { name: 'Custom Agent', by: 'You', type: 'any', hasOwnSandbox: false, nemoclaw: false, desc: 'Your own agent packaged as a container image' }
+};
+
+let selectedAgent = null;
+
+function selectAgent(id) {
+  selectedAgent = id;
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step2').classList.add('active');
 }
 
-function showResult(resultId) {
-  document.querySelectorAll('.step, .result').forEach(el => {
-    el.classList.remove('active');
-  });
-  const result = document.getElementById(resultId);
-  result.classList.add('active');
-  // Trigger stack layer animations
-  result.querySelectorAll('.stack-layer').forEach((layer, i) => {
-    layer.style.animationDelay = (0.1 + i * 0.15) + 's';
-  });
+function goBack() {
+  document.querySelectorAll('.step, .result').forEach(s => s.classList.remove('active'));
+  document.getElementById('step1').classList.add('active');
+}
+
+function showResult() {
+  const a = agents[selectedAgent];
+  const chkNetwork = document.getElementById('chk-network').checked;
+  const chkCreds = document.getElementById('chk-creds').checked;
+  const chkAudit = document.getElementById('chk-audit').checked;
+  const chkFs = document.getElementById('chk-fs').checked;
+  const chkMulti = document.getElementById('chk-multi').checked;
+
+  const features = [
+    { label: 'Network policy (per-binary, per-host, L7)', enabled: chkNetwork },
+    { label: 'Credential masking via inference.local', enabled: chkCreds },
+    { label: 'OCSF audit trail', enabled: chkAudit },
+    { label: 'Landlock filesystem isolation', enabled: chkFs },
+    { label: 'Multi-user isolation (OIDC + workspaces)', enabled: chkMulti }
+  ];
+
+  const setupPath = a.nemoclaw
+    ? `<h4>Setup: NemoClaw (one command)</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.7rem;opacity:0.6">NemoClaw bundles OpenShell + inference routing + blueprint management</p>`
+    : `<h4>Setup: OpenShell directly</h4><p>Deploy via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.7rem;opacity:0.6">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment.'}</p>`;
+
+  const html = `
+    <div class="stack">
+      <div class="stack-section">
+        <div class="stack-section-header">
+          <span class="stack-section-label">Your Agent + Harness</span>
+          <span class="info-icon">i<span class="tooltip">The harness is everything that isn't the model — tools, memory, planning, filesystem, verification. Your agent already includes this.</span></span>
+        </div>
+        <div class="stack-section-product">${a.name}</div>
+        <div class="stack-section-desc">${a.desc}</div>
+      </div>
+      <div class="stack-section">
+        <div class="stack-section-header">
+          <span class="stack-section-label">Runtime — What OpenShell Adds</span>
+          <span class="info-icon">i<span class="tooltip">The runtime enforces WHERE and UNDER WHAT CONSTRAINTS your agent executes. Network isolation, credential brokering, audit logging — regardless of which agent you use.</span></span>
+        </div>
+        <div class="stack-section-product">NVIDIA OpenShell</div>
+        <ul class="stack-features">
+          ${features.map(f => `<li class="${f.enabled ? 'enabled' : 'disabled'}">${f.label}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="stack-section">
+        <div class="stack-section-header">
+          <span class="stack-section-label">Inference Routing</span>
+          <span class="info-icon">i<span class="tooltip">Your agent calls inference.local (a magic URL). The OpenShell gateway routes it to your configured model endpoint. Agent never sees API keys. You can switch providers without changing code.</span></span>
+        </div>
+        <div class="stack-section-product">inference.local → flexible backend</div>
+        <div class="inference-box" style="border:none;padding:0.4rem 0 0 0;margin:0">
+          <div class="routes">
+            <span>OpenShift AI (vLLM, NIM — on-cluster GPU)</span>
+            <span>Cloud APIs (Vertex AI, Anthropic, OpenAI)</span>
+            <span>Local models (Ollama, vLLM standalone)</span>
+          </div>
+        </div>
+      </div>
+      <div class="stack-section">
+        <div class="stack-section-header">
+          <span class="stack-section-label">Platform</span>
+          <span class="info-icon">i<span class="tooltip">The compute platform that schedules pods, manages networking, storage, and GPU resources. OpenShell runs as a StatefulSet here.</span></span>
+        </div>
+        <div class="stack-section-product">OpenShift</div>
+        <div class="stack-section-desc">Compute, networking, storage, GPU scheduling</div>
+      </div>
+    </div>
+    <div class="setup-path">${setupPath}</div>
+    <div class="actions">
+      <a class="btn btn-primary" href="../getting-started/prerequisites/">Deploy on OpenShift</a>
+      <button class="btn btn-secondary" onclick="restart()">Start over</button>
+    </div>
+  `;
+
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  const resultEl = document.getElementById('result');
+  resultEl.innerHTML = html;
+  resultEl.classList.add('active');
 }
 
 function restart() {
-  document.querySelectorAll('.step, .result').forEach(el => {
-    el.classList.remove('active');
-  });
+  document.getElementById('result').classList.remove('active');
+  document.getElementById('result').innerHTML = '';
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.getElementById('step1').classList.add('active');
 }
 </script>
