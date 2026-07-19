@@ -753,13 +753,12 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
       <button type="button" onclick="goBack()">Change selection</button>
     </div>
     <div class="question">What do you need?</div>
-    <p class="hint">Left edge = owner. Tap <strong>i</strong> for technical detail. Amber = not fully ready or platform-target.</p>
+    <p class="hint">Left edge = owner. Tap <strong>i</strong> for technical detail. Amber = Preview / not fully ready. Left edge groups capabilities under the OpenShift AI product.</p>
     <div class="cap-legend">
-      <span><span class="badge badge-owner-plat">Product</span> OpenShift AI</span>
-      <span><span class="badge badge-owner-os">OpenShell</span> sandbox capability</span>
-      <span><span class="badge badge-owner-plat">OpenShift</span> cluster / OSC</span>
-      <span><span class="badge badge-owner-addon">Safety</span> portfolio capabilities</span>
-      <span><span class="badge badge-maturity">Maturity</span></span>
+      <span><span class="badge badge-owner-plat">Product</span> Red Hat OpenShift AI</span>
+      <span><span class="badge badge-owner-os">OpenShell</span> sandbox</span>
+      <span><span class="badge badge-owner-plat">Platform</span> Kata · MCP · tenancy</span>
+      <span><span class="badge badge-owner-addon">Safety</span> Guardrails · EvalHub · Garak · MLflow</span>
     </div>
     <div class="checks" id="capChecks"></div>
     <div class="actions">
@@ -787,7 +786,7 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
  *   agent-sandbox  = Sandbox CRD lifecycle (kubernetes-sigs; ships with OSC path)
  *   MCP Gateway    = Red Hat AI tool governance (Envoy + Kuadrant AuthPolicy + Authorino)
  *   ogx            = Open Responses / Mode-2 platform API surface (not OpenShell core)
- *   MLflow/OTEL    = OpenShift AI Agent Ops tracing/eval (not OpenShell OCSF)
+ *   MLflow/OTEL    = OpenShift AI · AgentRuntime tracing/eval (not OpenShell OCSF)
  *
  * Identity: Kagenti had full SPIRE via AuthBridge (Dev Preview, converged away).
  * OpenShell closes the gap with JWT-SVID grants / exchange; Red Hat contributes
@@ -797,7 +796,7 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
  *   Product = Red Hat OpenShift AI (Red Hat AI portfolio).
  *   OpenShell = capability (Planned DP in OpenShift AI 3.5, targeting TP in 3.6; NVIDIA collab).
  *   MCP Gateway, ogx, NeMo Guardrails, EvalHub, Garak, MLflow = capabilities (not products).
- *   Kata / OSC = GA layered product on OpenShift (compose under OpenShift AI).
+ *   Kata / OSC = GA layered capability (OpenShift Sandboxed Containers) composing under OpenShift AI.
  * Upstream OpenShell is also alpha / single-player-first.
  */
 
@@ -975,8 +974,8 @@ const usecases = {
   trusted_chatbot: {
     name: "Trusted read-only chatbot (public/RAG)",
     profileKey: "permissive",
-    platform: "OpenShift AI Agent Ops",
-    compute: "RHOAI Agent Ops Operator AgentRuntime on a normal Deployment/StatefulSet (container isolation). Controlled NetworkPolicy egress. OpenShell optional if you still want in-process policy.",
+    platform: "OpenShift AI · AgentRuntime path",
+    compute: "OpenShift AI AgentRuntime on a normal Deployment/StatefulSet (container isolation). Controlled NetworkPolicy egress. OpenShell optional when you want in-process policy.",
     desc: "Long-running shared service, trusted source, no private data. Guardrails on I/O. Kernel isolation usually not required.",
     harnessSuggest: "Your chatbot / RAG agent image",
     suggestedAgents: ["adk", "langgraph", "custom"],
@@ -986,7 +985,7 @@ const usecases = {
   nightly_trusted: {
     name: "Trusted nightly summary job",
     profileKey: "openshell_min",
-    platform: "OpenShift AI Agent Ops",
+    platform: "OpenShift AI · AgentRuntime",
     compute: "AgentRuntime as a Kubernetes Job with normal containers + controlled ingress/egress. Workload identity needed.",
     desc: "Scheduled, read-only data, hardcoded private output. Bounded behavior — container isolation often enough; add OpenShell when you want per-binary egress + cred masking.",
     harnessSuggest: "Batch/workflow agent",
@@ -997,8 +996,8 @@ const usecases = {
   private_chatbot: {
     name: "Private-data chatbot + MCP/Skills",
     profileKey: "openshell_kata",
-    platform: "OpenShift AI Agent Ops + OSC",
-    compute: "AgentRuntime Deployment/StatefulSet on OpenShift Sandboxed Containers (Kata) + controlled network. Compose OpenShell inside for Landlock/OPA/inference.local when agents are autonomous.",
+    platform: "OpenShift AI · AgentRuntime + OSC",
+    compute: "OpenShift AI AgentRuntime on OpenShift Sandboxed Containers (Kata) + controlled network. Compose OpenShell for Landlock/OPA/inference.local when agents are autonomous.",
     desc: "Private data, capable MCP servers, Agent Skills — privilege scoping + network + kernel isolation per field mapping table.",
     harnessSuggest: "Framework agent in your image",
     suggestedAgents: ["adk", "langgraph", "custom"],
@@ -1008,8 +1007,8 @@ const usecases = {
   email_agent: {
     name: "Email / messaging agent (untrusted I/O)",
     profileKey: "openshell_kata",
-    platform: "OpenShift AI Agent Ops + OSC",
-    compute: "AgentRuntime Job on OpenShift Sandboxed Containers + controlled network. User + workload identities. OpenShell for deny-by-default egress and cred masking.",
+    platform: "OpenShift AI · AgentRuntime + OSC",
+    compute: "OpenShift AI AgentRuntime Job on OpenShift Sandboxed Containers + controlled network. User + workload identities. OpenShell for deny-by-default egress and cred masking.",
     desc: "Reads untrusted email/chat and writes back — field guide requires OSC-class isolation.",
     harnessSuggest: "Always-on or scheduled harness",
     suggestedAgents: ["openclaw", "hermes", "custom"],
@@ -1030,7 +1029,7 @@ const usecases = {
   coding_cluster: {
     name: "Coding / claw agent in cluster",
     profileKey: "openshell_typical",
-    platform: "OpenShift (+ optional OpenShift AI)",
+    platform: "OpenShift AI on OpenShift",
     compute: "OpenShell sandbox with OpenShift/Kubernetes compute driver + agent-sandbox CRD lifecycle. Privileged SCC on openshell-sandbox SA for netns. Controlled egress.",
     desc: "Policy, shared compute, or always-on when laptop is off. Field mapping: OpenShell on OpenShift.",
     harnessSuggest: "Base-image coding agents or claw via NemoClaw",
@@ -1041,7 +1040,7 @@ const usecases = {
   mode2_exec: {
     name: "Sandbox execution via platform APIs (Mode 2)",
     profileKey: "openshell_typical",
-    platform: "Red Hat AI (ogx) + ephemeral exec sandboxes",
+    platform: "OpenShift AI · Mode 2 (ogx)",
     compute: "Agent stays outside; code execution goes to disposable Firecracker/Kata/gVisor-class sandboxes via platform APIs. OpenShell+RHOAI cover Mode 2 via Responses API / ogx (open source).",
     desc: "Separate failure domains — agent process survives exec failure. Distinct from whole-agent Mode 1.",
     harnessSuggest: "Agents using OpenAI Responses / Open Responses",
@@ -1073,7 +1072,7 @@ const capabilities = [
     id: "audit",
     owner: "openshell",
     label: "OCSF security audit",
-    desc: "Structured OCSF v1.7.0 for network/HTTP/SSH/process/config/findings — SIEM-ready. Distinct from MLflow/OTEL product tracing in OpenShift AI Agent Ops.",
+    desc: "Structured OCSF v1.7.0 for network/HTTP/SSH/process/config/findings — SIEM-ready. Distinct from MLflow/OTEL observability capabilities in OpenShift AI.",
   },
   {
     id: "fs",
@@ -1123,10 +1122,10 @@ const capabilities = [
   },
   {
     id: "mlflow",
-    owner: "platform",
+    owner: "addon",
     maturity: "platform-target",
     label: "MLflow / OTEL",
-    desc: "OpenShift AI capability (Preview): MLflow tracing with OpenTelemetry for agent observability. Complements — does not replace — OpenShell OCSF security audit. Not a separate product.",
+    desc: "OpenShift AI observability capability (Preview): MLflow tracing with OpenTelemetry. Complements — does not replace — OpenShell OCSF security audit. Not a separate product.",
   },
   {
     id: "guardrails",
@@ -1139,7 +1138,7 @@ const capabilities = [
 
 const OWNER_BADGE = {
   openshell: { cls: "badge-owner-os", text: "OpenShell" },
-  platform: { cls: "badge-owner-plat", text: "OpenShift" },
+  platform: { cls: "badge-owner-plat", text: "Platform" },
   addon: { cls: "badge-owner-addon", text: "Safety" },
 };
 
@@ -1424,7 +1423,7 @@ function showResult() {
 
   const platformFeatures = capabilities
     .filter((c) => c.owner === "platform")
-    .map((c) => ({ label: c.label, enabled: caps[c.id] }));
+    .map((c) => ({ id: c.id, label: c.label, enabled: caps[c.id] }));
 
   const addonItems = [];
   if (caps.guardrails) {
@@ -1447,7 +1446,7 @@ function showResult() {
       ? [
           "# Field mapping: AgentRuntime on normal containers may suffice",
           "# Add OpenShell when you need per-binary egress, Landlock, or inference.local",
-          "Follow OpenShift AI Agent Ops Operator docs for AgentRuntime",
+          "Follow OpenShift AI AgentRuntime / Agent Ops docs",
         ]
       : [
           "openshell sandbox create --from <image> --policy ./policy.yaml",
@@ -1470,8 +1469,12 @@ function showResult() {
   // Face shows only enabled chips; full detail lives in (i) so the cake fits the viewport.
   const chipOn = (label) => `<li>${label}</li>`;
   const openshellChips = openshellFeatures.filter((f) => f.enabled).map((f) => chipOn(f.label)).join("");
+  // Layer 04 = platform isolation/connectivity caps only (not a product name).
+  // ogx stays on Model; MLflow/safety stay on Safety — avoid duplicate chips.
   const platformChips = [
-    ...platformFeatures.filter((f) => f.enabled).map((f) => chipOn(f.label)),
+    ...platformFeatures
+      .filter((f) => f.enabled && f.id !== "ogx")
+      .map((f) => chipOn(f.label)),
     ...(caps.kata ? [chipOn("OSC node eligibility")] : []),
     chipOn("vLLM / llm-d"),
   ].join("");
@@ -1479,9 +1482,7 @@ function showResult() {
     ...(caps.guardrails ? [chipOn("NeMo Guardrails"), chipOn("Garak"), chipOn("EvalHub")] : []),
     ...(caps.mlflow ? [chipOn("MLflow / OTEL")] : []),
   ].join("") || chipOn("OpenShell OCSF baseline");
-  const platformTitle = (String(platformName).includes("Red Hat") || String(platformName).includes("OpenShift"))
-    ? `${rhHat}<span class="rh-brand">${platformName}</span>`
-    : platformName;
+  const useCaseContext = uc ? platformName : "";
 
   const modelTip = [
     "Inference capabilities inside OpenShift AI — not a separate product.",
@@ -1511,12 +1512,12 @@ function showResult() {
   ].join(" ");
 
   const platformTip = [
-    "OpenShift cluster foundation capabilities inside the OpenShift AI product — not a second product.",
+    "Platform capabilities of the Red Hat OpenShift AI product — not a separate product called OpenShift foundation.",
     computeLine,
-    uc ? `Use-case context: ${platformName}.` : "",
-    "NetworkPolicy + optional UDN + egress proxy (composable with OpenShell proxy).",
+    useCaseContext ? `Use-case context: ${useCaseContext}.` : "",
+    "Includes OpenShift Sandboxed Containers / Kata (GA layered), multitenancy (projects / NetworkPolicy / UDN), MCP Gateway (Preview), and related cluster controls.",
+    "NetworkPolicy + optional UDN + egress proxy compose with the OpenShell capability.",
     "SPIFFE/SPIRE on OpenShift layers with sandbox JWT.",
-    "OSC / Kata: GA layered product. MCP Gateway and ogx: Preview capabilities per strategy appendix.",
   ].filter(Boolean).join(" ");
 
   const safetyTip = addonItems.length
@@ -1546,19 +1547,18 @@ function showResult() {
     </div>
 
     <div class="result-pane active" id="pane-arch" role="tabpanel">
-      <p class="cake-hint">Product = OpenShift AI · layers = capabilities (not products) · tap <strong>i</strong> for detail</p>
+      <p class="cake-hint">Only product: <strong>Red Hat OpenShift AI</strong> · numbered rows are capability groups · tap <strong>i</strong> for detail</p>
       <div class="cake" role="list" aria-label="OpenShift AI capability layers">
         <div class="cake-product-bar">
           <span class="badge badge-owner-plat">Product</span>
           <strong class="rh-brand">${rhHat}Red Hat OpenShift AI</strong>
-          <span class="muted">Red Hat AI portfolio · BYOA platform</span>
+          <span class="muted">only product in this diagram · BYOA</span>
         </div>
         <section class="cake-layer layer-model" role="listitem">
           <div class="cake-top">
             <span class="cake-index">01 · Model</span>
             <div class="cake-title-row">
               <div class="cake-product">Inference &amp; APIs</div>
-              ${maturityBadge("capability")}
               ${caps.ogx ? maturityBadge("platform-target") : ""}
               ${infoButton(modelTip, "About model and API capabilities")}
             </div>
@@ -1594,7 +1594,6 @@ function showResult() {
             <span class="cake-index">03 · Sandbox</span>
             <div class="cake-title-row">
               <div class="cake-product">OpenShell</div>
-              ${maturityBadge("capability")}
               ${maturityBadge("rhoai-dp")}
               <span class="badge badge-bundled">${profile.name}</span>
               ${infoButton(openshellTip, "About OpenShell capability")}
@@ -1605,12 +1604,12 @@ function showResult() {
 
         <section class="cake-layer layer-platform" role="listitem">
           <div class="cake-top">
-            <span class="cake-index">04 · Cluster</span>
+            <span class="cake-index">04 · Platform</span>
             <div class="cake-title-row">
-              <div class="cake-product">OpenShift foundation</div>
-              ${maturityBadge("capability")}
+              <div class="cake-product">Isolation, tenancy &amp; connectivity</div>
               ${caps.kata ? maturityBadge("ga") : ""}
-              ${infoButton(platformTip, "About OpenShift foundation capabilities")}
+              ${(caps.mcp || caps.multi) ? maturityBadge("platform-target") : ""}
+              ${infoButton(platformTip, "About platform capabilities in OpenShift AI")}
             </div>
           </div>
           <ul class="cake-chips">${platformChips}</ul>
@@ -1620,10 +1619,9 @@ function showResult() {
           <div class="cake-top">
             <span class="cake-index">05 · Safety</span>
             <div class="cake-title-row">
-              <div class="cake-product">Safety portfolio</div>
-              ${maturityBadge("capability")}
+              <div class="cake-product">Safety &amp; evaluation</div>
               ${(caps.guardrails || caps.mlflow) ? maturityBadge("platform-target") : ""}
-              ${infoButton(safetyTipFull, "About safety portfolio capabilities")}
+              ${infoButton(safetyTipFull, "About safety and evaluation capabilities")}
             </div>
           </div>
           <ul class="cake-chips">${safetyChips}</ul>
@@ -1649,7 +1647,7 @@ function showResult() {
       </div>
     </div>
 
-    <p class="footer-note">Product: Red Hat OpenShift AI. OpenShell, MCP Gateway, ogx, EvalHub, NeMo Guardrails, and Garak are <em>capabilities</em> in the Red Hat AI portfolio — not separate products. Kata/OSC is a GA layered OpenShift product that composes under OpenShift AI. Vault <em>dev mode</em> / eval TLS flags in this reference are for learning only.</p>
+    <p class="footer-note">Only product in this diagram: <strong>Red Hat OpenShift AI</strong>. OpenShell, Kata/OSC, MCP Gateway, ogx, EvalHub, NeMo Guardrails, Garak, and MLflow are <em>capabilities</em> (or GA layered isolation for Kata/OSC) delivered in that portfolio — not peer products. Vault <em>dev mode</em> / eval TLS flags in this reference are for learning only.</p>
   `;
 
   document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));
