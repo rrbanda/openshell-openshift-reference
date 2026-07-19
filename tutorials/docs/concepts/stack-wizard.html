@@ -605,8 +605,6 @@ body.showing-stack .header .tagline { display: none; }
 body.showing-stack .header { margin-bottom: 0.35rem; }
 body.showing-stack .header h1 { font-size: clamp(1.1rem, 2.2vw, 1.35rem); }
 body.showing-stack .progress { margin-bottom: 0.4rem; }
-body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
-
 .callout {
   margin-top: 0.55rem; padding: 0.55rem 0.7rem; border-radius: 7px;
   font-size: 0.78rem; line-height: 1.4;
@@ -704,8 +702,8 @@ body.showing-stack .footer-note { margin-top: 0.75rem; font-size: 0.68rem; }
   <div class="header-row"><h1>Pick Your Agent. See Your Stack.</h1></div>
   <p class="tagline">Agent = Model + Harness · BYOA on Red Hat OpenShift AI · product at the base</p>
   <details>
-    <summary>About · sources · layering</summary>
-    <strong>Product (base of the stack):</strong> Red Hat OpenShift AI — the AI services layer. You bring the agent (BYOA); it runs on that product. Numbered rows are <strong>capabilities</strong> (not separate products): OpenShell app sandbox (NVIDIA collab; planned Developer Preview in OpenShift AI 3.5, targeting Tech Preview in 3.6), OpenShift Sandboxed Containers / Kata (GA layered), MCP Gateway, ogx / Open Responses, safety portfolio (NeMo Guardrails, EvalHub, Garak), MLflow/OTEL. OpenShift Container Platform sits under OpenShift AI as the cluster platform (outside this agent-capability diagram). Aligned to Red Hat AI Enterprise / OpenShift AI architecture and Kagenti→OpenShell field guide.
+    <summary>About · sources</summary>
+    Maps agents and use cases to a Red Hat OpenShift AI stack. Sources: Red Hat AI Agentic Strategy 2026, Kagenti→OpenShell field guide, Sandboxing for Agents (July 2026). OpenShell planned DP in OpenShift AI 3.5 → TP in 3.6.
   </details>
 </div>
 
@@ -1655,7 +1653,6 @@ function showResult() {
       </div>
     </div>
 
-    <p class="footer-note">Sole product (base of the stack): <strong>Red Hat OpenShift AI</strong> — AI services layer for enterprise agents. Rows above are BYOA + portfolio <em>capabilities</em> (OpenShell, Kata/OSC, MCP Gateway, ogx, EvalHub, NeMo Guardrails, Garak, MLflow), not peer products. OpenShift Container Platform is the underlying cluster platform outside this agent-capability view. Vault <em>dev mode</em> / eval TLS flags in this reference are for learning only.</p>
   `;
 
   document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));
