@@ -252,6 +252,16 @@ function showResult() {
   const chkFs = document.getElementById('chk-fs').checked;
   const chkMulti = document.getElementById('chk-multi').checked;
 
+  const nemoclawLayer = a.nemoclaw ? `
+      <div class="stack-section" style="border-left: 3px solid #76b900;">
+        <div class="stack-section-header">
+          <span class="stack-section-label">NemoClaw (optional — one-command setup)</span>
+          <span class="info-icon">i<span class="tooltip">NemoClaw bundles OpenShell + inference routing + hardened blueprints into a single command. Only supports 3 agents: OpenClaw, Hermes, LangChain Deep Agents. For everything else, deploy OpenShell directly.</span></span>
+        </div>
+        <div class="stack-section-product">NVIDIA NemoClaw</div>
+        <div class="stack-section-desc">Guided onboarding, versioned blueprints, managed inference config</div>
+      </div>` : '';
+
   const features = [
     { label: 'Network policy (per-binary, per-host, L7)', enabled: chkNetwork },
     { label: 'Credential masking via inference.local', enabled: chkCreds },
@@ -261,23 +271,32 @@ function showResult() {
   ];
 
   const setupPath = a.nemoclaw
-    ? `<h4>Setup: NemoClaw (one command)</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.7rem;opacity:0.6">NemoClaw bundles OpenShell + inference routing + blueprint management</p>`
-    : `<h4>Setup: OpenShell directly</h4><p>Deploy via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.7rem;opacity:0.6">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment.'}</p>`;
+    ? `<h4>Setup path</h4><p><code>nemoclaw onboard${selectedAgent === 'hermes' ? ' --agent hermes' : selectedAgent === 'deepagents' ? ' --agent langchain-deepagents-code' : ''}</code></p><p style="margin-top:0.3rem;font-size:0.7rem;opacity:0.6">Or deploy OpenShell directly via Helm if you prefer manual control.</p>`
+    : `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.7rem;opacity:0.6">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
 
   const html = `
     <div class="stack">
       <div class="stack-section">
         <div class="stack-section-header">
-          <span class="stack-section-label">Your Agent + Harness</span>
-          <span class="info-icon">i<span class="tooltip">The harness is everything that isn't the model — tools, memory, planning, filesystem, verification. Your agent already includes this.</span></span>
+          <span class="stack-section-label">Model (the intelligence)</span>
+          <span class="info-icon">i<span class="tooltip">The LLM that reasons and decides. It takes in context, outputs text — tool calls, code, plans. By itself it cannot execute anything or remember between calls.</span></span>
+        </div>
+        <div class="stack-section-product">Your chosen LLM</div>
+        <div class="stack-section-desc">Claude, Gemini, GPT, Nemotron, Llama — accessed via inference.local</div>
+      </div>
+      <div class="stack-section">
+        <div class="stack-section-header">
+          <span class="stack-section-label">Harness (makes the model useful)</span>
+          <span class="info-icon">i<span class="tooltip">Agent = Model + Harness. The harness is EVERYTHING that isn't the model: system prompts, tools, filesystem, memory, orchestration loops, code execution, context compaction, verification, subagent spawning. It turns a text-generator into a working agent.</span></span>
         </div>
         <div class="stack-section-product">${a.name}</div>
         <div class="stack-section-desc">${a.desc}</div>
       </div>
+      ${nemoclawLayer}
       <div class="stack-section">
         <div class="stack-section-header">
-          <span class="stack-section-label">Runtime — What OpenShell Adds</span>
-          <span class="info-icon">i<span class="tooltip">The runtime enforces WHERE and UNDER WHAT CONSTRAINTS your agent executes. Network isolation, credential brokering, audit logging — regardless of which agent you use.</span></span>
+          <span class="stack-section-label">Runtime (makes it safe) — OpenShell</span>
+          <span class="info-icon">i<span class="tooltip">The runtime decides what the agent is ALLOWED to do — not what it SHOULD do. Network isolation, credential masking, filesystem restrictions, audit. The harness decides actions; the runtime enforces boundaries on those actions.</span></span>
         </div>
         <div class="stack-section-product">NVIDIA OpenShell</div>
         <ul class="stack-features">
@@ -309,7 +328,8 @@ function showResult() {
     </div>
     <div class="setup-path">${setupPath}</div>
     <div class="actions">
-      <a class="btn btn-primary" href="../getting-started/prerequisites/">Deploy on OpenShift</a>
+      <a class="btn btn-primary" href="../quickstart/">Quickstart (10 min)</a>
+      <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Learn: Harness vs Runtime</a>
       <button class="btn btn-secondary" onclick="restart()">Start over</button>
     </div>
   `;
