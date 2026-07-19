@@ -135,6 +135,10 @@ body::before {
 .result { display: none; animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 .result.active { display: block; }
 
+/* Result layout — two columns */
+.result-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 0.7rem; margin-bottom: 0.7rem; }
+@media (max-width: 700px) { .result-grid { grid-template-columns: 1fr; } }
+
 /* Stack diagram */
 .stack {
   backdrop-filter: blur(16px);
@@ -142,9 +146,10 @@ body::before {
   border-radius: 12px;
   border: 1px solid rgba(230,237,243,0.08);
   overflow: hidden;
-  margin-bottom: 1rem;
   box-shadow: 0 4px 30px rgba(0,0,0,0.3);
 }
+
+.right-panel { display: flex; flex-direction: column; gap: 0.5rem; }
 
 .stack-section {
   padding: 0.55rem 1rem;
@@ -408,6 +413,7 @@ function showResult() {
     : `<h4>Setup path</h4><p>Deploy OpenShell via Helm chart on OpenShift. Package your agent as a container.</p><p style="margin-top:0.3rem;font-size:0.68rem;opacity:0.5">${a.hasOwnSandbox ? a.name + ' has its own sandbox — OpenShell adds network-level policy and credential masking on top.' : 'OpenShell provides the full sandbox environment for your agent.'}</p>`;
 
   const html = `
+    <div class="result-grid">
     <div class="stack">
       <div class="stack-section">
         <div class="stack-section-header">
@@ -437,30 +443,29 @@ function showResult() {
       </div>
       <div class="stack-section">
         <div class="stack-section-header">
-          <span class="stack-section-label">Inference Routing</span>
-          <span class="info-icon">i<span class="tooltip">Your agent calls inference.local (a magic URL inside the sandbox). The OpenShell gateway intercepts it and routes to your configured model endpoint. Agent never sees API keys or real URLs. Switch providers without changing agent code.</span></span>
-        </div>
-        <div class="stack-section-product">inference.local → flexible backend</div>
-        <div class="routes">
-          <span>OpenShift AI (vLLM, NIM — on-cluster GPU)</span>
-          <span>Cloud APIs (Vertex AI, Anthropic, OpenAI)</span>
-          <span>Local models (Ollama, vLLM standalone)</span>
-        </div>
-      </div>
-      <div class="stack-section">
-        <div class="stack-section-header">
           <span class="stack-section-label">Platform</span>
-          <span class="info-icon">i<span class="tooltip">The compute platform that schedules pods, manages networking, storage, and GPU resources. OpenShell deploys as a StatefulSet. Agent Sandbox controller watches Sandbox CRs and creates pods.</span></span>
+          <span class="info-icon">i<span class="tooltip">OpenShift + Red Hat build of Agent Sandbox. Compute, networking, storage, GPU scheduling. Agent Sandbox controller manages pod lifecycle via CRDs.</span></span>
         </div>
-        <div class="stack-section-product">OpenShift + Red Hat build of Agent Sandbox${kataNote}</div>
-        <div class="stack-section-desc">Compute, networking, storage, GPU scheduling. Agent Sandbox controller manages sandbox pod lifecycle via CRDs.</div>
+        <div class="stack-section-product">OpenShift${kataNote}</div>
       </div>
     </div>
-    <div class="setup-path">${setupPath}</div>
-    <div class="actions">
-      <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart (10 min)</a>
-      <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Learn: Harness vs Runtime</a>
-      <button class="btn btn-secondary" onclick="restart()">Start over</button>
+    <div class="right-panel">
+      <div class="setup-path">${setupPath}</div>
+      <div class="setup-path" style="border-color: rgba(230,237,243,0.08);">
+        <h4>Inference routing</h4>
+        <p style="font-size:0.68rem;opacity:0.6">inference.local → flexible backend</p>
+        <div class="routes" style="margin-top:0.2rem">
+          <span>OpenShift AI (vLLM, NIM)</span>
+          <span>Cloud (Vertex, Anthropic, OpenAI)</span>
+          <span>Local (Ollama, vLLM)</span>
+        </div>
+      </div>
+      <div class="actions" style="margin-top:auto">
+        <a class="btn btn-primary" href="../quickstart/" style="text-decoration:none">Quickstart</a>
+        <a class="btn btn-secondary" href="agent-architecture/" style="text-decoration:none">Concepts</a>
+        <button class="btn btn-secondary" onclick="restart()">Restart</button>
+      </div>
+    </div>
     </div>
   `;
 
