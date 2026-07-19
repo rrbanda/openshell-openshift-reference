@@ -78,9 +78,6 @@ body::before {
 .usecase-card:nth-child(2) { animation-delay: 0.06s; }
 .usecase-card:nth-child(3) { animation-delay: 0.10s; }
 .usecase-card:nth-child(4) { animation-delay: 0.14s; }
-.usecase-card:nth-child(5) { animation-delay: 0.18s; }
-.usecase-card:nth-child(6) { animation-delay: 0.22s; }
-.usecase-card:nth-child(7) { animation-delay: 0.26s; }
 .usecase-card:hover {
   border-color: rgba(118, 185, 0, 0.4);
   transform: translateY(-2px);
@@ -363,13 +360,10 @@ body::before {
     <div class="step-label">Step 1 — Choose your use case</div>
     <div class="question">What are you building?</div>
     <div class="usecase-grid">
-      <div class="usecase-card" onclick="selectUseCase('chatbot')"><h4>Trusted Chatbot</h4><p>Read-only chatbot using RAG over public data. No access to private systems.</p><span class="uc-profile">Permissive profile</span></div>
-      <div class="usecase-card" onclick="selectUseCase('scheduled')"><h4>Scheduled Data Agent</h4><p>Nightly summaries, Jira reports, or batch jobs writing to hardcoded locations.</p><span class="uc-profile">Permissive profile</span></div>
-      <div class="usecase-card" onclick="selectUseCase('private_chatbot')"><h4>Private-Data Chatbot</h4><p>Access to private data, MCP servers, Agent Skills, and PII. Needs kernel isolation.</p><span class="uc-profile">OpenShell + Kata</span></div>
-      <div class="usecase-card" onclick="selectUseCase('email_agent')"><h4>Email / Messaging Agent</h4><p>Reads untrusted input (email, chat) and writes output. Untrusted context in, untrusted export out.</p><span class="uc-profile">OpenShell + Kata</span></div>
-      <div class="usecase-card" onclick="selectUseCase('coding_env')"><h4>Coding Environment</h4><p>IDE or Jupyter notebook deployed in-cluster for interactive development.</p><span class="uc-profile">Dev Spaces / Workbench</span></div>
-      <div class="usecase-card" onclick="selectUseCase('coding_laptop')"><h4>Coding Agent on Laptop</h4><p>Claude Code, dcode, or similar on your workstation. Sandbox protects the host machine.</p><span class="uc-profile">OpenShell + Podman</span></div>
-      <div class="usecase-card" onclick="selectUseCase('coding_cluster')"><h4>Coding Agent in Cluster</h4><p>Coding assistant deployed on OpenShift — for policy, compute, or always-on access.</p><span class="uc-profile">OpenShell + OpenShift</span></div>
+      <div class="usecase-card" onclick="selectUseCase('private_chatbot')"><h4>Private-Data Chatbot</h4><p>Chatbot with access to private data, MCP servers, and Agent Skills. Needs privilege scoping and kernel isolation.</p><span class="uc-profile">OpenShell + Kata</span></div>
+      <div class="usecase-card" onclick="selectUseCase('email_agent')"><h4>Email / Messaging Agent</h4><p>Reads untrusted input (email, chat) and writes to untrusted destinations. Full isolation required.</p><span class="uc-profile">OpenShell + Kata</span></div>
+      <div class="usecase-card" onclick="selectUseCase('coding_laptop')"><h4>Coding Agent on Laptop</h4><p>Claude Code, dcode, or similar on your workstation. OpenShell sandbox protects the host machine.</p><span class="uc-profile">OpenShell + Podman</span></div>
+      <div class="usecase-card" onclick="selectUseCase('coding_cluster')"><h4>Coding Agent in Cluster</h4><p>Coding assistant deployed on OpenShift — for policy enforcement, shared compute, or always-on access.</p><span class="uc-profile">OpenShell + OpenShift</span></div>
     </div>
   </div>
 
@@ -419,11 +413,8 @@ const agents = {
 };
 
 const usecases = {
-  chatbot: { name: 'Trusted Chatbot', profile: 'Permissive', platform: 'OpenShift (normal containers)', desc: 'Read-only chatbot using RAG over public data, guardrails on input and output', harness: 'Your agent framework', defaults: { network: true, creds: false, audit: true, fs: false, identity: false, mcp: false, guardrails: true, kata: false, multi: false } },
-  scheduled: { name: 'Scheduled Data Agent', profile: 'Permissive', platform: 'OpenShift (Kubernetes Job)', desc: 'Nightly batch jobs — Jira summaries, reports, data pipelines writing to controlled destinations', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: false, identity: true, mcp: false, guardrails: false, kata: false, multi: false } },
-  private_chatbot: { name: 'Private-Data Chatbot', profile: 'OpenShell + Kata', platform: 'OpenShift + Kata Containers', desc: 'Chatbot with access to private data, MCP servers, and Agent Skills — needs privilege scoping and kernel isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: true, kata: true, multi: false } },
-  email_agent: { name: 'Email / Messaging Agent', profile: 'OpenShell + Kata', platform: 'OpenShift + Kata Containers', desc: 'Reads untrusted input (email, chat), writes to untrusted destinations — needs full isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: false, guardrails: true, kata: true, multi: false } },
-  coding_env: { name: 'Coding Environment', profile: 'Dev Spaces / Workbench', platform: 'OpenShift (Dev Spaces or RHOAI Workbench)', desc: 'IDE or Jupyter notebook deployed in-cluster for interactive development', harness: 'Dev Spaces / RHOAI Workbench', defaults: { network: true, creds: false, audit: true, fs: true, identity: false, mcp: false, guardrails: false, kata: false, multi: false } },
+  private_chatbot: { name: 'Private-Data Chatbot', profile: 'OpenShell with Kata or VM', platform: 'OpenShift + Kata Containers', desc: 'Chatbot with access to private data, MCP servers, and Agent Skills — needs privilege scoping and kernel isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: true, kata: true, multi: false } },
+  email_agent: { name: 'Email / Messaging Agent', profile: 'OpenShell with Kata or VM', platform: 'OpenShift + Kata Containers', desc: 'Reads untrusted input (email, chat), writes to untrusted destinations — needs full isolation', harness: 'Your agent framework', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: false, guardrails: true, kata: true, multi: false } },
   coding_laptop: { name: 'Coding Agent on Laptop', profile: 'OpenShell, Typical Configuration', platform: 'Podman (local workstation)', desc: 'Coding assistant on your workstation — OpenShell sandbox protects the host from the agent', harness: 'Claude Code, dcode, OpenCode, or similar', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: false, kata: false, multi: false } },
   coding_cluster: { name: 'Coding Agent in Cluster', profile: 'OpenShell, Typical Configuration', platform: 'OpenShift', desc: 'Coding assistant on OpenShift — for policy enforcement, shared compute, or always-on access', harness: 'Claude Code, dcode, OpenCode, or similar', defaults: { network: true, creds: true, audit: true, fs: true, identity: true, mcp: true, guardrails: false, kata: false, multi: true } }
 };
