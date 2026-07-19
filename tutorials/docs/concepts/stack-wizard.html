@@ -216,10 +216,8 @@ body::before {
 .card p {
   font-size: 0.76rem;
   color: var(--muted);
-  line-height: 1.45;
+  line-height: 1.35;
   margin: 0;
-  /* Full copy — never clamp/ellipsis; grid equal-height handles uneven text */
-  overflow: visible;
   flex: 1 1 auto;
 }
 .card .meta {
@@ -229,6 +227,11 @@ body::before {
   margin-top: auto;
   padding-top: 0.55rem;
   align-content: flex-start;
+  min-height: 1.6rem;
+}
+.agent-grid .card,
+.usecase-grid .card {
+  min-height: 8.25rem;
 }
 
 .badge {
@@ -271,26 +274,97 @@ body::before {
 
 .checks {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.55rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
   margin-bottom: 1.25rem;
+  align-items: stretch;
 }
-@media (min-width: 900px) { .checks { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 520px) { .checks { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .checks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .checks { grid-template-columns: 1fr; } }
 
 .check-item {
-  display: flex; align-items: flex-start; gap: 0.5rem;
-  padding: 0.7rem 0.85rem;
-  background: rgba(22, 27, 34, 0.55);
-  border-radius: 8px;
-  border: 1px solid rgba(230,237,243,0.06);
-  min-height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem 0.9rem;
+  min-height: 6.75rem;
+  height: 100%;
+  background: linear-gradient(165deg, rgba(28, 34, 42, 0.92), rgba(18, 22, 28, 0.88));
+  border-radius: 10px;
+  border: 1px solid rgba(230,237,243,0.1);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
-.check-item:hover { border-color: rgba(118,185,0,0.22); }
-.check-item input { margin-top: 2px; accent-color: var(--nv); width: 16px; height: 16px; flex-shrink: 0; }
-.check-item label { font-size: 0.86rem; cursor: pointer; font-weight: 560; display: block; }
-.check-item .check-desc { font-size: 0.73rem; color: var(--muted); margin-top: 0.15rem; line-height: 1.4; }
-.check-item .owner-row { margin-top: 0.35rem; }
+.check-item:hover {
+  border-color: rgba(118,185,0,0.35);
+  box-shadow: 0 0 0 1px rgba(118,185,0,0.12), 0 10px 28px rgba(0,0,0,0.28);
+}
+.check-item.on {
+  border-color: rgba(118,185,0,0.65);
+  background: linear-gradient(165deg, rgba(118,185,0,0.12), rgba(18, 22, 28, 0.92));
+  box-shadow: 0 0 0 1px rgba(118,185,0,0.28), 0 8px 24px rgba(0,0,0,0.28);
+}
+.check-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.55rem;
+  align-items: start;
+  flex: 1 1 auto;
+}
+.check-item input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0.1rem 0 0;
+  border: 1.5px solid rgba(230,237,243,0.35);
+  border-radius: 4px;
+  background: rgba(0,0,0,0.25);
+  accent-color: var(--nv);
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+}
+.check-item input:checked {
+  background: var(--nv);
+  border-color: var(--nv);
+  box-shadow: inset 0 0 0 2px rgba(10,14,20,0.35);
+}
+.check-item input:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px; top: 1px;
+  width: 4px; height: 9px;
+  border: solid #0a0e14;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.check-title {
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+  padding-top: 0.05rem;
+}
+.check-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  margin-top: auto;
+  align-items: center;
+  min-height: 1.35rem;
+}
+.badge-maturity {
+  background: rgba(230,184,77,0.1);
+  border-color: rgba(230,184,77,0.35);
+  color: var(--warn);
+}
+.badge-ga {
+  background: rgba(118,185,0,0.1);
+  border-color: rgba(118,185,0,0.3);
+  color: #a0e030;
+}
 
 .actions { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
 .btn {
@@ -402,19 +476,61 @@ body::before {
 
 .info-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 18px; height: 18px; border-radius: 50%;
+  width: 20px; height: 20px; border-radius: 50%;
   background: rgba(118,185,0,0.12); color: var(--nv);
-  font-size: 0.65rem; font-weight: 700; cursor: help; position: relative;
+  border: 1px solid rgba(118,185,0,0.28);
+  font-size: 0.68rem; font-weight: 700; cursor: help; position: relative;
+  flex-shrink: 0; line-height: 1; padding: 0;
+  font-family: inherit;
 }
-.info-icon:hover, .info-icon:focus-visible { background: rgba(118,185,0,0.28); outline: none; }
+.info-icon:hover, .info-icon:focus-visible {
+  background: rgba(118,185,0,0.28);
+  outline: none;
+  border-color: rgba(118,185,0,0.55);
+}
 .info-icon .tooltip {
-  display: none; position: absolute; bottom: calc(100% + 8px); left: 0;
-  background: rgba(16, 22, 30, 0.97); border: 1px solid rgba(118,185,0,0.25);
-  border-radius: 8px; padding: 0.6rem 0.75rem; width: min(300px, 70vw);
-  font-size: 0.76rem; font-weight: 400; color: rgba(230,237,243,0.92); line-height: 1.45;
-  z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,0.4); text-align: left;
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  background: rgba(12, 16, 22, 0.98);
+  border: 1px solid rgba(118,185,0,0.35);
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  width: min(320px, calc(100vw - 2.5rem));
+  font-size: 0.76rem; font-weight: 400;
+  color: rgba(230,237,243,0.92); line-height: 1.45;
+  z-index: 300;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.55);
+  text-align: left;
+  pointer-events: none;
 }
-.info-icon:hover .tooltip, .info-icon:focus-visible .tooltip { display: block; }
+.info-icon .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%; right: 8px;
+  border: 6px solid transparent;
+  border-top-color: rgba(118,185,0,0.35);
+}
+.info-icon:hover .tooltip,
+.info-icon:focus-visible .tooltip,
+.info-icon[data-open="1"] .tooltip { display: block; }
+.info-icon[data-place="below"] .tooltip {
+  bottom: auto;
+  top: calc(100% + 10px);
+}
+.info-icon[data-place="below"] .tooltip::after {
+  top: auto; bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: rgba(118,185,0,0.35);
+}
+.card .info-icon { margin-left: auto; }
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+.card-top h4 { flex: 1 1 auto; }
 
 .footer-note {
   margin: 1rem auto 0;
@@ -490,7 +606,8 @@ body::before {
       <div>Selected: <strong id="selectedName"></strong> <span id="selectedMeta" style="color:var(--muted);font-size:0.8rem"></span></div>
       <button type="button" onclick="goBack()">Change selection</button>
     </div>
-    <div class="question">What do you need? (owner badges = who provides it)</div>
+    <div class="question">What do you need?</div>
+    <p class="hint">Equal tiles: check what you want. Tap <strong>i</strong> for full technical detail. Owner badges = who provides it; amber badges = not fully ready or platform-target.</p>
     <div class="cap-legend">
       <span><span class="badge badge-owner-os">OpenShell</span> app sandbox (Mode 1)</span>
       <span><span class="badge badge-owner-plat">Platform</span> Kata · MCP Gateway · ogx · MLflow</span>
@@ -793,20 +910,20 @@ const capabilities = [
   {
     id: "network",
     owner: "openshell",
-    label: "Network policy (OPA L4 + optional L7 / MCP-aware)",
-    desc: "In-process OPA via CONNECT proxy: per-binary, host/port, optional HTTP method/path. Hot-reloadable. Stronger than Kagenti sidecar+iptables; no NET_ADMIN required for OpenShell's model.",
+    label: "Network policy (OPA L4/L7)",
+    desc: "In-process OPA via CONNECT proxy: per-binary, host/port, optional HTTP method/path (MCP-aware). Hot-reloadable. Stronger than Kagenti sidecar+iptables; no NET_ADMIN required for OpenShell's model.",
   },
   {
     id: "creds",
     owner: "openshell",
-    label: "Credential masking (inference.local)",
+    label: "Credential masking",
     desc: "Privacy router: agent calls https://inference.local; proxy strips caller creds and injects provider credentials. Never log secrets in OCSF.",
   },
   {
     id: "audit",
     owner: "openshell",
-    label: "OCSF security audit (v1.7.0)",
-    desc: "Structured OCSF for network/HTTP/SSH/process/config/findings — SIEM-ready. Distinct from MLflow/OTEL product tracing in OpenShift AI Agent Ops.",
+    label: "OCSF security audit",
+    desc: "Structured OCSF v1.7.0 for network/HTTP/SSH/process/config/findings — SIEM-ready. Distinct from MLflow/OTEL product tracing in OpenShift AI Agent Ops.",
   },
   {
     id: "fs",
@@ -817,50 +934,56 @@ const capabilities = [
   {
     id: "identity",
     owner: "openshell",
-    label: "Sandbox JWT / JWT-SVID identity",
-    desc: "Gateway-minted sandbox JWTs authenticate supervisor RPCs (SPIFFE-shaped subjects). Kagenti's full SPIRE AuthBridge was Dev Preview and converged away; OpenShell is closing the SPIFFE gap (JWT-SVID grants/exchange). Red Hat contributes OIDC + SPIFFE identity drivers. Platform SPIFFE/SPIRE (OpenShift 4.20+) layers on for cluster zero-trust.",
+    maturity: "closing-gap",
+    label: "Sandbox JWT / JWT-SVID",
+    desc: "Gateway-minted sandbox JWTs authenticate supervisor RPCs (SPIFFE-shaped subjects today). Kagenti full SPIRE AuthBridge was Dev Preview and converged away; OpenShell is closing the SPIFFE gap (JWT-SVID grants/exchange). Platform SPIFFE/SPIRE on OpenShift layers on for cluster zero-trust — not the same as Kagenti SPIRE GA.",
   },
   {
     id: "oidc",
     owner: "openshell",
-    label: "OIDC user authentication (gateway)",
-    desc: "Control-plane user auth for CLI/API. Required on shared clusters. Eval overlays with allowUnauthenticatedUsers are trusted-network only.",
+    label: "OIDC user authentication",
+    desc: "Control-plane user auth for CLI/API. Required on shared clusters. Eval overlays with allowUnauthenticatedUsers are trusted-network only — not a production auth posture.",
   },
   {
     id: "kata",
     owner: "platform",
-    label: "Kata / OpenShift Sandboxed Containers (L5)",
-    desc: "Hardware/dedicated-kernel isolation (OSC, GA layered product). Composes under OpenShell: Kata = kernel boundary; OpenShell = policy inside. Needs eligible nodes (RHCOS, virt, NFD kata label). Not every agent needs Kata — see isolation decision tree.",
+    maturity: "ga",
+    label: "Kata / OSC (L5)",
+    desc: "Hardware/dedicated-kernel isolation (OpenShift Sandboxed Containers — GA layered product). Composes under OpenShell: Kata = kernel boundary; OpenShell = policy inside. Needs eligible nodes (RHCOS, virt, NFD kata label). Not every agent needs Kata.",
   },
   {
     id: "multi",
     owner: "platform",
-    label: "Multitenancy (projects / NetworkPolicy / UDN)",
+    label: "Multitenancy controls",
     desc: "OpenShift namespace RBAC, NetworkPolicy, optional UDN, ResourceQuota. Complements OpenShell egress proxy. Cryptographic identity still needs SPIFFE/mesh — labels alone are weaker.",
   },
   {
     id: "mcp",
     owner: "platform",
-    label: "MCP Gateway (tool governance)",
-    desc: "Red Hat AI Envoy-based gateway: OAuth2 token exchange, identity-based tool filtering via Kuadrant AuthPolicy + Authorino. Authorization from token claims — not the prompt. Not an OpenShell core subsystem (Kagenti AuthBridge concepts inform the platform story).",
+    maturity: "platform-target",
+    label: "MCP Gateway",
+    desc: "Red Hat AI Envoy-based tool gateway (OAuth2 exchange, Kuadrant AuthPolicy + Authorino). Authorization from token claims — not the prompt. Platform layer — not an OpenShell core subsystem. Compose when available in your OpenShift AI environment; do not assume it ships inside OpenShell alpha.",
   },
   {
     id: "ogx",
     owner: "platform",
-    label: "ogx / Open Responses (Mode 2 APIs)",
-    desc: "Open Responses (ogx) — multi-protocol agentic API surface (Responses API, etc.). Enables Mode 2: sandbox execution via platform APIs. Not OpenShell's Mode 1 whole-agent runtime.",
+    maturity: "platform-target",
+    label: "ogx / Open Responses",
+    desc: "Multi-protocol agentic API surface (Responses API, etc.) for Mode 2: sandbox execution via platform APIs. Distinct from OpenShell Mode 1 whole-agent runtime. Platform target — enable only when ogx is available in your cluster.",
   },
   {
     id: "mlflow",
     owner: "platform",
-    label: "MLflow tracing + OpenTelemetry",
-    desc: "OpenShift AI Agent Ops observability: prompts, tool calls, LLM requests. EvalHub for online eval. Complements — does not replace — OpenShell OCSF security audit.",
+    maturity: "platform-target",
+    label: "MLflow + OpenTelemetry",
+    desc: "OpenShift AI Agent Ops observability: prompts, tool calls, LLM requests. EvalHub for online eval. Complements — does not replace — OpenShell OCSF security audit. Requires Agent Ops / platform enablement.",
   },
   {
     id: "guardrails",
     owner: "addon",
-    label: "Safety guardrails + red teaming",
-    desc: "Portfolio: NeMo Guardrails / Guardrails Orchestrator (runtime), Garak (pre-prod adversarial), EvalHub. TrustyAI operator orchestration. Complements OpenShell egress policy; does not replace it.",
+    maturity: "platform-target",
+    label: "Safety + red teaming",
+    desc: "NeMo Guardrails / Guardrails Orchestrator (runtime), Garak (pre-prod adversarial), EvalHub via TrustyAI. Complements OpenShell egress policy; does not replace it. Portfolio availability depends on your OpenShift AI / NeMo stack.",
   },
 ];
 
@@ -880,6 +1003,53 @@ function ownerBadge(owner) {
   const b = OWNER_BADGE[owner];
   return `<span class="badge ${b.cls}">${b.text}</span>`;
 }
+
+const MATURITY_BADGES = {
+  ga: { cls: "badge-ga", text: "GA (platform)" },
+  "platform-target": { cls: "badge-maturity", text: "Platform target" },
+  "closing-gap": { cls: "badge-maturity", text: "Gap closing" },
+  alpha: { cls: "badge-maturity", text: "Alpha" },
+  announced: { cls: "badge-maturity", text: "Announced" },
+  "not-in-matrix": { cls: "badge-maturity", text: "Not in base matrix" },
+};
+
+function maturityBadge(key) {
+  if (!key || !MATURITY_BADGES[key]) return "";
+  const b = MATURITY_BADGES[key];
+  return `<span class="badge ${b.cls}">${b.text}</span>`;
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function infoButton(text, aria) {
+  return `<button type="button" class="info-icon" aria-label="${escapeHtml(aria || "More info")}" onclick="toggleInfo(event, this)" onmouseenter="placeInfo(this)" onfocus="placeInfo(this)"><span aria-hidden="true">i</span><span class="tooltip">${escapeHtml(text)}</span></button>`;
+}
+
+function placeInfo(el) {
+  const rect = el.getBoundingClientRect();
+  el.dataset.place = rect.top < 160 ? "below" : "above";
+}
+
+function toggleInfo(ev, el) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  placeInfo(el);
+  const open = el.dataset.open === "1";
+  document.querySelectorAll(".info-icon[data-open='1']").forEach((n) => { if (n !== el) n.dataset.open = "0"; });
+  el.dataset.open = open ? "0" : "1";
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".info-icon")) {
+    document.querySelectorAll(".info-icon[data-open='1']").forEach((n) => { n.dataset.open = "0"; });
+  }
+});
 
 function policyBadge(policy) {
   const b = POLICY_BADGES[policy] || POLICY_BADGES.custom;
@@ -916,46 +1086,73 @@ function setJourney(type) {
   updateProgress(0);
 }
 
+function agentMaturity(a) {
+  if (a.name === "Hermes") return "announced";
+  if (a.name === "Gemini CLI") return "not-in-matrix";
+  return null;
+}
+
 function renderAgentGrid() {
   const grid = document.getElementById("agentGrid");
   grid.innerHTML = Object.entries(agents).map(([id, a]) => `
-    <button type="button" class="card${selectedAgent === id ? " selected" : ""}" data-id="${id}"
-      aria-pressed="${selectedAgent === id}" onclick="selectAgent('${id}')">
-      <h4>${a.name}</h4>
+    <div class="card${selectedAgent === id ? " selected" : ""}" data-id="${id}" role="button" tabindex="0"
+      aria-pressed="${selectedAgent === id}" onclick="selectAgent('${id}')"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectAgent('${id}')}">
+      <div class="card-top">
+        <h4>${a.name}</h4>
+        ${infoButton(a.desc, `About ${a.name}`)}
+      </div>
       <p>${a.by}</p>
       <div class="meta">
         ${policyBadge(a.policy)}
+        ${maturityBadge(agentMaturity(a))}
         ${a.nemoclaw ? `<span class="badge badge-nc">NemoClaw</span>` : ""}
         <span class="badge badge-bundled">${a.entry === "harness" ? "Pattern 2" : "Pattern 1"}</span>
       </div>
-    </button>
+    </div>
   `).join("");
 }
 
 function renderUseCaseGrid() {
   const grid = document.getElementById("usecaseGrid");
-  grid.innerHTML = Object.entries(usecases).map(([id, u]) => `
-    <button type="button" class="card${selectedUseCase === id ? " selected" : ""}" onclick="selectUseCase('${id}')">
-      <h4>${u.name}</h4>
-      <p>${u.desc}</p>
+  grid.innerHTML = Object.entries(usecases).map(([id, u]) => {
+    const p = ISOLATION_PROFILES[u.profileKey];
+    return `
+    <div class="card${selectedUseCase === id ? " selected" : ""}" role="button" tabindex="0"
+      aria-pressed="${selectedUseCase === id}" onclick="selectUseCase('${id}')"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectUseCase('${id}')}">
+      <div class="card-top">
+        <h4>${u.name}</h4>
+        ${infoButton(u.desc, `About ${u.name}`)}
+      </div>
+      <p>${p ? p.name + " · " + p.layers : u.platform || ""}</p>
       <div class="meta">${profileBadge(u.profileKey)}</div>
-    </button>
-  `).join("");
+    </div>`;
+  }).join("");
+}
+
+function syncCapCard(id) {
+  const input = document.getElementById(`chk-${id}`);
+  const card = input?.closest(".check-item");
+  if (card) card.classList.toggle("on", !!input.checked);
 }
 
 function renderCapChecks(defaults) {
   const box = document.getElementById("capChecks");
   box.innerHTML = capabilities.map((c) => {
-    const checked = defaults[c.id] ? "checked" : "";
+    const on = !!defaults[c.id];
     return `
-      <div class="check-item">
-        <input type="checkbox" id="chk-${c.id}" ${checked}>
-        <div>
-          <label for="chk-${c.id}">${c.label}</label>
-          <div class="check-desc">${c.desc}</div>
-          <div class="owner-row">${ownerBadge(c.owner)}</div>
+      <label class="check-item${on ? " on" : ""}" for="chk-${c.id}">
+        <div class="check-head">
+          <input type="checkbox" id="chk-${c.id}" ${on ? "checked" : ""} onchange="syncCapCard('${c.id}')">
+          <span class="check-title">${c.label}</span>
+          ${infoButton(c.desc, `About ${c.label}`)}
         </div>
-      </div>`;
+        <div class="check-foot">
+          ${ownerBadge(c.owner)}
+          ${maturityBadge(c.maturity)}
+        </div>
+      </label>`;
   }).join("");
 }
 
