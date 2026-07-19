@@ -203,47 +203,51 @@ body::before {
 }
 .result-sidebar { display: flex; flex-direction: column; gap: 0.8rem; }
 
-/* Stack diagram */
-.stack {
-  backdrop-filter: blur(16px);
-  background: rgba(16, 20, 26, 0.7);
-  border-radius: 12px;
-  border: 1px solid rgba(230,237,243,0.08);
-  overflow: hidden;
-  box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-}
+/* Stack — layered cake */
+.stack { display: flex; flex-direction: column; gap: 0; }
 
 .stack-section {
-  padding: 1.2rem 1.4rem;
-  border-bottom: 1px solid rgba(230,237,243,0.05);
+  padding: 1.1rem 1.4rem;
   border-left: 3px solid rgba(230,237,243,0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(16px);
+  background: rgba(16, 20, 26, 0.7);
+  border: 1px solid rgba(230,237,243,0.07);
+  position: relative;
   animation: layerIn 0.4s ease forwards;
   opacity: 0;
-  transform: translateX(-15px);
+  transform: translateY(10px);
+  margin-top: -4px;
 }
-.stack-section:nth-child(1) { animation-delay: 0.1s; }
-.stack-section:nth-child(2) { animation-delay: 0.2s; }
-.stack-section:nth-child(3) { animation-delay: 0.3s; }
-.stack-section:nth-child(4) { animation-delay: 0.4s; }
-.stack-section:nth-child(5) { animation-delay: 0.5s; }
-.stack-section:nth-child(6) { animation-delay: 0.6s; }
-.stack-section:nth-child(7) { animation-delay: 0.7s; }
-.stack-section:nth-child(8) { animation-delay: 0.8s; }
-.stack-section:last-child { border-bottom: none; }
+.stack-section:first-child { margin-top: 0; }
+.stack-section:nth-child(1) { animation-delay: 0.08s; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.stack-section:nth-child(2) { animation-delay: 0.16s; z-index: 4; box-shadow: 0 3px 12px rgba(0,0,0,0.25); }
+.stack-section:nth-child(3) { animation-delay: 0.24s; z-index: 3; box-shadow: 0 4px 18px rgba(0,0,0,0.3); }
+.stack-section:nth-child(4) { animation-delay: 0.32s; z-index: 2; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+.stack-section:nth-child(5) { animation-delay: 0.40s; z-index: 1; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
 
-@keyframes layerIn { to { opacity: 1; transform: translateX(0); } }
+@keyframes layerIn { to { opacity: 1; transform: translateY(0); } }
 
-/* Color-coded layer borders */
-.stack-section.model-layer { border-left: 3px solid rgba(230,237,243,0.12); padding: 0.8rem 1.2rem; }
-.stack-section.harness-layer { border-left: 3px solid rgba(230,237,243,0.25); }
+/* Color-coded layers */
+.stack-section.model-layer {
+  border-left: 3px solid rgba(230,237,243,0.12);
+  background: linear-gradient(135deg, rgba(16,20,26,0.8) 0%, rgba(22,27,34,0.6) 100%);
+  padding: 0.8rem 1.2rem;
+}
+.stack-section.harness-layer {
+  border-left: 3px solid rgba(230,237,243,0.25);
+  background: linear-gradient(135deg, rgba(18,22,28,0.8) 0%, rgba(26,31,38,0.6) 100%);
+}
 .stack-section.runtime-layer {
-  border-left: 3px solid #76b900;
-  background: rgba(118,185,0,0.04);
+  border-left: 4px solid #76b900;
+  background: linear-gradient(135deg, rgba(118,185,0,0.06) 0%, rgba(16,20,26,0.8) 100%);
+  box-shadow: 0 4px 20px rgba(118,185,0,0.08), 0 4px 18px rgba(0,0,0,0.3) !important;
 }
 .stack-section.platform-layer {
-  border-left: 3px solid #ee0000;
-  background: rgba(238,0,0,0.03);
+  border-left: 4px solid #ee0000;
+  background: linear-gradient(135deg, rgba(238,0,0,0.04) 0%, rgba(16,20,26,0.8) 100%);
   padding: 0.8rem 1.2rem;
+  box-shadow: 0 6px 24px rgba(238,0,0,0.06), 0 8px 30px rgba(0,0,0,0.35) !important;
 }
 
 /* Red Hat brand accent for product names */
