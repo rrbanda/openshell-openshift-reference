@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pick Your Agent. See Your Stack. | OpenShell on Red Hat OpenShift AI</title>
+<title>Pick Your Agent. See Your Stack. | OpenShell + OpenShift AI reference</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta name="description" content="Stack wizard for Red Hat OpenShift AI: map agents and use cases to portfolio capabilities (OpenShell, OSC, MCP Gateway, safety portfolio).">
+<meta name="description" content="Reference architecture wizard: map agents and use cases to OpenShell, optional OpenShift compose, and OpenShift AI portfolio notes. Not a shipping RHOAI OpenShell SKU claim.">
 <style>
 :root {
   --bg: #0a0e14;
@@ -630,6 +630,8 @@ body.showing-stack .header .tagline { display: none; }
 body.showing-stack .header { margin-bottom: 0.35rem; }
 body.showing-stack .header h1 { font-size: clamp(1.1rem, 2.2vw, 1.35rem); }
 body.showing-stack .progress { margin-bottom: 0.4rem; }
+#policyGap:empty { display: none; }
+#policyGap .callout { margin: 0 0 0.85rem; }
 .callout {
   margin-top: 0.55rem; padding: 0.55rem 0.7rem; border-radius: 7px;
   font-size: 0.78rem; line-height: 1.4;
@@ -718,12 +720,14 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
 
 <div class="header">
   <div class="header-row"><h1>Pick Your Agent. See Your Stack.</h1></div>
-  <p class="tagline">Agent = Model + Harness · OpenShell on Red Hat OpenShift AI</p>
+  <p class="tagline">Agent = Model + Harness · OpenShell + Red Hat OpenShift AI <em>reference</em></p>
   <details>
     <summary>About · sources</summary>
     <a href="https://docs.nvidia.com/openshell/about/supported-agents" target="_blank" rel="noopener">OpenShell Supported Agents</a>
-    · <a href="https://docs.nvidia.com/nemoclaw/" target="_blank" rel="noopener">NemoClaw</a> (blueprint agents: OpenClaw, Hermes, Deep Agents Code only)
-    · Red Hat AI Sandboxing for Agents. Product base: Red Hat OpenShift AI.
+    · <a href="https://github.com/NVIDIA/OpenShell" target="_blank" rel="noopener">OpenShell README</a> (upstream alpha / single-player)
+    · <a href="https://docs.nvidia.com/nemoclaw/" target="_blank" rel="noopener">NemoClaw</a> (OpenClaw, Hermes, Deep Agents Code)
+    · <a href="https://www.redhat.com/en/blog/red-hat-ai-and-openshell-driving-security-enhanced-agent-execution-for-enterprise-ai" target="_blank" rel="noopener">Red Hat AI + OpenShell blog</a> (planned integration; early validations ≠ shipping SKU)
+    · Product base when composing on cluster: Red Hat OpenShift AI. OpenShell is <strong>not</strong> listed as DP/TP in public OpenShift AI 3.5 release notes (checked 2026-07-19).
   </details>
 </div>
 
@@ -750,7 +754,7 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
   <div class="step active" id="step1" role="tabpanel">
     <div class="step-label">Step 1 — Choose your agent</div>
     <div class="question">I'm using (or plan to use)…</div>
-    <p class="hint">Tap <strong>i</strong> for detail. Badges: <strong>OpenShell only</strong> = named on NVIDIA OpenShell Supported Agents / Community. <strong>NemoClaw blueprint</strong> = OpenClaw / Hermes / Deep Agents Code. <strong>Not on matrix</strong> = no NVIDIA named support; generic <code>--from</code> only.</p>
+    <p class="hint">Tap <strong>i</strong> for detail. Badges: <strong>OpenShell only</strong> = named on OpenShell Supported Agents. <strong>Community catalog</strong> = Community <code>--from</code> (may be off the Supported Agents table). <strong>NemoClaw blueprint</strong> = OpenClaw / Hermes / Deep Agents Code. <strong>BYOA</strong> = Bring Your Own Agent — enterprise-common path (your image + OpenShell policy); not a NVIDIA named-agent row, still a first-class OpenShell / Red Hat AI pattern.</p>
     <div class="agent-grid" id="agentGrid"></div>
   </div>
 
@@ -758,7 +762,7 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
   <div class="step" id="step1uc" role="tabpanel">
     <div class="step-label">Step 1 — Choose your use case</div>
     <div class="question">What are you building?</div>
-    <p class="hint">Tap <strong>i</strong> for isolation detail. Profiles: Permissive → OpenShell Typical → OpenShell+Kata → Confidential.</p>
+    <p class="hint">Tap <strong>i</strong> for detail. Isolation profile badges are <strong>illustrative field guidance</strong> (suggested compose), not NVIDIA Supported Agents or OpenShift AI release-notes SKUs. Modes 1–2 follow the public Red Hat AI + OpenShell blog.</p>
     <div class="usecase-grid" id="usecaseGrid"></div>
   </div>
 
@@ -772,6 +776,7 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
     </div>
     <div class="question">Compose options</div>
     <p class="hint">OpenShell controls are <strong>included</strong> when you use a sandbox — not shopping items. Only optional platform compose is selectable. Preview portfolio items are notes, not toggles.</p>
+    <div id="policyGap" aria-live="polite"></div>
     <div id="capChecks"></div>
     <div class="actions">
       <button type="button" class="btn btn-primary" onclick="showResult()">Show my architecture</button>
@@ -791,10 +796,12 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
  * - https://github.com/NVIDIA/OpenShell-Community (community sandboxes, e.g. gemini)
  * - https://docs.nvidia.com/nemoclaw/ (OpenClaw / Hermes / Deep Agents)
  * - https://docs.nvidia.com/nemoclaw/user-guide/openclaw/about/ecosystem (NemoClaw vs OpenShell path)
- * - Red Hat AI Sandboxing for Agents / Agentic Strategy 2026 (OpenShift AI product + isolation profiles only)
+ * - Red Hat blog 2026-05-20: OpenShell planned for Red Hat AI; early validations ≠ shipping features
+ * - Red Hat Developer 2026-05-14: OpenShell planned / “coming to” OpenShift AI (not versioned DP/TP)
+ * - RHOAI 3.5 DP/TP release notes: OpenShell not listed (do not claim DP 3.5 → TP 3.6)
  *
  * Do not invent: "Custom img", RHAISTRAT tickets, harness.use_plugin("openshell"),
- * or Pattern 1/2 badges — those are not NVIDIA OpenShell/NemoClaw matrix labels.
+ * Pattern 1/2 badges, or Agentic Strategy Appendix A version numbers as public fact.
  * Use OpenShell path vs NemoClaw path (ecosystem docs).
  */
 
@@ -810,20 +817,23 @@ const POLICY_BADGES = {
 const SOURCE_BADGES = {
   base: { cls: "badge-bundled", text: "base" },
   community: { cls: "badge-bundled", text: "Community" },
+  /** Community catalog exists; not on OpenShell Supported Agents docs table */
+  "community-offtable": { cls: "badge-partial", text: "Community · not on Supported Agents table" },
   nemoclaw: { cls: "badge-nc", text: "NemoClaw" },
   byo: { cls: "badge-custom", text: "BYO" },
 };
 
 /**
- * Path badge — only use wording backed by NVIDIA docs:
- * - OpenShell only: on Supported Agents / Community catalog (not a NemoClaw blueprint agent)
- * - NemoClaw blueprint: OpenClaw / Hermes / Deep Agents Code per NemoClaw
- * - Not on matrix: generic --from possible; no NVIDIA named-agent support claim
+ * Path badge:
+ * - OpenShell only: named on Supported Agents / Community catalog (not a NemoClaw blueprint)
+ * - NemoClaw blueprint: OpenClaw / Hermes / Deep Agents Code
+ * - BYOA: Bring Your Own Agent — Red Hat AgentOps principle; your image + OpenShell.
+ *   Not a NVIDIA named Supported Agents row — still the common enterprise path.
  */
 const PATH_BADGES = {
   openshell: { cls: "badge-bundled", text: "OpenShell only" },
   nemoclaw: { cls: "badge-nc", text: "NemoClaw blueprint" },
-  byo: { cls: "badge-custom", text: "Not on matrix" },
+  byo: { cls: "badge-owner-plat", text: "BYOA" },
 };
 
 /** NVIDIA ecosystem: OpenShell path vs NemoClaw reference path. */
@@ -832,32 +842,37 @@ const ENTRY_PATHS = {
   nemoclaw: "NemoClaw path — nemoclaw onboard (reference stack)",
 };
 
-/** Isolation profiles from Red Hat AI Sandboxing for Agents (July 2026). */
+/**
+ * Isolation profiles — ILLUSTRATIVE field guidance (suggested compose intensity).
+ * Not an NVIDIA Supported Agents matrix and not OpenShift AI release-notes SKUs.
+ * Public anchors: RH Mode 1/2/3 blog (2026-05-20); RH defense-in-depth (2026-05-14);
+ * OSC/Kata + confidential containers docs.redhat.com.
+ */
 const ISOLATION_PROFILES = {
   permissive: {
     name: "Permissive",
-    layers: "L2–L3",
-    blurb: "Low-risk / traditional workloads. Not the OpenShell default for autonomous coding agents.",
+    layers: "Platform / container",
+    blurb: "Illustrative: low-risk / traditional workloads on normal containers + NetworkPolicy. Not the usual OpenShell default for autonomous coding agents.",
   },
   openshell_min: {
-    name: "OpenShell, Minimally Restrictive",
-    layers: "L1–L4",
-    blurb: "Trusted internal agents. OpenShell: no unproxied egress, credential protection, security audit. Platform network controls still required.",
+    name: "OpenShell, light policy",
+    layers: "OpenShell policy",
+    blurb: "Illustrative: trusted internal agents — OpenShell egress proxy, credential masking, audit. Still pair with platform network controls on cluster.",
   },
   openshell_typical: {
-    name: "OpenShell, Typical Configuration",
-    layers: "L1–L4",
-    blurb: "Pre-approved agents that may generate/run code. Landlock + seccomp + netns + OPA egress + inference.local. Tuned binary/host policy.",
+    name: "OpenShell, typical",
+    layers: "OpenShell policy",
+    blurb: "Illustrative Mode 1–style whole-agent sandbox: Landlock + seccomp + netns + OPA egress + inference.local with tuned binary/host policy.",
   },
   openshell_kata: {
-    name: "OpenShell with Kata or VM",
-    layers: "L1–L5",
-    blurb: "Broader/less-defined scope or sensitive data. Compose OSC/Kata (or OpenShell VM/libkrun) under OpenShell policy — hardware + application isolation.",
+    name: "OpenShell + Kata / VM",
+    layers: "OSC + OpenShell",
+    blurb: "Illustrative: compose OpenShift Sandboxed Containers (Kata, GA) or OpenShell VM/libkrun under OpenShell app policy — dedicated-kernel + process policy.",
   },
   confidential: {
-    name: "Confidential Containers",
-    layers: "L1–L5 (Kata-CC)",
-    blurb: "Regulated / multi-tenant needing hardware confidentiality (SEV/TDX path). Beyond typical OpenShell+Kata.",
+    name: "Confidential containers",
+    layers: "OSC confidential",
+    blurb: "Illustrative OSC confidential-containers path (TEE / attestation; maturity varies by platform). Beyond typical OpenShell+Kata. No wizard use case selects this profile today.",
   },
 };
 
@@ -867,10 +882,12 @@ const ISOLATION_PROFILES = {
  *   https://github.com/NVIDIA/NemoClaw — nemoclaw onboard / nemohermes / nemo-deepagents
  * - Claude Code, Copilot, OpenCode, Codex: OpenShell base image path ONLY
  *   https://docs.nvidia.com/openshell/about/supported-agents — openshell sandbox create -- <agent>
- * - Gemini / Ollama / Pi: OpenShell Community --from ONLY (not NemoClaw blueprints)
+ * - Ollama / Pi: OpenShell Community --from AND listed on Supported Agents
+ * - Gemini: Community catalog --from gemini (NOT on Supported Agents docs table as of 2026-07)
+ * - OpenClaw / Hermes / Deep Agents: NemoClaw path only (no Community --from openclaw today)
  * - Claude/Codex/Copilot may install NemoClaw as a *host* coding agent; that is not a blueprint
- * - OpenShift AI: OpenShell is a portfolio capability — OpenShell-path agents run under OpenShell
- *   on the platform; NemoClaw blueprints are an additional NVIDIA reference packaging layer
+ * - OpenShell on cluster is upstream/reference compose today; Red Hat AI integration is planned (blogs)
+ * - Use-case isolation profiles are illustrative field guidance (Deliverable D) — not release-notes SKUs
  */
 const agents = {
   claude: {
@@ -899,9 +916,9 @@ const agents = {
   },
   gemini: {
     name: "Gemini CLI", by: "Google", type: "coding",
-    nemoclaw: false, source: "community", policy: "bundled", path: "openshell",
+    nemoclaw: false, source: "community-offtable", policy: "bundled", path: "openshell",
     command: "openshell sandbox create --from gemini",
-    desc: "Exists in OpenShell-Community as sandboxes/gemini (--from gemini). Not in the base image. Not a NemoClaw blueprint. Not always listed on the Supported Agents docs table — community catalog is the source.",
+    desc: "OpenShell-Community catalog only: sandboxes/gemini via openshell sandbox create --from gemini. Not on the OpenShell Supported Agents docs table. Not a NemoClaw blueprint.",
   },
   ollama: {
     name: "Ollama sandbox", by: "Community", type: "coding",
@@ -919,13 +936,13 @@ const agents = {
     name: "OpenClaw", by: "Community", type: "assistant",
     nemoclaw: true, source: "nemoclaw", policy: "blueprint", path: "nemoclaw",
     command: "nemoclaw onboard",
-    desc: "Documented NemoClaw default agent (blueprint-managed on OpenShell). Prefer nemoclaw onboard. OpenShell Community also has --from openclaw without the NemoClaw blueprint.",
+    desc: "Documented NemoClaw default agent (blueprint-managed on OpenShell). Path: nemoclaw onboard. Do not claim OpenShell-alone via --from openclaw — that Community sandbox is not present today; Supported Agents source is NemoClaw.",
   },
   hermes: {
     name: "Hermes", by: "Nous Research", type: "assistant",
     nemoclaw: true, source: "nemoclaw", policy: "blueprint", path: "nemoclaw",
     command: "nemohermes onboard",
-    desc: "Documented NemoClaw agent (blueprint-managed). nemohermes onboard or nemoclaw onboard --agent hermes. Not an OpenShell base trailing command.",
+    desc: "Documented NemoClaw agent (blueprint-managed; Tested on NemoClaw platform-support — production parity with OpenClaw not asserted). nemohermes onboard or nemoclaw onboard --agent hermes. Not an OpenShell base trailing command.",
   },
   deepagents: {
     name: "Deep Agents (dcode)", by: "LangChain", type: "coding",
@@ -937,126 +954,134 @@ const agents = {
     name: "OpenHands", by: "Open-source", type: "coding",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <image> --policy ./policy.yaml",
-    desc: "Not on OpenShell Supported Agents or NemoClaw. OpenShell can run arbitrary images via --from, but there is no NVIDIA named support or validated blueprint for OpenHands.",
+    desc: "BYOA (Bring Your Own Agent): package OpenHands in your image and run under OpenShell policy via --from. Common enterprise pattern — Red Hat AgentOps is framework-agnostic. Not a NVIDIA named Supported Agents / NemoClaw row; you own the image and policy.",
   },
   adk: {
     name: "Google ADK", by: "Google", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not on OpenShell Supported Agents or NemoClaw. No NVIDIA named support. Generic --from + policy only — not a validated OpenShift AI agent SKU.",
+    desc: "BYOA: ship your ADK agent image under OpenShell (--from + policy). Enterprise-typical — platform wraps identity, sandbox, and egress; you keep the framework. Not a NVIDIA named Supported Agents / NemoClaw blueprint.",
   },
   langgraph: {
     name: "LangGraph", by: "LangChain", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not on OpenShell Supported Agents. Not a NemoClaw blueprint (use Deep Agents Code for the NemoClaw LangChain runtime). Generic --from + policy only.",
+    desc: "BYOA: your LangGraph (or LangChain) agent image + OpenShell policy. For the NemoClaw-managed LangChain runtime, use Deep Agents Code instead. Otherwise this is the standard enterprise OpenShell --from path.",
   },
   crewai: {
     name: "CrewAI", by: "CrewAI", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not on OpenShell Supported Agents or NemoClaw. Generic --from + policy only — no NVIDIA named support claim.",
+    desc: "BYOA: CrewAI in your image under OpenShell. Framework stays yours; OpenShell supplies sandbox policy. Not a NVIDIA named Supported Agents / NemoClaw row.",
   },
   strands: {
     name: "Strands", by: "AWS (open-source)", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not on OpenShell Supported Agents or NemoClaw. Generic --from + policy only — no NVIDIA named support claim.",
+    desc: "BYOA: Strands Agents SDK in your image under OpenShell. Enterprise-common bring-your-framework path; not a NVIDIA named Supported Agents / NemoClaw row.",
   },
   watsonx: {
     name: "watsonx Orchestrate", by: "IBM", type: "workflow",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-agent-image> --policy ./policy.yaml",
-    desc: "Not on OpenShell Supported Agents or NemoClaw. watsonx is a separate control plane. No claim of OpenShell or OpenShift AI validation here.",
+    desc: "BYOA when you package a watsonx-related agent/runtime image for OpenShell. watsonx remains its own control plane — this card means OpenShell sandboxing of your image, not an IBM product SKU claim.",
   },
   custom: {
     name: "Custom / Other", by: "You", type: "any",
     nemoclaw: false, source: "byo", policy: "byo", path: "openshell",
     command: "openshell sandbox create --from <your-image> --policy ./policy.yaml -- <entrypoint>",
-    desc: "Generic OpenShell --from path (community name, local dir, or registry image). Not a named Supported Agent unless your image is one.",
+    desc: "BYOA catch-all: community name, local Dockerfile dir, or registry image. This is the primary enterprise path when the agent is not on the NVIDIA Supported Agents / NemoClaw lists — OpenShell still applies full policy.",
   },
 };
 
 /**
- * Use cases from Red Hat AI Sandboxing for Agents — Use-case Mapping Table.
- * Profiles align with Isolation Profiles slide.
+ * Use cases — illustrative compose suggestions (Deliverable D).
+ * Mode 1/2 language: RH blog 2026-05-20. AgentRuntime: RHOAI DP where noted.
+ * Isolation profileKey is suggested intensity, not a mandatory product SKU.
  */
 const usecases = {
   trusted_chatbot: {
     name: "Trusted read-only chatbot (public/RAG)",
     profileKey: "permissive",
-    platform: "OpenShift AI · AgentRuntime path",
-    compute: "OpenShift AI AgentRuntime on a normal Deployment/StatefulSet (container isolation). Controlled NetworkPolicy egress. OpenShell optional when you want in-process policy.",
-    desc: "Long-running shared service, trusted source, no private data. Guardrails on I/O. Kernel isolation usually not required.",
+    platform: "OpenShift AI · AgentRuntime (DP)",
+    compute: "Suggested: AgentRuntime (Developer Preview in OpenShift AI 3.5) on a normal Deployment/StatefulSet + NetworkPolicy egress. Add OpenShell when you want in-sandbox OPA / Landlock / inference.local.",
+    desc: "Illustrative: long-running shared service, trusted source, no private data. Guardrails on I/O. Dedicated-kernel isolation often unnecessary.",
     harnessSuggest: "Your chatbot / RAG agent image",
     suggestedAgents: ["adk", "langgraph", "custom"],
     needsOpenShell: false,
+    clusterCompose: true,
     defaults: { oidc: true, kata: false, multi: true },
   },
   nightly_trusted: {
     name: "Trusted nightly summary job",
     profileKey: "openshell_min",
-    platform: "OpenShift AI · AgentRuntime",
-    compute: "AgentRuntime as a Kubernetes Job with normal containers + controlled ingress/egress. Workload identity needed.",
-    desc: "Scheduled, read-only data, hardcoded private output. Bounded behavior — container isolation often enough; add OpenShell when you want per-binary egress + cred masking.",
+    platform: "OpenShift AI · AgentRuntime (DP)",
+    compute: "Suggested: AgentRuntime Job (DP) with normal containers + controlled ingress/egress and workload identity. OpenShell optional for per-binary egress + credential masking.",
+    desc: "Illustrative: scheduled, read-only inputs, bounded writes. Container isolation may suffice; OpenShell when you need process-aware policy.",
     harnessSuggest: "Batch/workflow agent",
     suggestedAgents: ["adk", "langgraph", "custom"],
     needsOpenShell: false,
+    clusterCompose: true,
     defaults: { oidc: true, kata: false, multi: false },
   },
   private_chatbot: {
     name: "Private-data chatbot + MCP/Skills",
     profileKey: "openshell_kata",
-    platform: "OpenShift AI · AgentRuntime + OSC",
-    compute: "OpenShift AI AgentRuntime on OpenShift Sandboxed Containers (Kata) + controlled network. Compose OpenShell for Landlock/OPA/inference.local when agents are autonomous.",
-    desc: "Private data, capable MCP servers, Agent Skills — privilege scoping + network + kernel isolation per field mapping table.",
+    platform: "OpenShift AI · AgentRuntime (DP) + OSC",
+    compute: "Suggested: AgentRuntime (DP) on OpenShift Sandboxed Containers (Kata, GA) + controlled network. Compose OpenShell for Landlock/OPA/inference.local when the agent is autonomous.",
+    desc: "Illustrative: private data + capable tools (MCP/skills). Suggest dedicated-kernel (OSC) plus OpenShell app policy — not a mandatory RHOAI SKU pairing.",
     harnessSuggest: "Framework agent in your image",
     suggestedAgents: ["adk", "langgraph", "custom"],
     needsOpenShell: true,
+    clusterCompose: true,
     defaults: { oidc: true, kata: true, multi: true },
   },
   email_agent: {
     name: "Email / messaging agent (untrusted I/O)",
     profileKey: "openshell_kata",
-    platform: "OpenShift AI · AgentRuntime + OSC",
-    compute: "OpenShift AI AgentRuntime Job on OpenShift Sandboxed Containers + controlled network. User + workload identities. OpenShell for deny-by-default egress and cred masking.",
-    desc: "Reads untrusted email/chat and writes back — field guide requires OSC-class isolation.",
+    platform: "OpenShift AI · AgentRuntime (DP) + OSC",
+    compute: "Suggested: AgentRuntime Job (DP) on OSC/Kata + controlled network; OpenShell for deny-by-default egress and credential masking.",
+    desc: "Illustrative: untrusted inbound content written back out. Strong isolation (OSC + OpenShell) is a common recommendation — treat as guidance, not a product requirement row.",
     harnessSuggest: "Always-on or scheduled harness",
     suggestedAgents: ["openclaw", "hermes", "custom"],
     needsOpenShell: true,
+    clusterCompose: true,
     defaults: { oidc: true, kata: true, multi: false },
   },
   coding_laptop: {
     name: "Coding / claw agent on laptop",
     profileKey: "openshell_typical",
-    platform: "Podman + Kaiden (local)",
-    compute: "OpenShell sandbox with Podman driver + Kaiden local agent dev environment. No cluster login / CRs required.",
-    desc: "Single user, untrusted generated code, CLIs. Isolate from the workstation. Field mapping: OpenShell + Podman + Kaiden.",
+    platform: "Local OpenShell (Podman/Docker)",
+    compute: "Documented OpenShell path: Podman or Docker driver. Agent Sandbox operator / Sandbox CRs do not apply. Kaiden (openkaiden.ai / Red Hat Desktop roadmap) is an optional local UI that can use OpenShell — not required to run openshell sandbox create.",
+    desc: "Mode 1–style whole-agent sandbox on a workstation: untrusted generated code/CLIs. Prefer OpenShell CLI + Podman; Kaiden optional.",
     harnessSuggest: "Claude Code, Copilot, OpenCode, Codex, OpenClaw",
     suggestedAgents: ["claude", "copilot", "opencode", "codex", "openclaw"],
     needsOpenShell: true,
+    clusterCompose: false,
     defaults: { oidc: false, kata: false, multi: false },
   },
   coding_cluster: {
     name: "Coding / claw agent in cluster",
     profileKey: "openshell_typical",
-    platform: "OpenShift AI on OpenShift",
-    compute: "OpenShell sandbox with OpenShift/Kubernetes compute driver + agent-sandbox CRD lifecycle. Privileged SCC on openshell-sandbox SA for netns. Controlled egress.",
-    desc: "Policy, shared compute, or always-on when laptop is off. Field mapping: OpenShell on OpenShift.",
+    platform: "OpenShell on OpenShift (upstream)",
+    compute: "Documented OpenShell OpenShift/Kubernetes driver + optional agent-sandbox CR lifecycle. Privileged SCC on openshell-sandbox SA for netns is a real ops concern. Controlled egress via OpenShell policy.",
+    desc: "Mode 1 on shared cluster compute when laptop is insufficient. Upstream OpenShell compose today; Red Hat AI native packaging is planned (not a shipping RHOAI OpenShell SKU).",
     harnessSuggest: "Base-image coding agents or claw via NemoClaw",
     suggestedAgents: ["claude", "copilot", "opencode", "openclaw"],
     needsOpenShell: true,
+    clusterCompose: true,
     defaults: { oidc: true, kata: false, multi: true },
   },
   mode2_exec: {
     name: "Sandbox execution via platform APIs (Mode 2)",
     profileKey: "openshell_typical",
-    platform: "OpenShift AI · Mode 2 (ogx Preview)",
-    compute: "Agent stays outside; code execution goes to disposable sandboxes via platform APIs. ogx / Open Responses is an OpenShift AI Preview capability — not an OpenShell checkbox.",
-    desc: "Separate failure domains — agent process survives exec failure. Distinct from whole-agent OpenShell Mode 1.",
+    platform: "Mode 2 · Open Responses / ogx",
+    compute: "Public Mode 2 pattern (RH blog): agent brain outside; disposable sandboxes for execution. OpenShell can back those sandboxes. ogx / Open Responses is a platform API surface — not an OpenShell toggle. Maturity of any specific RHOAI packaging varies; treat as Preview/portfolio until your release notes say otherwise.",
+    desc: "Mode 2 (public RH definition): separate failure domains — agent process can survive exec failure. Distinct from Mode 1 whole-agent OpenShell.",
     harnessSuggest: "Agents using OpenAI Responses / Open Responses",
     suggestedAgents: ["custom", "adk", "langgraph"],
     needsOpenShell: true,
+    clusterCompose: true,
     mode2Preview: true,
     defaults: { oidc: true, kata: true, multi: false },
   },
@@ -1103,7 +1128,7 @@ const capabilities = [
   {
     id: "kata", role: "optional", owner: "platform", maturity: "ga",
     label: "Kata / OSC",
-    desc: "Optional L5: OpenShift Sandboxed Containers (Kata) — GA layered product. Composes under OpenShell (kernel boundary ∪ app policy). Needs eligible nodes.",
+    desc: "Optional: OpenShift Sandboxed Containers (Kata) — GA layered product. Dedicated-kernel boundary under OpenShell app policy. Needs eligible nodes.",
   },
   {
     id: "multi", role: "optional", owner: "platform",
@@ -1118,7 +1143,7 @@ const capabilities = [
   {
     id: "ogx", role: "preview", owner: "platform", maturity: "platform-target",
     label: "ogx / Responses",
-    desc: "OpenShift AI Preview capability (Mode 2 API surface). Distinct from OpenShell whole-agent sandboxing. Not selectable here.",
+    desc: "Mode 2 API surface (Open Responses / ogx). Distinct from Mode 1 whole-agent OpenShell. Portfolio/Preview note only — not an OpenShell toggle; check your OpenShift AI release notes for packaging maturity.",
   },
   {
     id: "mlflow", role: "preview", owner: "addon", maturity: "platform-target",
@@ -1147,8 +1172,9 @@ let selectedUseCase = null;
 const MATURITY_BADGES = {
   ga: { cls: "badge-ga", text: "GA" },
   "platform-target": { cls: "badge-maturity", text: "Preview" },
-  alpha: { cls: "badge-maturity", text: "Alpha" },
-  "rhoai-dp": { cls: "badge-maturity", text: "DP 3.5 → TP 3.6" },
+  alpha: { cls: "badge-maturity", text: "Alpha upstream" },
+  /** Planned Red Hat AI integration (public blogs) — not a RHOAI DP/TP release-notes row */
+  "rhoai-planned": { cls: "badge-maturity", text: "Planned for Red Hat AI" },
 };
 
 function maturityBadge(key) {
@@ -1202,13 +1228,18 @@ function sourceBadge(source) {
 function pathBadge(a) {
   if (a.path === "nemoclaw") return `<span class="badge ${PATH_BADGES.nemoclaw.cls}">${PATH_BADGES.nemoclaw.text}</span>`;
   if (a.source === "byo") return `<span class="badge ${PATH_BADGES.byo.cls}">${PATH_BADGES.byo.text}</span>`;
+  /* Gemini: Community catalog path — keep OpenShell-only wording (not NemoClaw), source badge carries offtable caveat */
   return `<span class="badge ${PATH_BADGES.openshell.cls}">${PATH_BADGES.openshell.text}</span>`;
+}
+
+function isCommunitySource(source) {
+  return source === "community" || source === "community-offtable";
 }
 
 function profileBadge(profileKey) {
   const p = ISOLATION_PROFILES[profileKey];
   if (!p) return "";
-  return `<span class="badge badge-owner-os">${p.name} · ${p.layers}</span>`;
+  return `<span class="badge badge-owner-os" title="Illustrative field guidance — not a release-notes SKU">${p.name} · ${p.layers}</span>`;
 }
 
 function updateProgress(step) {
@@ -1291,6 +1322,18 @@ function usesOpenShellSandbox() {
   return true;
 }
 
+/**
+ * Agent Sandbox operator (kubernetes-sigs/agent-sandbox CR lifecycle) applies on
+ * OpenShift/Kubernetes compose — not on laptop Podman / local OpenShell paths.
+ * - Use case: honor explicit clusterCompose flag
+ * - Agent journey: only when Kata or Multitenancy optional compose is selected
+ *   (OIDC alone can be a local shared gateway and does not imply the operator)
+ */
+function usesAgentSandboxOperator(caps, uc) {
+  if (uc) return uc.clusterCompose === true;
+  return !!(caps && (caps.kata || caps.multi));
+}
+
 function tileIncluded(c) {
   return `
     <div class="check-item included" data-owner="${c.owner}">
@@ -1349,12 +1392,14 @@ function renderCapChecks(defaults) {
       <div class="checks">${OPTIONAL_CAP_IDS.map((id) => tileOptional(CAP_BY_ID[id], !!d[id])).join("")}</div>
     </section>`;
 
-  const previewBlock = `
-    <section class="cap-section">
-      <h3 class="cap-section-title">OpenShift AI portfolio (Preview — not selectable)</h3>
-      <p class="cap-section-note">Documented as Preview capabilities in the OpenShift AI portfolio. Shown for awareness only — not OpenShell toggles and not claimed as ready for this agent path.</p>
-      <div class="checks">${PREVIEW_CAPS.map(tilePreview).join("")}</div>
-    </section>`;
+  /* S-10: Preview portfolio is noisy on agent-only OpenShell paths — show for use-case journey */
+  const previewBlock = currentJourney === "usecase"
+    ? `<section class="cap-section">
+        <h3 class="cap-section-title">OpenShift AI portfolio (notes — not selectable)</h3>
+        <p class="cap-section-note">Portfolio capabilities that may appear in OpenShift AI (maturity varies by release). Awareness only — not OpenShell toggles and not claimed as required for this use case.</p>
+        <div class="checks">${PREVIEW_CAPS.map(tilePreview).join("")}</div>
+      </section>`
+    : "";
 
   box.innerHTML = includedBlock + optionalBlock + previewBlock;
 }
@@ -1366,6 +1411,11 @@ function defaultCapsForAgent() {
 function enterStep2(name, meta, defaults) {
   document.getElementById("selectedName").textContent = name;
   document.getElementById("selectedMeta").textContent = meta || "";
+  const gap = document.getElementById("policyGap");
+  if (gap) {
+    const a = selectedAgent ? agents[selectedAgent] : null;
+    gap.innerHTML = policyCallout(a) || "";
+  }
   renderCapChecks(defaults || defaultCapsForAgent());
   document.querySelectorAll(".step, .result").forEach((s) => s.classList.remove("active"));
   document.getElementById("step2").classList.add("active");
@@ -1409,19 +1459,22 @@ function readCaps() {
 function policyCallout(a) {
   if (!a) return "";
   if (a.policy === "none") {
-    return `<div class="callout callout-warn"><strong>No coverage:</strong> Codex needs a custom policy (OpenAI endpoints + Codex binary paths) per OpenShell Supported Agents.</div>`;
+    return `<div class="callout callout-warn"><strong>Policy gap (blocking):</strong> Codex default policy is <em>No coverage</em> on OpenShell Supported Agents. Before production use, ship a custom policy with OpenAI endpoints and Codex binary paths, and set <code>OPENAI_API_KEY</code>. Command already includes <code>--policy</code>.</div>`;
   }
   if (a.policy === "partial") {
-    return `<div class="callout callout-warn"><strong>Partial coverage:</strong> OpenCode needs extra endpoints/binaries (e.g. opencode.ai). See OpenShell Supported Agents.</div>`;
+    return `<div class="callout callout-warn"><strong>Policy gap:</strong> OpenCode default policy is <em>Partial coverage</em> on OpenShell Supported Agents. For full function: set <code>ANTHROPIC_BASE_URL="https://inference.local/v1"</code> with a configured provider, and add <code>opencode.ai</code> plus OpenCode binary paths to the policy.</div>`;
+  }
+  if (a.source === "community-offtable") {
+    return `<div class="callout callout-warn"><strong>Community catalog (not on Supported Agents table):</strong> <code>${escapeHtml(a.command)}</code> works via OpenShell-Community. Do not treat this as a Supported Agents docs-table agent.</div>`;
   }
   if (a.source === "community") {
-    return `<div class="callout callout-info"><strong>Community sandbox:</strong> Use <code>${escapeHtml(a.command)}</code> (OpenShell Community / Supported Agents <code>--from</code> path).</div>`;
+    return `<div class="callout callout-info"><strong>Community sandbox (on Supported Agents):</strong> Use <code>${escapeHtml(a.command)}</code>.</div>`;
   }
   if (a.source === "byo") {
-    return `<div class="callout callout-warn"><strong>Not on NVIDIA matrix:</strong> No named OpenShell Supported Agents or NemoClaw support. Generic <code>--from</code> may work; do not treat this as a validated stack.</div>`;
+    return `<div class="callout callout-info"><strong>BYOA (Bring Your Own Agent):</strong> First-class enterprise path — your image + OpenShell policy via <code>${escapeHtml(a.command)}</code>. Not a NVIDIA named Supported Agents / NemoClaw row; Red Hat AgentOps is framework-agnostic (you keep the agent, platform supplies sandbox/governance).</div>`;
   }
   if (a.policy === "blueprint") {
-    return `<div class="callout callout-info"><strong>NemoClaw path:</strong> Prefer <code>${escapeHtml(a.command)}</code> so blueprint policy and managed inference stay consistent. See NemoClaw ecosystem: NemoClaw path vs OpenShell path.</div>`;
+    return `<div class="callout callout-info"><strong>NemoClaw path only:</strong> Use <code>${escapeHtml(a.command)}</code> for blueprint policy and managed inference. There is no documented Community <code>--from openclaw</code> sandbox today.</div>`;
   }
   return "";
 }
@@ -1469,27 +1522,34 @@ function showResult() {
 
   const addonItems = [];
   if (a?.nemoclaw) addonItems.push(`NemoClaw path: <code>${a.command}</code>`);
-  if (uc?.mode2Preview) addonItems.push("Mode 2 / ogx is OpenShift AI Preview — not an OpenShell control");
+  if (uc?.mode2Preview) addonItems.push("Mode 2 / ogx (Open Responses) is a platform API pattern — not an OpenShell control; check RHOAI release notes for packaging maturity");
 
   const resultName = a?.name || uc?.name || "Stack";
   const harnessName = a?.name || uc?.harnessSuggest || "Your harness";
   const harnessDesc = a?.desc || uc?.desc || "";
-  const platformName = uc?.platform || "Red Hat OpenShift AI";
-  const computeLine = uc?.compute ||
-    "Compose: kubernetes-sigs/agent-sandbox (lifecycle) + OpenShell (policy) + optional OSC/Kata (L5).";
+  const clusterCompose = usesAgentSandboxOperator(caps, uc);
+  const platformName = uc?.platform || (clusterCompose ? "Red Hat OpenShift AI" : "Local OpenShell (Podman / Docker)");
+  const computeLine = uc?.compute || (clusterCompose
+    ? "Cluster compose: kubernetes-sigs/agent-sandbox (lifecycle) + OpenShell (policy) + optional OSC/Kata (L5)."
+    : "Local compose: OpenShell sandbox (Podman/Docker driver). Agent Sandbox operator / Sandbox CRs are not part of this path — enable Kata or Multitenancy (or pick a cluster use case) for OpenShift lifecycle.");
 
   let commands = a ? [a.command] : [];
   if (uc && !a) {
     commands = uc.needsOpenShell === false
       ? [
-          "# Field mapping: AgentRuntime on normal containers may suffice",
+          "# Suggested: AgentRuntime (DP in OpenShift AI 3.5) on normal containers may suffice",
           "# Add OpenShell when you need per-binary egress, Landlock, or inference.local",
-          "Follow OpenShift AI AgentRuntime docs",
+          "# See OpenShift AI AgentRuntime docs for your release",
         ]
-      : [
-          "openshell sandbox create --from <image> --policy ./policy.yaml",
-          "# Cluster: Agent Sandbox CRDs + privileged SCC + Helm (see Quickstart)",
-        ];
+      : clusterCompose
+        ? [
+            "openshell sandbox create --from <image> --policy ./policy.yaml",
+            "# Cluster: Agent Sandbox CRDs + privileged SCC + Helm (see Quickstart)",
+          ]
+        : [
+            "openshell sandbox create --from <image> --policy ./policy.yaml",
+            "# Local: Podman/Docker driver — no Agent Sandbox operator / Sandbox CRs",
+          ];
   }
 
   const authNote = (caps.oidc
@@ -1499,7 +1559,7 @@ function showResult() {
   const entryLine = a
     ? ENTRY_PATHS[a.path]
     : (uc?.mode2Preview
-      ? "Mode 2 use case — ogx / Responses is OpenShift AI Preview (not OpenShell)"
+      ? "Mode 2 use case — Open Responses / ogx platform API (not an OpenShell toggle)"
       : "OpenShell path — openshell sandbox create");
 
   syncUrl(caps);
@@ -1518,7 +1578,7 @@ function showResult() {
 
   const modelTip = [
     withOs ? "With OpenShell: route model calls via inference.local (credential masking) and/or allowed provider endpoints in policy." : "Without OpenShell, inference routing is outside this sandbox model.",
-    showMode2 ? "This use case references Mode 2 / ogx (OpenShift AI Preview) — distinct from OpenShell whole-agent sandboxing." : "",
+    showMode2 ? "This use case references Mode 2 (RH blog): Open Responses / ogx — distinct from Mode 1 whole-agent OpenShell." : "",
   ].filter(Boolean).join(" ");
 
   const policyTip = (() => {
@@ -1535,17 +1595,26 @@ function showResult() {
     policyTip,
   ].filter(Boolean).join(" ");
 
-  const openshellTip = [
-    "Sandbox path is a compose, not a single name: OpenShell (app policy) + Agent Sandbox operator (kubernetes-sigs/agent-sandbox CR lifecycle on OpenShift).",
-    "OpenShell is an OpenShift AI portfolio capability (NVIDIA collaboration) — Landlock, seccomp, netns, OPA L4/L7, inference.local, OCSF.",
-    "Agent Sandbox operator owns Sandbox CR lifecycle (create/schedule/teardown); it does not replace OpenShell policy.",
-    "Red Hat AI Agentic Strategy 2026 Appendix A: OpenShell planned Developer Preview in OpenShift AI 3.5, targeting Tech Preview in 3.6. Upstream OpenShell is also alpha / single-player-first.",
-    `Isolation profile: ${profile.name} (${profile.layers}) — ${profile.blurb}`,
-    "Optional L5: Kata / OpenShift Sandboxed Containers for dedicated-kernel isolation.",
-  ].join(" ");
+  const openshellTip = clusterCompose
+    ? [
+        "Cluster sandbox path is a compose: OpenShell (app policy) + Agent Sandbox operator (kubernetes-sigs/agent-sandbox CR lifecycle on OpenShift).",
+        "OpenShell (NVIDIA upstream, Red Hat contributing) — Landlock, seccomp, netns, OPA L4/L7, inference.local, OCSF. Deployable on OpenShift today via upstream drivers; not a shipping OpenShift AI product SKU yet.",
+        "Agent Sandbox operator owns Sandbox CR lifecycle (create/schedule/teardown); it does not replace OpenShell policy.",
+        "Maturity (public): NVIDIA OpenShell is alpha / single-player-first. Red Hat blogs (May 2026): planned integration into Red Hat AI; early validations, not shipping product features. OpenShell is not listed as Developer Preview or Tech Preview in public OpenShift AI 3.5 release notes — do not treat this wizard as a DP/TP claim.",
+        `Isolation profile (illustrative): ${profile.name} (${profile.layers}) — ${profile.blurb}`,
+        "Optional: Kata / OpenShift Sandboxed Containers for dedicated-kernel isolation.",
+      ].join(" ")
+    : [
+        "Local OpenShell path: app policy (Landlock, seccomp, netns, OPA L4/L7, inference.local, OCSF) via Podman/Docker — no Agent Sandbox operator.",
+        "Agent Sandbox operator (Sandbox CR lifecycle) applies on OpenShift/Kubernetes compose only. Select Kata or Multitenancy, or a cluster use case, to include it.",
+        "Upstream OpenShell is alpha / single-player-first (NVIDIA README).",
+        `Isolation profile (illustrative): ${profile.name} (${profile.layers}) — ${profile.blurb}`,
+      ].join(" ");
 
   const platformTip = [
-    "Optional compose on OpenShift under the OpenShift AI product.",
+    clusterCompose
+      ? "Optional compose on OpenShift under the OpenShift AI product."
+      : "Optional compose is for OpenShift; this stack is the local OpenShell path unless you enable Kata/Multitenancy.",
     computeLine,
     useCaseContext ? `Use-case context: ${useCaseContext}.` : "",
     caps.kata ? "Kata / OSC selected (GA layered)." : "Kata / OSC not selected.",
@@ -1553,11 +1622,19 @@ function showResult() {
     "MCP Gateway and other Preview portfolio items are not toggles in this wizard.",
   ].filter(Boolean).join(" ");
 
+  const sandboxTitle = clusterCompose ? "OpenShell + Agent Sandbox" : "OpenShell";
+  const sandboxChips = [
+    ...(clusterCompose
+      ? [chipOn("Agent Sandbox operator"), chipOn("Sandbox CR lifecycle")]
+      : [chipOn("Local / Podman path"), chipOn("No Agent Sandbox operator")]),
+    openshellChips || chipOn("OpenShell policy"),
+  ].join("");
+
   const harnessMaturity = a ? maturityBadge(agentMaturity(a)) : "";
 
   const html = `
     <div class="result-header">
-      <div class="result-title">OpenShift AI stack for: <span>${resultName}</span></div>
+      <div class="result-title">${clusterCompose ? "Reference stack for" : "Local OpenShell stack for"}: <span>${resultName}</span></div>
       <div class="actions actions-sm">
         <button type="button" class="btn btn-secondary" id="shareBtn" onclick="copyShareLink()">Copy link</button>
         <button type="button" class="btn btn-secondary" onclick="restart()">Restart</button>
@@ -1571,6 +1648,7 @@ function showResult() {
 
     <div class="result-pane active" id="pane-arch" role="tabpanel">
       <p class="cake-hint">Agent = Model + Harness · tap <strong>i</strong> for detail</p>
+      ${policyCallout(a)}
       <div class="cake" role="list" aria-label="Model, harness, and OpenShift AI capabilities">
         <section class="cake-layer layer-model" role="listitem">
           <div class="cake-top">
@@ -1583,7 +1661,7 @@ function showResult() {
           </div>
           <ul class="cake-chips">
             ${withOs ? chipOn("inference.local") : ""}
-            ${showMode2 ? chipOn("ogx / Mode 2 (Preview)") : ""}
+            ${showMode2 ? chipOn("Mode 2 · Open Responses / ogx") : ""}
             ${chipOn("Provider policy allows")}
           </ul>
         </section>
@@ -1600,10 +1678,11 @@ function showResult() {
             </div>
           </div>
           <ul class="cake-chips">
-            ${chipOn(a?.path === "nemoclaw" ? "NemoClaw blueprint" : (a?.source === "byo" ? "Not on NVIDIA matrix" : "OpenShell only"))}
-            ${a?.source === "community" ? chipOn(a.command.replace("openshell sandbox create ", "")) : ""}
+            ${chipOn(a?.path === "nemoclaw" ? "NemoClaw blueprint" : (a?.source === "byo" ? "BYOA · your image" : "OpenShell only"))}
+            ${isCommunitySource(a?.source) ? chipOn(a.command.replace("openshell sandbox create ", "")) : ""}
+            ${a?.source === "community-offtable" ? chipOn("not on Supported Agents table") : ""}
             ${a?.source === "base" ? chipOn("base image") : ""}
-            ${a?.source === "byo" ? chipOn("--from <image>") : ""}
+            ${a?.source === "byo" ? chipOn("--from <image> + policy") : ""}
           </ul>
           ${suggestAgentsHtml(uc?.suggestedAgents)}
         </section>
@@ -1612,17 +1691,13 @@ function showResult() {
           <div class="cake-top">
             <span class="cake-index">03 · Sandbox</span>
             <div class="cake-title-row">
-              <div class="cake-product">OpenShell + Agent Sandbox</div>
-              ${maturityBadge("rhoai-dp")}
+              <div class="cake-product">${sandboxTitle}</div>
+              ${clusterCompose ? maturityBadge("rhoai-planned") : maturityBadge("alpha")}
               <span class="badge badge-bundled">${profile.name}</span>
-              ${infoButton(openshellTip, "About OpenShell and Agent Sandbox operator")}
+              ${infoButton(openshellTip, clusterCompose ? "About OpenShell and Agent Sandbox operator" : "About local OpenShell sandbox")}
             </div>
           </div>
-          <ul class="cake-chips">
-            ${chipOn("Agent Sandbox operator")}
-            ${chipOn("Sandbox CR lifecycle")}
-            ${openshellChips || chipOn("OpenShell policy")}
-          </ul>
+          <ul class="cake-chips">${sandboxChips}</ul>
         </section>
 
         <section class="cake-layer layer-platform" role="listitem">
@@ -1653,8 +1728,9 @@ function showResult() {
         <div class="cmd-list">
           ${commands.map((c) => `<code class="cmd">${c}</code>`).join("")}
         </div>
+        ${policyCallout(a)}
         ${addonItems.length ? `<div class="callout callout-info">${addonItems.join("<br>")}</div>` : ""}
-        <div class="callout callout-warn"><strong>Auth / maturity:</strong> ${authNote} OpenShell upstream is alpha (single-player-first); OpenShift AI OpenShell path is planned DP in 3.5 → TP in 3.6. Privileged SCC for sandbox netns is intentionally powerful.</div>
+        <div class="callout callout-warn"><strong>Auth / maturity:</strong> ${authNote} OpenShell upstream is <em>alpha</em> (single-player-first). Red Hat public blogs: OpenShell is <em>planned</em> for Red Hat AI / “coming to” OpenShift AI — early validations, not a shipping RHOAI feature; not listed as DP/TP in OpenShift AI 3.5 release notes. Privileged SCC for sandbox netns (cluster path) is intentionally powerful.</div>
         <div class="actions actions-sm">
           <a class="btn btn-primary" href="../quickstart/">Open Quickstart</a>
           <a class="btn btn-secondary" href="../sandboxes/network-policies/">Network policies</a>

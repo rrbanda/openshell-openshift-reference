@@ -148,27 +148,27 @@ flowchart TB
 
 ## Product Mapping
 
-Aligned to Red Hat AI field positioning (July 2026): **Kagenti → OpenShell**, BYOA, and the Sandboxing for Agents use-case table. **Default policy** also matches the upstream [Supported Agents](https://docs.nvidia.com/openshell/latest/about/supported-agents.html) matrix where applicable.
+**Default policy** matches the upstream [Supported Agents](https://docs.nvidia.com/openshell/latest/about/supported-agents.html) matrix where applicable. Isolation **use-case profiles** in the [Interactive Wizard](stack-wizard.html) are **illustrative field guidance** (suggested compose), not OpenShift AI release-notes SKUs — see Modes 1–2 in the [Red Hat AI + OpenShell blog](https://www.redhat.com/en/blog/red-hat-ai-and-openshell-driving-security-enhanced-agent-execution-for-enterprise-ai) and the [defense-in-depth article](https://developers.redhat.com/articles/2026/05/14/every-layer-counts-defense-depth-ai-agents-red-hat-ai).
 
 ### How layers compose (do not conflate)
 
 | Layer | What it is | Owner |
 |---|---|---|
-| **OpenShift Sandboxed Containers (Kata)** | Hardware / dedicated-kernel isolation (L5) | OpenShift (GA layered product) |
+| **OpenShift Sandboxed Containers (Kata)** | Hardware / dedicated-kernel isolation | OpenShift (GA layered product) |
 | **OpenShell** | In-sandbox policy: Landlock, seccomp, netns, OPA L4/L7, `inference.local`, OCSF | NVIDIA OpenShell (+ Red Hat drivers) |
-| **kubernetes-sigs/agent-sandbox** | Sandbox CRD lifecycle | OpenShift / OSC path |
-| **MCP Gateway** | Tool OAuth2 exchange, claim-based auth (Kuadrant/Authorino) | Red Hat AI |
-| **ogx / Open Responses** | Mode 2 agentic API surface | Red Hat AI |
+| **kubernetes-sigs/agent-sandbox** | Sandbox CRD lifecycle (cluster compose) | OpenShift / Kubernetes path |
+| **MCP Gateway** | Tool OAuth2 exchange, claim-based auth (Kuadrant/Authorino) | Red Hat AI (check release notes) |
+| **ogx / Open Responses** | Mode 2 agentic API surface | Red Hat AI / OGX (packaging maturity varies) |
 | **MLflow + OTEL / EvalHub** | Observability & evaluation capabilities | Red Hat OpenShift AI |
 
-**Compose:** Kata for kernel boundary ∪ OpenShell for application policy ∪ agent-sandbox for lifecycle. OpenShell does **not** replace OSC or MCP Gateway.
+**Compose (cluster):** Kata for kernel boundary ∪ OpenShell for application policy ∪ Agent Sandbox operator for Sandbox CR lifecycle. OpenShell does **not** replace OSC or MCP Gateway. **Local / Podman** OpenShell paths use the same app policy without the Agent Sandbox operator. **Kaiden** is an optional local desktop UI that can use OpenShell — not required for `openshell sandbox create`.
 
 ### Entry paths (NVIDIA OpenShell / NemoClaw)
 
 | Path | Valid for | Not valid for |
 |---|---|---|
-| **OpenShell only** (`openshell sandbox create`) | Claude Code, Copilot, OpenCode, Codex (base); Gemini / Ollama / Pi (`--from`); BYO images | Claiming a NemoClaw blueprint |
-| **NemoClaw blueprint** (`nemoclaw onboard` …) | OpenClaw, Hermes, LangChain Deep Agents Code only | Claude Code, Gemini, OpenCode, Codex as the sandboxed agent |
+| **OpenShell only** (`openshell sandbox create`) | Claude Code, Copilot, OpenCode, Codex (base); Ollama / Pi (`--from`, on Supported Agents); Gemini (`--from gemini`, Community catalog only); BYO images | Claiming a NemoClaw blueprint; claiming `--from openclaw` (not in Community today) |
+| **NemoClaw blueprint** (`nemoclaw onboard` …) | OpenClaw, Hermes, LangChain Deep Agents Code only | Claude Code, Gemini, OpenCode, Codex as the sandboxed agent; OpenShell-alone OpenClaw via Community `--from` |
 
 Claude Code / Copilot / Codex can appear in NemoClaw docs as the **host installer UI** — that does not make them NemoClaw blueprint agents. On OpenShift AI, OpenShell-path agents run under the OpenShell capability; NemoClaw is an optional NVIDIA reference packaging layer on top of OpenShell for its three agents.
 
@@ -178,23 +178,23 @@ Claude Code / Copilot / Codex can appear in NemoClaw docs as the **host installe
 |---|---|---|---|---|
 | **Claude Code** | `base` | Full coverage | OpenShell | `openshell sandbox create -- claude` |
 | **GitHub Copilot CLI** | `base` | Full coverage | OpenShell | `openshell sandbox create -- copilot` |
-| **OpenCode** | `base` | Partial coverage | OpenShell | `openshell sandbox create -- opencode` |
-| **OpenAI Codex CLI** | `base` | No coverage | OpenShell | custom policy + `-- codex` |
-| **Gemini CLI** | Community (`gemini`) | Bundled | OpenShell | `openshell sandbox create --from gemini` |
-| **Ollama** / **Pi** | Community | Bundled | OpenShell | `--from ollama` / `--from pi` |
-| **OpenClaw** | NemoClaw | Blueprint-managed | NemoClaw | `nemoclaw onboard` |
-| **Hermes** | NemoClaw | Blueprint-managed | NemoClaw | `nemohermes onboard` |
-| **Deep Agents Code** | NemoClaw | Blueprint-managed | NemoClaw | `nemo-deepagents onboard` |
-| **ADK / LangGraph / CrewAI / Strands / OpenHands** | Not on matrix | BYO policy | OpenShell BYO | `--from <image>` + policy |
+| **OpenCode** | `base` | Partial coverage — add `opencode.ai` + binaries; often `ANTHROPIC_BASE_URL=https://inference.local/v1` | OpenShell | `openshell sandbox create -- opencode` |
+| **OpenAI Codex CLI** | `base` | No coverage — custom policy (OpenAI endpoints + Codex binaries) + `OPENAI_API_KEY` | OpenShell | `--policy` + `-- codex` |
+| **Gemini CLI** | Community catalog (`gemini`) — **not** on Supported Agents docs table | Bundled (image) | OpenShell | `openshell sandbox create --from gemini` |
+| **Ollama** / **Pi** | Community — **on** Supported Agents table | Bundled | OpenShell | `--from ollama` / `--from pi` |
+| **OpenClaw** | NemoClaw | Blueprint-managed | NemoClaw only | `nemoclaw onboard` |
+| **Hermes** | NemoClaw | Blueprint-managed (Tested; production parity with OpenClaw not asserted) | NemoClaw | `nemohermes onboard` |
+| **Deep Agents Code** | NemoClaw (may lag OpenShell Supported Agents table) | Blueprint-managed | NemoClaw | `nemo-deepagents onboard` |
+| **ADK / LangGraph / CrewAI / Strands / OpenHands / custom** | **BYOA** (not a NVIDIA named row) | You supply policy | OpenShell `--from` | `--from <image>` + policy — common enterprise path; Red Hat AgentOps is framework-agnostic |
 | **NemoClaw** | Reference stack | — | — | orchestrates OpenShell |
 
-Use the [Interactive Wizard](stack-wizard.html) for isolation profiles and owner-accurate stacks.
+Use the [Interactive Wizard](stack-wizard.html) for path-accurate stacks. Treat isolation profile badges as illustrative suggestions, not product certification.
 
 !!! note "Identity (Kagenti convergence)"
     Kagenti shipped full SPIRE via AuthBridge (Dev Preview only — no GA). OpenShell authenticates supervisors with **gateway-minted sandbox JWTs / JWT-SVID** (SPIFFE-shaped subjects) and is **closing the SPIFFE gap**; Red Hat contributes OIDC + SPIFFE identity drivers. Platform SPIFFE/SPIRE on OpenShift layers on for cluster zero-trust — complementary, not “OpenShell already is full SPIRE.”
 
-!!! note "Maturity"
-    OpenShell is **alpha** (single-player-first). Field target: Dev/Tech Preview in RHOAI **3.5/3.6** (H2 CY2026).
+!!! note "Maturity (public sources only)"
+    OpenShell upstream is **alpha** (single-player-first) — [NVIDIA/OpenShell README](https://github.com/NVIDIA/OpenShell). Red Hat blogs (May 2026) describe OpenShell as **planned for integration** into Red Hat AI / “coming to” OpenShift AI, with **early validations that are not shipping product features yet**. OpenShell is **not** listed as Developer Preview or Tech Preview in public [OpenShift AI 3.5 release notes](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.5/html/release_notes/developer-preview-features_relnotes) (checked 2026-07-19). Do not treat field “DP 3.5 → TP 3.6” targets as product fact until they appear in docs.redhat.com.
 
 ---
 
