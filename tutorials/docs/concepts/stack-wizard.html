@@ -293,23 +293,26 @@ body::before {
 }
 .selected-bar button:hover, .selected-bar button:focus-visible { color: var(--nv); border-color: rgba(118,185,0,0.4); outline: none; }
 
-.cap-legend {
-  display: flex; flex-wrap: wrap; gap: 0.4rem 0.75rem; margin: 0 0 0.55rem;
-  font-size: 0.72rem; color: var(--muted);
+.cap-section { margin: 0 0 1.1rem; }
+.cap-section-title {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 0.3rem;
 }
-.cap-legend span { display: inline-flex; align-items: center; gap: 0.28rem; }
+.cap-section-note {
+  font-size: 0.78rem; color: var(--dim); margin: 0 0 0.55rem; line-height: 1.4; max-width: 48rem;
+}
 
 .checks {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.55rem;
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.35rem;
   align-items: stretch;
 }
 @media (max-width: 700px) { .checks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 420px) { .checks { grid-template-columns: 1fr; } }
 
-/* Equal-height capability tiles — detail lives in (i) */
+/* Capability tiles — detail lives in (i) */
 .check-item {
   position: relative;
   display: flex;
@@ -326,10 +329,32 @@ body::before {
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
   overflow: visible;
 }
+.check-item.included {
+  cursor: default;
+  border-color: rgba(118,185,0,0.22);
+  background: linear-gradient(165deg, rgba(118,185,0,0.07), rgba(18, 22, 28, 0.88));
+}
+.check-item.included:hover { box-shadow: none; }
+.check-item.preview-info {
+  cursor: default;
+  opacity: 0.85;
+  border-left-color: rgba(230,184,77,0.55);
+}
+.check-item.preview-info:hover { box-shadow: none; border-color: rgba(230,237,243,0.1); }
+.check-mark {
+  flex: 0 0 auto;
+  width: 1.1rem; height: 1.1rem;
+  border-radius: 3px;
+  background: rgba(118,185,0,0.2);
+  border: 1px solid rgba(118,185,0,0.45);
+  color: var(--nv);
+  font-size: 0.7rem; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
 .check-item[data-owner="openshell"] { border-left-color: var(--nv); }
 .check-item[data-owner="platform"] { border-left-color: #ff6b6b; }
 .check-item[data-owner="addon"] { border-left-color: var(--addon); }
-.check-item:hover {
+.check-item:hover:not(.included):not(.preview-info) {
   border-color: rgba(118,185,0,0.4);
   box-shadow: 0 0 0 1px rgba(118,185,0,0.12);
 }
@@ -740,20 +765,14 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
 
   <!-- STEP 2 -->
   <div class="step" id="step2" role="tabpanel">
-    <div class="step-label">Step 2 — Capabilities</div>
+    <div class="step-label">Step 2 — Compose</div>
     <div class="selected-bar" id="selectedBar">
       <div>Selected: <strong id="selectedName"></strong> <span id="selectedMeta" style="color:var(--muted);font-size:0.8rem"></span></div>
       <button type="button" onclick="goBack()">Change selection</button>
     </div>
-    <div class="question">What do you need?</div>
-    <p class="hint">Left edge = owner. Tap <strong>i</strong> for technical detail. Amber = Preview / not fully ready. Left edge groups capabilities under the OpenShift AI product.</p>
-    <div class="cap-legend">
-      <span><span class="badge badge-owner-plat">Product</span> Red Hat OpenShift AI</span>
-      <span><span class="badge badge-owner-os">OpenShell</span> sandbox</span>
-      <span><span class="badge badge-owner-plat">Platform</span> Kata · MCP · tenancy</span>
-      <span><span class="badge badge-owner-addon">Safety</span> Guardrails · EvalHub · Garak · MLflow</span>
-    </div>
-    <div class="checks" id="capChecks"></div>
+    <div class="question">Compose options</div>
+    <p class="hint">OpenShell controls are <strong>included</strong> when you use a sandbox — not shopping items. Only optional platform compose is selectable. Preview portfolio items are notes, not toggles.</p>
+    <div id="capChecks"></div>
     <div class="actions">
       <button type="button" class="btn btn-primary" onclick="showResult()">Show my architecture</button>
       <button type="button" class="btn btn-secondary" onclick="goBack()">← Back</button>
@@ -972,7 +991,7 @@ const usecases = {
     harnessSuggest: "Your chatbot / RAG agent image",
     suggestedAgents: ["adk", "langgraph", "custom"],
     needsOpenShell: false,
-    defaults: { network: true, creds: false, audit: false, fs: false, identity: true, oidc: true, mcp: false, guardrails: true, kata: false, multi: true, ogx: false, mlflow: true },
+    defaults: { oidc: true, kata: false, multi: true },
   },
   nightly_trusted: {
     name: "Trusted nightly summary job",
@@ -983,7 +1002,7 @@ const usecases = {
     harnessSuggest: "Batch/workflow agent",
     suggestedAgents: ["adk", "langgraph", "custom"],
     needsOpenShell: false,
-    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: false, guardrails: true, kata: false, multi: false, ogx: false, mlflow: true },
+    defaults: { oidc: true, kata: false, multi: false },
   },
   private_chatbot: {
     name: "Private-data chatbot + MCP/Skills",
@@ -994,7 +1013,7 @@ const usecases = {
     harnessSuggest: "Framework agent in your image",
     suggestedAgents: ["adk", "langgraph", "custom"],
     needsOpenShell: true,
-    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: true, guardrails: true, kata: true, multi: true, ogx: false, mlflow: true },
+    defaults: { oidc: true, kata: true, multi: true },
   },
   email_agent: {
     name: "Email / messaging agent (untrusted I/O)",
@@ -1005,7 +1024,7 @@ const usecases = {
     harnessSuggest: "Always-on or scheduled harness",
     suggestedAgents: ["openclaw", "hermes", "custom"],
     needsOpenShell: true,
-    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: false, guardrails: true, kata: true, multi: false, ogx: false, mlflow: true },
+    defaults: { oidc: true, kata: true, multi: false },
   },
   coding_laptop: {
     name: "Coding / claw agent on laptop",
@@ -1016,7 +1035,7 @@ const usecases = {
     harnessSuggest: "Claude Code, Copilot, OpenCode, Codex, OpenClaw",
     suggestedAgents: ["claude", "copilot", "opencode", "codex", "openclaw"],
     needsOpenShell: true,
-    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: false, mcp: false, guardrails: false, kata: false, multi: false, ogx: false, mlflow: false },
+    defaults: { oidc: false, kata: false, multi: false },
   },
   coding_cluster: {
     name: "Coding / claw agent in cluster",
@@ -1027,112 +1046,97 @@ const usecases = {
     harnessSuggest: "Base-image coding agents or claw via NemoClaw",
     suggestedAgents: ["claude", "copilot", "opencode", "openclaw"],
     needsOpenShell: true,
-    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: false, guardrails: false, kata: false, multi: true, ogx: false, mlflow: true },
+    defaults: { oidc: true, kata: false, multi: true },
   },
   mode2_exec: {
     name: "Sandbox execution via platform APIs (Mode 2)",
     profileKey: "openshell_typical",
-    platform: "OpenShift AI · Mode 2 (ogx)",
-    compute: "Agent stays outside; code execution goes to disposable Firecracker/Kata/gVisor-class sandboxes via platform APIs. OpenShell+RHOAI cover Mode 2 via Responses API / ogx (open source).",
-    desc: "Separate failure domains — agent process survives exec failure. Distinct from whole-agent Mode 1.",
+    platform: "OpenShift AI · Mode 2 (ogx Preview)",
+    compute: "Agent stays outside; code execution goes to disposable sandboxes via platform APIs. ogx / Open Responses is an OpenShift AI Preview capability — not an OpenShell checkbox.",
+    desc: "Separate failure domains — agent process survives exec failure. Distinct from whole-agent OpenShell Mode 1.",
     harnessSuggest: "Agents using OpenAI Responses / Open Responses",
     suggestedAgents: ["custom", "adk", "langgraph"],
     needsOpenShell: true,
-    defaults: { network: true, creds: true, audit: true, fs: true, identity: true, oidc: true, mcp: false, guardrails: true, kata: true, multi: false, ogx: true, mlflow: true },
+    mode2Preview: true,
+    defaults: { oidc: true, kata: true, multi: false },
   },
 };
 
 
 /**
- * Capability catalog with correct owners per field guides.
- * OpenShell ≠ MCP Gateway ≠ Kata ≠ ogx ≠ MLflow.
+ * Configure model (accurate roles — do not treat Preview portfolio as OpenShell toggles):
+ *   included  = always present when OpenShell sandbox is used
+ *   optional  = real compose choices (selectable)
+ *   preview   = OpenShift AI Preview notes only (not selectable)
  */
 const capabilities = [
   {
-    id: "network",
-    owner: "openshell",
+    id: "network", role: "included", owner: "openshell",
     label: "Network policy",
-    desc: "In-process OPA via CONNECT proxy: per-binary, host/port, optional HTTP method/path (MCP-aware). Hot-reloadable. Stronger than Kagenti sidecar+iptables; no NET_ADMIN required for OpenShell's model.",
+    desc: "OpenShell: in-process OPA via CONNECT proxy (per-binary, host/port, optional L7). Included with the sandbox — not an optional add-on.",
   },
   {
-    id: "creds",
-    owner: "openshell",
+    id: "creds", role: "included", owner: "openshell",
     label: "Credential masking",
-    desc: "Privacy router: agent calls https://inference.local; proxy strips caller creds and injects provider credentials. Never log secrets in OCSF.",
+    desc: "OpenShell privacy router: agent calls https://inference.local; proxy injects provider credentials. Included with the sandbox.",
   },
   {
-    id: "audit",
-    owner: "openshell",
+    id: "audit", role: "included", owner: "openshell",
     label: "OCSF security audit",
-    desc: "Structured OCSF v1.7.0 for network/HTTP/SSH/process/config/findings — SIEM-ready. Distinct from MLflow/OTEL observability capabilities in OpenShift AI.",
+    desc: "OpenShell structured OCSF v1.7.0 audit. Included with the sandbox. Distinct from OpenShift AI MLflow/OTEL (Preview).",
   },
   {
-    id: "fs",
-    owner: "openshell",
+    id: "fs", role: "included", owner: "openshell",
     label: "Landlock / seccomp / netns",
-    desc: "Kernel/userspace controls inside the sandbox: filesystem scoping, syscall filter, network namespace forcing proxy. Applied at create — recreate to change FS/process policy.",
+    desc: "OpenShell kernel/userspace controls inside the sandbox. Included at create time — not a shopping toggle.",
   },
   {
-    id: "identity",
-    owner: "openshell",
-    maturity: "closing-gap",
+    id: "identity", role: "included", owner: "openshell",
     label: "Sandbox JWT",
-    desc: "Gateway-minted sandbox JWTs authenticate supervisor RPCs (SPIFFE-shaped subjects today). Kagenti full SPIRE AuthBridge was Dev Preview and converged away; OpenShell is closing the SPIFFE gap (JWT-SVID grants/exchange). Platform SPIFFE/SPIRE on OpenShift layers on for cluster zero-trust — not the same as Kagenti SPIRE GA.",
+    desc: "OpenShell gateway-minted sandbox JWTs authenticate supervisor RPCs (SPIFFE-shaped subjects). Full SPIFFE/SPIRE parity is still closing — JWT auth itself is how OpenShell works today, not an optional feature flag.",
   },
   {
-    id: "oidc",
-    owner: "openshell",
+    id: "oidc", role: "optional", owner: "openshell",
     label: "OIDC auth",
-    desc: "Control-plane user auth for CLI/API. Required on shared clusters. Eval overlays with allowUnauthenticatedUsers are trusted-network only — not a production auth posture.",
+    desc: "Optional control-plane user auth for shared OpenShell gateways. Eval overlays with allowUnauthenticatedUsers are trusted-network only.",
   },
   {
-    id: "kata",
-    owner: "platform",
-    maturity: "ga",
+    id: "kata", role: "optional", owner: "platform", maturity: "ga",
     label: "Kata / OSC",
-    desc: "Hardware/dedicated-kernel isolation (OpenShift Sandboxed Containers — GA layered product). Composes under OpenShell: Kata = kernel boundary; OpenShell = policy inside. Needs eligible nodes (RHCOS, virt, NFD kata label). Not every agent needs Kata.",
+    desc: "Optional L5: OpenShift Sandboxed Containers (Kata) — GA layered product. Composes under OpenShell (kernel boundary ∪ app policy). Needs eligible nodes.",
   },
   {
-    id: "multi",
-    owner: "platform",
+    id: "multi", role: "optional", owner: "platform",
     label: "Multitenancy",
-    desc: "OpenShift namespace RBAC, NetworkPolicy, optional UDN, ResourceQuota. Complements OpenShell egress proxy. Cryptographic identity still needs SPIFFE/mesh — labels alone are weaker.",
+    desc: "Optional OpenShift project RBAC / NetworkPolicy / UDN posture. Complements OpenShell egress — not an OpenShell subsystem.",
   },
   {
-    id: "mcp",
-    owner: "platform",
-    maturity: "platform-target",
+    id: "mcp", role: "preview", owner: "platform", maturity: "platform-target",
     label: "MCP Gateway",
-    desc: "OpenShift AI capability (Preview): Envoy-based tool gateway (OAuth2 exchange, Kuadrant AuthPolicy + Authorino). Authorization from token claims — not the prompt. Not a separate product; not an OpenShell subsystem.",
+    desc: "OpenShift AI Preview capability (tool gateway). Not OpenShell. Not selectable here — do not treat as a validated agent requirement.",
   },
   {
-    id: "ogx",
-    owner: "platform",
-    maturity: "platform-target",
+    id: "ogx", role: "preview", owner: "platform", maturity: "platform-target",
     label: "ogx / Responses",
-    desc: "OpenShift AI capability (Preview): Open Responses / ogx multi-protocol agentic API surface for Mode 2. Distinct from OpenShell Mode 1 whole-agent sandboxing. Not a separate product.",
+    desc: "OpenShift AI Preview capability (Mode 2 API surface). Distinct from OpenShell whole-agent sandboxing. Not selectable here.",
   },
   {
-    id: "mlflow",
-    owner: "addon",
-    maturity: "platform-target",
+    id: "mlflow", role: "preview", owner: "addon", maturity: "platform-target",
     label: "MLflow / OTEL",
-    desc: "OpenShift AI observability capability (Preview): MLflow tracing with OpenTelemetry. Complements — does not replace — OpenShell OCSF security audit. Not a separate product.",
+    desc: "OpenShift AI Preview observability. Complements — does not replace — OpenShell OCSF. Not selectable here.",
   },
   {
-    id: "guardrails",
-    owner: "addon",
-    maturity: "platform-target",
+    id: "guardrails", role: "preview", owner: "addon", maturity: "platform-target",
     label: "Safety portfolio",
-    desc: "OpenShift AI safety portfolio capabilities (TrustyAI) — not separate products and not OpenShell: NeMo Guardrails / Guardrails Orchestrator (runtime; Preview), EvalHub evaluation hub (orchestrates Garak and other providers), Garak adversarial scanning. Complements OpenShell OPA/OCSF; does not replace them.",
+    desc: "OpenShift AI Preview safety/eval portfolio (e.g. Guardrails, EvalHub, Garak). Not OpenShell. Not selectable here.",
   },
 ];
 
-const OWNER_BADGE = {
-  openshell: { cls: "badge-owner-os", text: "OpenShell" },
-  platform: { cls: "badge-owner-plat", text: "Platform" },
-  addon: { cls: "badge-owner-addon", text: "Safety" },
-};
+const OPTIONAL_CAP_IDS = capabilities.filter((c) => c.role === "optional").map((c) => c.id);
+const INCLUDED_CAPS = capabilities.filter((c) => c.role === "included");
+const PREVIEW_CAPS = capabilities.filter((c) => c.role === "preview");
+const CAP_BY_ID = Object.fromEntries(capabilities.map((c) => [c.id, c]));
+
 
 const rhHat = `<img class="rh-hat" src="redhat-hat.png" alt="">`;
 
@@ -1140,18 +1144,11 @@ let currentJourney = "agent";
 let selectedAgent = null;
 let selectedUseCase = null;
 
-function ownerBadge(owner) {
-  const b = OWNER_BADGE[owner];
-  return `<span class="badge ${b.cls}">${b.text}</span>`;
-}
-
 const MATURITY_BADGES = {
   ga: { cls: "badge-ga", text: "GA" },
   "platform-target": { cls: "badge-maturity", text: "Preview" },
-  "closing-gap": { cls: "badge-maturity", text: "Gap" },
   alpha: { cls: "badge-maturity", text: "Alpha" },
   "rhoai-dp": { cls: "badge-maturity", text: "DP 3.5 → TP 3.6" },
-  capability: { cls: "badge-bundled", text: "Capability" },
 };
 
 function maturityBadge(key) {
@@ -1288,34 +1285,88 @@ function syncCapCard(id) {
   if (card) card.classList.toggle("on", !!input.checked);
 }
 
+function usesOpenShellSandbox() {
+  if (selectedAgent && agents[selectedAgent]) return true;
+  if (selectedUseCase && usecases[selectedUseCase]) return usecases[selectedUseCase].needsOpenShell !== false;
+  return true;
+}
+
+function tileIncluded(c) {
+  return `
+    <div class="check-item included" data-owner="${c.owner}">
+      <span class="check-mark" aria-hidden="true">✓</span>
+      <span class="check-title">${c.label}</span>
+      <span class="check-foot">
+        <span class="badge badge-bundled">Included</span>
+        ${infoButton(c.desc, `About ${c.label}`)}
+      </span>
+    </div>`;
+}
+
+function tileOptional(c, on) {
+  return `
+    <label class="check-item${on ? " on" : ""}" data-owner="${c.owner}" for="chk-${c.id}">
+      <input type="checkbox" id="chk-${c.id}" ${on ? "checked" : ""} onchange="syncCapCard('${c.id}')">
+      <span class="check-title">${c.label}</span>
+      <span class="check-foot">
+        ${maturityBadge(c.maturity)}
+        ${infoButton(c.desc, `About ${c.label}`)}
+      </span>
+    </label>`;
+}
+
+function tilePreview(c) {
+  return `
+    <div class="check-item preview-info" data-owner="${c.owner}">
+      <span class="check-title">${c.label}</span>
+      <span class="check-foot">
+        ${maturityBadge(c.maturity)}
+        ${infoButton(c.desc, `About ${c.label}`)}
+      </span>
+    </div>`;
+}
+
 function renderCapChecks(defaults) {
   const box = document.getElementById("capChecks");
-  box.innerHTML = capabilities.map((c) => {
-    const on = !!defaults[c.id];
-    return `
-      <label class="check-item${on ? " on" : ""}" data-owner="${c.owner}" for="chk-${c.id}" title="${escapeHtml(c.label)}">
-        <input type="checkbox" id="chk-${c.id}" ${on ? "checked" : ""} onchange="syncCapCard('${c.id}')">
-        <span class="check-title">${c.label}</span>
-        <span class="check-foot">
-          ${maturityBadge(c.maturity)}
-          ${infoButton(c.desc, `About ${c.label}`)}
-        </span>
-      </label>`;
-  }).join("");
+  const withOs = usesOpenShellSandbox();
+  const d = defaults || {};
+
+  const includedBlock = withOs
+    ? `<section class="cap-section">
+        <h3 class="cap-section-title">Included with OpenShell</h3>
+        <p class="cap-section-note">These ship with an OpenShell sandbox. They are not optional add-ons.</p>
+        <div class="checks">${INCLUDED_CAPS.map(tileIncluded).join("")}</div>
+      </section>`
+    : `<section class="cap-section">
+        <h3 class="cap-section-title">OpenShell</h3>
+        <p class="cap-section-note">This use-case profile often runs without OpenShell (container isolation + NetworkPolicy may suffice). Add OpenShell when you need in-sandbox OPA, Landlock, or inference.local.</p>
+      </section>`;
+
+  const optionalBlock = `
+    <section class="cap-section">
+      <h3 class="cap-section-title">Optional compose</h3>
+      <p class="cap-section-note">Real platform choices you can layer. Only these are selectable.</p>
+      <div class="checks">${OPTIONAL_CAP_IDS.map((id) => tileOptional(CAP_BY_ID[id], !!d[id])).join("")}</div>
+    </section>`;
+
+  const previewBlock = `
+    <section class="cap-section">
+      <h3 class="cap-section-title">OpenShift AI portfolio (Preview — not selectable)</h3>
+      <p class="cap-section-note">Documented as Preview capabilities in the OpenShift AI portfolio. Shown for awareness only — not OpenShell toggles and not claimed as ready for this agent path.</p>
+      <div class="checks">${PREVIEW_CAPS.map(tilePreview).join("")}</div>
+    </section>`;
+
+  box.innerHTML = includedBlock + optionalBlock + previewBlock;
 }
 
 function defaultCapsForAgent() {
-  return {
-    network: true, creds: true, audit: true, fs: true, identity: true,
-    oidc: false, mcp: false, guardrails: false, kata: false, multi: false,
-    ogx: false, mlflow: false,
-  };
+  return { oidc: false, kata: false, multi: false };
 }
 
 function enterStep2(name, meta, defaults) {
   document.getElementById("selectedName").textContent = name;
   document.getElementById("selectedMeta").textContent = meta || "";
-  renderCapChecks(defaults);
+  renderCapChecks(defaults || defaultCapsForAgent());
   document.querySelectorAll(".step, .result").forEach((s) => s.classList.remove("active"));
   document.getElementById("step2").classList.add("active");
   updateProgress(1);
@@ -1335,7 +1386,7 @@ function selectUseCase(id) {
   renderUseCaseGrid();
   const u = usecases[id];
   const p = ISOLATION_PROFILES[u.profileKey];
-  enterStep2(u.name, `· ${p.name}`, u.defaults);
+  enterStep2(u.name, `· ${p.name}`, u.defaults || defaultCapsForAgent());
 }
 
 function goBack() {
@@ -1347,9 +1398,11 @@ function goBack() {
 
 function readCaps() {
   const out = {};
-  capabilities.forEach((c) => {
-    out[c.id] = !!document.getElementById(`chk-${c.id}`)?.checked;
+  INCLUDED_CAPS.forEach((c) => { out[c.id] = usesOpenShellSandbox(); });
+  OPTIONAL_CAP_IDS.forEach((id) => {
+    out[id] = !!document.getElementById(`chk-${id}`)?.checked;
   });
+  PREVIEW_CAPS.forEach((c) => { out[c.id] = false; });
   return out;
 }
 
@@ -1389,7 +1442,7 @@ function syncUrl(caps) {
   params.set("show", "1");
   if (selectedAgent) params.set("agent", selectedAgent);
   if (selectedUseCase) params.set("usecase", selectedUseCase);
-  capabilities.forEach((c) => params.set(c.id, caps[c.id] ? "1" : "0"));
+  OPTIONAL_CAP_IDS.forEach((id) => params.set(id, caps[id] ? "1" : "0"));
   history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
 }
 
@@ -1409,25 +1462,14 @@ function showResult() {
   const isUC = currentJourney === "usecase";
   const a = (!isUC) ? agents[selectedAgent] : null;
   const uc = isUC ? usecases[selectedUseCase] : null;
+  const withOs = usesOpenShellSandbox();
 
   const profileKey = uc?.profileKey || (caps.kata ? "openshell_kata" : "openshell_typical");
   const profile = ISOLATION_PROFILES[profileKey];
 
-  const openshellFeatures = capabilities
-    .filter((c) => c.owner === "openshell")
-    .map((c) => ({ label: c.label, enabled: caps[c.id], tip: c.desc }));
-
-  const platformFeatures = capabilities
-    .filter((c) => c.owner === "platform")
-    .map((c) => ({ id: c.id, label: c.label, enabled: caps[c.id] }));
-
   const addonItems = [];
-  if (caps.guardrails) {
-    addonItems.push("NeMo Guardrails — OpenShift AI safety capability (Preview; TrustyAI)");
-    addonItems.push("EvalHub — OpenShift AI evaluation capability (orchestrates Garak and other providers)");
-    addonItems.push("Garak — adversarial scanning capability via EvalHub providers");
-  }
   if (a?.nemoclaw) addonItems.push(`NemoClaw path: <code>${a.command}</code>`);
+  if (uc?.mode2Preview) addonItems.push("Mode 2 / ogx is OpenShift AI Preview — not an OpenShell control");
 
   const resultName = a?.name || uc?.name || "Stack";
   const harnessName = a?.name || uc?.harnessSuggest || "Your harness";
@@ -1451,41 +1493,32 @@ function showResult() {
   }
 
   const authNote = (caps.oidc
-    ? "OIDC planned in this stack — keep allowUnauthenticatedUsers=false on shared clusters."
-    : "OpenShift eval overlays (disableTls + allowUnauthenticatedUsers) are trusted-network only.");
+    ? "OIDC enabled for shared gateway access — keep allowUnauthenticatedUsers=false."
+    : "Without OIDC, treat gateway access as trusted-network only (eval overlays).");
 
   const entryLine = a
     ? ENTRY_PATHS[a.path]
-    : (uc?.name?.includes("Mode 2") || caps.ogx
-      ? "Mode 2 — Sandbox execution via platform APIs (ogx / Responses)"
+    : (uc?.mode2Preview
+      ? "Mode 2 use case — ogx / Responses is OpenShift AI Preview (not OpenShell)"
       : "OpenShell path — openshell sandbox create");
 
   syncUrl(caps);
 
-  // Face shows only enabled chips; full detail lives in (i) so the cake fits the viewport.
   const chipOn = (label) => `<li>${label}</li>`;
-  const openshellChips = openshellFeatures.filter((f) => f.enabled).map((f) => chipOn(f.label)).join("");
-  // Layer 04 = platform isolation/connectivity caps only (not a product name).
-  // ogx stays on Model; MLflow/safety stay on Safety — avoid duplicate chips.
+  const openshellChips = withOs
+    ? INCLUDED_CAPS.map((c) => chipOn(c.label)).join("")
+    : chipOn("OpenShell not required for this profile");
   const platformChips = [
-    ...platformFeatures
-      .filter((f) => f.enabled && f.id !== "ogx")
-      .map((f) => chipOn(f.label)),
-    ...(caps.kata ? [chipOn("OSC node eligibility")] : []),
-    chipOn("vLLM / llm-d"),
-  ].join("");
-  const safetyChips = [
-    ...(caps.guardrails ? [chipOn("NeMo Guardrails"), chipOn("Garak"), chipOn("EvalHub")] : []),
-    ...(caps.mlflow ? [chipOn("MLflow / OTEL")] : []),
-  ].join("") || chipOn("OpenShell OCSF baseline");
+    ...(caps.kata ? [chipOn("Kata / OSC"), chipOn("OSC node eligibility")] : []),
+    ...(caps.multi ? [chipOn("Multitenancy")] : []),
+    ...(caps.oidc ? [chipOn("OIDC auth")] : []),
+  ].join("") || chipOn("No optional compose selected");
   const useCaseContext = uc ? platformName : "";
+  const showMode2 = !!uc?.mode2Preview;
 
   const modelTip = [
-    "Inference capabilities inside OpenShift AI — not a separate product.",
-    "Route through inference.local and/or platform gateways; do not conflate with OpenShell policy.",
-    "Red Hat AI captures Completions, Responses/ogx (Preview capability), planned Anthropic Messages & Google Interactions for vLLM/llm-d without rewrites.",
-    "Direct provider hosts still need explicit OpenShell network allows.",
-    caps.ogx ? "ogx selected: Mode 2 API capability — distinct from OpenShell Mode 1 whole-agent sandboxing." : "",
+    withOs ? "With OpenShell: route model calls via inference.local (credential masking) and/or allowed provider endpoints in policy." : "Without OpenShell, inference routing is outside this sandbox model.",
+    showMode2 ? "This use case references Mode 2 / ogx (OpenShift AI Preview) — distinct from OpenShell whole-agent sandboxing." : "",
   ].filter(Boolean).join(" ");
 
   const policyTip = (() => {
@@ -1512,25 +1545,15 @@ function showResult() {
   ].join(" ");
 
   const platformTip = [
-    "Platform capability group inside the Red Hat OpenShift AI product (isolation, tenancy, tool connectivity).",
+    "Optional compose on OpenShift under the OpenShift AI product.",
     computeLine,
     useCaseContext ? `Use-case context: ${useCaseContext}.` : "",
-    "Includes OpenShift Sandboxed Containers / Kata (GA layered), multitenancy (projects / NetworkPolicy / UDN), and MCP Gateway (Preview).",
-    "NetworkPolicy + optional UDN + egress proxy compose with the OpenShell capability.",
-    "SPIFFE/SPIRE on OpenShift layers with sandbox JWT.",
+    caps.kata ? "Kata / OSC selected (GA layered)." : "Kata / OSC not selected.",
+    caps.multi ? "Multitenancy posture selected." : "",
+    "MCP Gateway and other Preview portfolio items are not toggles in this wizard.",
   ].filter(Boolean).join(" ");
 
-  const safetyTip = addonItems.length
-    ? addonItems.join(" · ")
-    : "None selected — OpenShell OCSF + OPA remain the security baseline. Enable OpenShift AI safety portfolio capabilities (EvalHub, Garak, NeMo Guardrails, MLflow) when you need product safety and eval.";
-
   const harnessMaturity = a ? maturityBadge(agentMaturity(a)) : "";
-  const safetyTipFull = [
-    "Safety portfolio capabilities of OpenShift AI (TrustyAI) — capabilities, not separate products.",
-    "NeMo Guardrails (Preview), EvalHub (evaluation hub; orchestrates Garak and other providers), Garak (adversarial scanning), MLflow/OTEL (Preview tracing).",
-    "These complement OpenShell Landlock/OPA/OCSF and do not replace them.",
-    safetyTip,
-  ].join(" ");
 
   const html = `
     <div class="result-header">
@@ -1554,14 +1577,14 @@ function showResult() {
             <span class="cake-index">01 · Model</span>
             <div class="cake-title-row">
               <div class="cake-product">Inference &amp; APIs</div>
-              ${caps.ogx ? maturityBadge("platform-target") : ""}
+              ${showMode2 ? maturityBadge("platform-target") : ""}
               ${infoButton(modelTip, "About model and API capabilities")}
             </div>
           </div>
           <ul class="cake-chips">
-            ${caps.creds ? chipOn("inference.local") : ""}
-            ${caps.ogx ? chipOn("ogx / Mode 2") : ""}
-            ${chipOn("Provider allows")}
+            ${withOs ? chipOn("inference.local") : ""}
+            ${showMode2 ? chipOn("ogx / Mode 2 (Preview)") : ""}
+            ${chipOn("Provider policy allows")}
           </ul>
         </section>
 
@@ -1604,27 +1627,14 @@ function showResult() {
 
         <section class="cake-layer layer-platform" role="listitem">
           <div class="cake-top">
-            <span class="cake-index">04 · Platform</span>
+            <span class="cake-index">04 · Optional compose</span>
             <div class="cake-title-row">
-              <div class="cake-product">Isolation, tenancy &amp; connectivity</div>
+              <div class="cake-product">Kata · tenancy · OIDC</div>
               ${caps.kata ? maturityBadge("ga") : ""}
-              ${(caps.mcp || caps.multi) ? maturityBadge("platform-target") : ""}
-              ${infoButton(platformTip, "About platform capabilities in OpenShift AI")}
+              ${infoButton(platformTip, "About optional compose")}
             </div>
           </div>
           <ul class="cake-chips">${platformChips}</ul>
-        </section>
-
-        <section class="cake-layer layer-safety" role="listitem">
-          <div class="cake-top">
-            <span class="cake-index">05 · Safety</span>
-            <div class="cake-title-row">
-              <div class="cake-product">Safety &amp; evaluation</div>
-              ${(caps.guardrails || caps.mlflow) ? maturityBadge("platform-target") : ""}
-              ${infoButton(safetyTipFull, "About safety and evaluation capabilities")}
-            </div>
-          </div>
-          <ul class="cake-chips">${safetyChips}</ul>
         </section>
 
         <div class="cake-product-bar" role="listitem" aria-label="Product base: Red Hat OpenShift AI">
@@ -1638,12 +1648,13 @@ function showResult() {
     <div class="result-pane" id="pane-next" role="tabpanel">
       <div class="next-panel">
         <h3>Next steps</h3>
-        <p class="next-lead">Commands, auth posture, and links — not architecture layers and not product names.</p>
+        <p class="next-lead">Commands and auth posture. Preview portfolio items (MCP Gateway, ogx, MLflow, safety) are not claimed as selected here.</p>
         <div class="stack-section-label" style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.5;margin-bottom:0.25rem">Commands</div>
         <div class="cmd-list">
           ${commands.map((c) => `<code class="cmd">${c}</code>`).join("")}
         </div>
-        <div class="callout callout-warn"><strong>Auth / maturity:</strong> ${authNote} OpenShell upstream is alpha (single-player-first); OpenShift AI path is planned DP in 3.5 → TP in 3.6. Privileged SCC for sandbox netns is intentionally powerful.</div>
+        ${addonItems.length ? `<div class="callout callout-info">${addonItems.join("<br>")}</div>` : ""}
+        <div class="callout callout-warn"><strong>Auth / maturity:</strong> ${authNote} OpenShell upstream is alpha (single-player-first); OpenShift AI OpenShell path is planned DP in 3.5 → TP in 3.6. Privileged SCC for sandbox netns is intentionally powerful.</div>
         <div class="actions actions-sm">
           <a class="btn btn-primary" href="../quickstart/">Open Quickstart</a>
           <a class="btn btn-secondary" href="../sandboxes/network-policies/">Network policies</a>
@@ -1708,10 +1719,10 @@ function hydrateFromUrl() {
   const agent = params.get("agent");
   const usecase = params.get("usecase");
   const defaults = {};
-  capabilities.forEach((c) => {
-    if (params.has(c.id)) defaults[c.id] = params.get(c.id) === "1";
+  OPTIONAL_CAP_IDS.forEach((id) => {
+    if (params.has(id)) defaults[id] = params.get(id) === "1";
   });
-  const hasCaps = capabilities.some((c) => params.has(c.id));
+  const hasCaps = OPTIONAL_CAP_IDS.some((id) => params.has(id));
 
   if (agent && agents[agent]) {
     setJourney("agent");
