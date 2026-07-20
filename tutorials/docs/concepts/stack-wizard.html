@@ -633,12 +633,26 @@ body.showing-stack .progress { margin-bottom: 0.4rem; }
 #policyGap:empty { display: none; }
 #policyGap .callout { margin: 0 0 0.85rem; }
 .callout {
-  margin-top: 0.55rem; padding: 0.55rem 0.7rem; border-radius: 7px;
-  font-size: 0.78rem; line-height: 1.4;
+  margin-top: 0.55rem; padding: 0.65rem 0.8rem; border-radius: 7px;
+  font-size: 0.78rem; line-height: 1.45;
 }
 .callout-warn { background: var(--warn-bg); border: 1px solid rgba(230,184,77,0.3); color: #f0d48a; }
 .callout-info { background: rgba(118,185,0,0.08); border: 1px solid rgba(118,185,0,0.25); color: rgba(200,230,150,0.95); }
 .callout-dim { background: rgba(230,237,243,0.03); border: 1px solid var(--line); color: var(--muted); }
+.callout-title {
+  display: block; font-weight: 700; font-size: 0.72rem;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  margin: 0 0 0.4rem; color: inherit;
+}
+.callout p { margin: 0 0 0.4rem; }
+.callout p:last-child { margin-bottom: 0; }
+.callout-note { color: var(--muted); font-size: 0.72rem; }
+.callout .cmd {
+  margin: 0.45rem 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 
 .cmd {
   display: block; margin-top: 0.2rem; padding: 0.35rem 0.55rem;
@@ -1459,22 +1473,47 @@ function readCaps() {
 function policyCallout(a) {
   if (!a) return "";
   if (a.policy === "none") {
-    return `<div class="callout callout-warn"><strong>Policy gap (blocking):</strong> Codex default policy is <em>No coverage</em> on OpenShell Supported Agents. Before production use, ship a custom policy with OpenAI endpoints and Codex binary paths, and set <code>OPENAI_API_KEY</code>. Command already includes <code>--policy</code>.</div>`;
+    return `<div class="callout callout-warn">
+      <strong class="callout-title">Policy gap — Codex</strong>
+      <p>Default policy is <em>No coverage</em> on OpenShell Supported Agents.</p>
+      <p>Before production: custom policy (OpenAI endpoints + Codex binaries) and <code>OPENAI_API_KEY</code>. Command already includes <code>--policy</code>.</p>
+    </div>`;
   }
   if (a.policy === "partial") {
-    return `<div class="callout callout-warn"><strong>Policy gap:</strong> OpenCode default policy is <em>Partial coverage</em> on OpenShell Supported Agents. For full function: set <code>ANTHROPIC_BASE_URL="https://inference.local/v1"</code> with a configured provider, and add <code>opencode.ai</code> plus OpenCode binary paths to the policy.</div>`;
+    return `<div class="callout callout-warn">
+      <strong class="callout-title">Policy gap — OpenCode</strong>
+      <p>Default policy is <em>Partial coverage</em> on OpenShell Supported Agents.</p>
+      <p>For full function: <code>ANTHROPIC_BASE_URL="https://inference.local/v1"</code> with a configured provider; add <code>opencode.ai</code> and OpenCode binary paths to the policy.</p>
+    </div>`;
   }
   if (a.source === "community-offtable") {
-    return `<div class="callout callout-warn"><strong>Community catalog (not on Supported Agents table):</strong> <code>${escapeHtml(a.command)}</code> works via OpenShell-Community. Do not treat this as a Supported Agents docs-table agent.</div>`;
+    return `<div class="callout callout-warn">
+      <strong class="callout-title">Community catalog</strong>
+      <p>Works via OpenShell-Community — not on the Supported Agents docs table.</p>
+      <code class="cmd">${escapeHtml(a.command)}</code>
+    </div>`;
   }
   if (a.source === "community") {
-    return `<div class="callout callout-info"><strong>Community sandbox (on Supported Agents):</strong> Use <code>${escapeHtml(a.command)}</code>.</div>`;
+    return `<div class="callout callout-info">
+      <strong class="callout-title">Community sandbox</strong>
+      <p>Listed on OpenShell Supported Agents.</p>
+      <code class="cmd">${escapeHtml(a.command)}</code>
+    </div>`;
   }
   if (a.source === "byo") {
-    return `<div class="callout callout-info"><strong>BYOA (Bring Your Own Agent):</strong> First-class enterprise path — your image + OpenShell policy via <code>${escapeHtml(a.command)}</code>. Not a NVIDIA named Supported Agents / NemoClaw row; Red Hat AgentOps is framework-agnostic (you keep the agent, platform supplies sandbox/governance).</div>`;
+    return `<div class="callout callout-info">
+      <strong class="callout-title">BYOA — Bring Your Own Agent</strong>
+      <p>First-class enterprise path: your image + OpenShell policy.</p>
+      <code class="cmd">${escapeHtml(a.command)}</code>
+      <p class="callout-note">Not a NVIDIA named Supported Agents / NemoClaw row. Red Hat AgentOps is framework-agnostic — you keep the agent; the platform supplies sandbox and governance.</p>
+    </div>`;
   }
   if (a.policy === "blueprint") {
-    return `<div class="callout callout-info"><strong>NemoClaw path only:</strong> Use <code>${escapeHtml(a.command)}</code> for blueprint policy and managed inference. There is no documented Community <code>--from openclaw</code> sandbox today.</div>`;
+    return `<div class="callout callout-info">
+      <strong class="callout-title">NemoClaw path</strong>
+      <p>Blueprint policy and managed inference. No Community <code>--from openclaw</code> sandbox today.</p>
+      <code class="cmd">${escapeHtml(a.command)}</code>
+    </div>`;
   }
   return "";
 }
