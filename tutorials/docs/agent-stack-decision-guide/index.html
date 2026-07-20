@@ -6,7 +6,7 @@
     <title>Agent Stack Decision Guide</title>
     <meta
       name="description"
-      content="A structured decision guide for choosing workflows vs autonomous agents, OpenClaw vs Hermes, LangGraph vs Google ADK, and sandbox platforms."
+      content="Layered agent stack decision guide: pattern → runtime or framework → isolation. Heuristics labeled; NemoClaw/OpenShell/BYOA paths aligned to NVIDIA docs. Pair with the Stack wizard."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -757,7 +757,7 @@
         font-weight: 600;
       }
 
-      .compose-arrow {
+      .layer-arrow {
         display: flex;
         justify-content: center;
         color: var(--mist-dim);
@@ -765,6 +765,97 @@
         font-size: 0.75rem;
         letter-spacing: 0.14em;
         padding: 0.15rem 0;
+      }
+
+      .evidence-badge {
+        display: inline-flex;
+        align-items: center;
+        margin: 0 0 0.75rem;
+        padding: 0.28rem 0.65rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border: 1px solid var(--line);
+      }
+
+      .evidence-badge.docs {
+        color: var(--accent);
+        background: rgba(200, 240, 108, 0.1);
+        border-color: rgba(200, 240, 108, 0.35);
+      }
+
+      .evidence-badge.heuristic {
+        color: var(--warn);
+        background: rgba(240, 197, 108, 0.1);
+        border-color: rgba(240, 197, 108, 0.35);
+      }
+
+      .result-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        margin-top: 1.1rem;
+      }
+
+      .result-actions .btn {
+        font-size: 0.85rem;
+        padding: 0.55rem 0.9rem;
+      }
+
+      .role-jumps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .role-jumps a {
+        display: inline-flex;
+        padding: 0.4rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid var(--line-strong);
+        background: rgba(26, 38, 32, 0.8);
+        color: var(--mist);
+        font-size: 0.82rem;
+        text-decoration: none;
+      }
+
+      .role-jumps a:hover {
+        border-color: rgba(200, 240, 108, 0.45);
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .examples-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.9rem;
+        margin-top: 1rem;
+      }
+
+      .example-card {
+        padding: 1rem 1.05rem;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+      }
+
+      .example-card h3 {
+        margin: 0 0 0.45rem;
+        font-size: 1rem;
+      }
+
+      .example-card p {
+        margin: 0;
+        color: var(--mist);
+        font-size: 0.88rem;
+        line-height: 1.45;
+      }
+
+      @media (max-width: 900px) {
+        .examples-grid { grid-template-columns: 1fr; }
       }
 
       .flow-svg {
@@ -888,11 +979,12 @@
           <span>Agent Stack Decision Guide</span>
         </div>
         <nav class="nav" aria-label="Primary">
+          <a href="#wizard">Advisor</a>
           <a href="#layers">Layers</a>
           <a href="#flowchart">Flowchart</a>
-          <a href="#order">Order</a>
-          <a href="#wizard">Advisor</a>
           <a href="#matrices">Matrices</a>
+          <a href="#examples">Examples</a>
+          <a href="../concepts/stack-wizard.html">Stack wizard</a>
           <a href="#sources">Sources</a>
         </nav>
       </div>
@@ -905,17 +997,30 @@
           <h1>Choose the right agent stack</h1>
           <p class="hero-lead">
             OpenClaw, Hermes, Google ADK, LangGraph, and “autonomous agents” are not rivals on one
-            axis. Use this guide in order: decide the control pattern, then the product runtime or
-            build framework, then isolation. Wrong layer comparisons produce wrong picks.
+            axis. Decide the control pattern, then whether you adopt a product runtime <em>or</em>
+            build with a framework, then isolation. Wrong layer comparisons produce wrong picks.
           </p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#wizard">Run the decision advisor</a>
-            <a class="btn btn-ghost" href="#flowchart">See the decision flowchart</a>
+            <a class="btn btn-ghost" href="../concepts/stack-wizard.html">Validate stack (OpenShell wizard)</a>
           </div>
           <div class="meta-row">
             <span><strong>Audience:</strong> architects &amp; platform leads</span>
             <span><strong>Method:</strong> layered decision, not vendor ranking</span>
-            <span><strong>Publish:</strong> static GitHub Pages ready</span>
+            <span><strong>Pair with:</strong> fact-checked Stack wizard for OpenShell / NemoClaw / BYOA</span>
+          </div>
+          <div class="callout info" style="margin-top:1.1rem">
+            <strong>Non-goals:</strong> This page does not rank vendors, certify Red Hat OpenShift AI
+            SKUs, or treat OpenClaw↔Hermes / ADK↔LangGraph tables as NVIDIA documentation. Those
+            matrices are <em>heuristics</em>. Platform path facts (NemoClaw vs OpenShell / BYOA) follow
+            NVIDIA and NemoClaw docs — confirm in the
+            <a href="../concepts/stack-wizard.html">Stack wizard</a>.
+          </div>
+          <div class="role-jumps" aria-label="Jump to decision type">
+            <a href="#tab-jump-pattern">I’m choosing a pattern</a>
+            <a href="#tab-jump-runtime">I’m choosing a runtime</a>
+            <a href="#tab-jump-framework">I’m choosing a framework</a>
+            <a href="#tab-jump-platform">I’m choosing isolation</a>
           </div>
         </div>
       </section>
@@ -930,7 +1035,7 @@
             deciding is the most common failure mode.
           </p>
 
-          <div class="viz-shell" aria-label="Layer composition diagram">
+          <div class="viz-shell" aria-label="Layer decision diagram">
             <div class="stack-viz">
               <div class="stack-row">
                 <div class="stack-label">Layer 0</div>
@@ -942,34 +1047,32 @@
                   <span class="chip">Always-on presence</span>
                 </div>
               </div>
-              <div class="compose-arrow">THEN COMPOSE ↓</div>
+              <div class="layer-arrow">THEN ↓ pick runtime <em>or</em> framework (usually not both as the product)</div>
               <div class="stack-row">
-                <div class="stack-label">Layer 1 or 2</div>
+                <div class="stack-label">Layer 1 <span style="opacity:.5">or</span> 2</div>
                 <div class="stack-track">
-                  <span class="chip accent">Usually one path</span>
-                  <span class="chip">OpenClaw</span>
-                  <span class="chip">Hermes</span>
+                  <span class="chip accent">One primary path</span>
+                  <span class="chip">OpenClaw / Hermes / Deep Agents</span>
                   <span class="chip muted">or</span>
-                  <span class="chip">LangGraph</span>
-                  <span class="chip">Google ADK</span>
+                  <span class="chip">LangGraph / ADK / BYOA</span>
                 </div>
               </div>
-              <div class="compose-arrow">THEN HOST ON ↓</div>
+              <div class="layer-arrow">THEN ↓ choose isolation / packaging</div>
               <div class="stack-row">
                 <div class="stack-label">Layer 3</div>
                 <div class="stack-track">
                   <span class="chip accent">Pick isolation</span>
                   <span class="chip">NemoClaw</span>
-                  <span class="chip">OpenShell alone</span>
+                  <span class="chip">OpenShell (BYOA)</span>
                   <span class="chip">Cloud agent platform</span>
                   <span class="chip">Bare host / VPC</span>
                 </div>
               </div>
             </div>
             <p class="viz-caption">
-              Read top to bottom: choose how control works, then whether you adopt a runtime or build
-              with a framework, then where it runs. Do not compare chips across different rows as if
-              they were the same decision.
+              Read top to bottom. Layer 1 (adopt a product runtime) and Layer 2 (build with a
+              framework) are alternatives for most teams — not two products you must stack.
+              Do not compare chips across different rows as if they were the same decision.
             </p>
           </div>
 
@@ -982,22 +1085,23 @@
             <article class="layer-card">
               <div class="layer-num">Layer 1</div>
               <h3>Product runtime</h3>
-              <p>OpenClaw · Hermes · other always-on assistants</p>
+              <p>OpenClaw · Hermes · Deep Agents Code (NemoClaw) · other assistants</p>
             </article>
             <article class="layer-card">
               <div class="layer-num">Layer 2</div>
-              <h3>Build framework</h3>
-              <p>LangGraph · Google ADK · internal orchestration</p>
+              <h3>Build framework / BYOA</h3>
+              <p>LangGraph · Google ADK · CrewAI · your image — enterprise-common</p>
             </article>
             <article class="layer-card">
               <div class="layer-num">Layer 3</div>
               <h3>Execution platform</h3>
-              <p>NemoClaw · OpenShell · cloud agent platform · bare host</p>
+              <p>NemoClaw · OpenShell (BYOA) · cloud agent platform · bare host</p>
             </article>
           </div>
           <div class="callout">
-            <strong>Rule:</strong> There is no single official matrix that ranks all five names
-            together. Good decisions compose layers. Bad decisions force a false either/or.
+            <strong>Rule:</strong> There is no single official matrix that ranks all these names
+            together. Good decisions pick one choice per layer in order. Bad decisions force a false
+            either/or across layers (e.g. “LangGraph vs OpenClaw”).
           </div>
         </div>
       </section>
@@ -1029,7 +1133,7 @@
 
               <!-- Q1 -->
               <rect class="node" x="300" y="128" width="380" height="58" rx="14" />
-              <text x="490" y="152" text-anchor="middle">1. Is the main path enumerable?</text>
+              <text x="490" y="152" text-anchor="middle">1. Can you list the main steps up front?</text>
               <text x="490" y="172" text-anchor="middle" class="label-sm">known steps vs open-ended exploration</text>
 
               <path class="edge" d="M300 157 H 160 V 220" />
@@ -1085,12 +1189,12 @@
               <text x="820" y="592" text-anchor="middle" class="label-sm">Build</text>
 
               <rect class="node node-end" x="40" y="600" width="240" height="56" rx="12" />
-              <text x="160" y="624" text-anchor="middle">OpenClaw or Hermes</text>
-              <text x="160" y="642" text-anchor="middle" class="label-sm">(+ NemoClaw if sandboxed)</text>
+              <text x="160" y="624" text-anchor="middle">OpenClaw / Hermes / Deep Agents</text>
+              <text x="160" y="642" text-anchor="middle" class="label-sm">via NemoClaw when sandboxed</text>
 
               <rect class="node node-end" x="700" y="600" width="240" height="56" rx="12" />
-              <text x="820" y="624" text-anchor="middle">LangGraph or Google ADK</text>
-              <text x="820" y="642" text-anchor="middle" class="label-sm">(GCP → ADK · else LangGraph)</text>
+              <text x="820" y="624" text-anchor="middle">Framework / BYOA image</text>
+              <text x="820" y="642" text-anchor="middle" class="label-sm">(GCP→ADK heuristic · else LangGraph/BYO)</text>
 
               <text x="490" y="690" text-anchor="middle" class="label-sm">4–5. Apply allowlist + isolation last — they can veto any branch above</text>
             </svg>
@@ -1110,9 +1214,9 @@
             <div class="flow-step">
               <div class="flow-index">1</div>
               <div>
-                <h3>Is the path enumerable?</h3>
+                <h3>Can you list the main steps up front?</h3>
                 <p>
-                  If steps are known ahead of time, prefer a deterministic workflow or cron pipeline.
+                  If you can write the steps down ahead of time, prefer a deterministic workflow or cron pipeline.
                   Reserve agent loops for branches you cannot hardcode. Most production systems are
                   hybrids: workflow shell, agent nodes only where uncertainty is real.
                 </p>
@@ -1135,8 +1239,10 @@
                 <h3>Build vs adopt a runtime?</h3>
                 <p>
                   Need chat channels and an assistant UX quickly → evaluate OpenClaw or Hermes (if
-                  approved). Need graph control, checkpoints, and app-owned orchestration → evaluate
-                  LangGraph or Google ADK.
+                  approved), packaged via <strong>NemoClaw</strong> when you want OpenShell
+                  sandboxing. Need graph control and app-owned orchestration → LangGraph, Google ADK,
+                  or other <strong>BYOA</strong> (your image + OpenShell policy). Coding CLI via
+                  NemoClaw → Deep Agents Code.
                 </p>
               </div>
             </div>
@@ -1146,8 +1252,9 @@
                 <h3>What does org policy allow?</h3>
                 <p>
                   Runtime allowlists, cloud mandates, and data residency beat feature matrices. An
-                  unapproved OpenClaw is not fixed by NemoClaw packaging. A GCP mandate pushes toward
-                  ADK even if LangGraph is more flexible.
+                  unapproved OpenClaw is not fixed by NemoClaw packaging. A GCP mandate is a
+                  <em>heuristic</em> toward ADK — not a law. Multi-cloud teams often keep LangGraph
+                  or BYOA.
                 </p>
               </div>
             </div>
@@ -1157,8 +1264,11 @@
                 <h3>What isolation boundary do you need?</h3>
                 <p>
                   Credential proxying, egress allowlists, and sandbox process limits are platform
-                  concerns. NemoClaw is the NVIDIA reference path for OpenClaw/Hermes on OpenShell.
-                  Custom agents usually need OpenShell-alone or another sandbox you integrate.
+                  concerns. <strong>NemoClaw</strong> is the NVIDIA reference path for OpenClaw,
+                  Hermes, and Deep Agents Code on OpenShell. Custom / framework agents use
+                  <strong>OpenShell directly</strong> (<code>openshell sandbox create --from …</code>)
+                  — BYOA — not a NemoClaw blueprint. There is no Community
+                  <code>--from openclaw</code> path today.
                 </p>
               </div>
             </div>
@@ -1171,8 +1281,10 @@
           <div class="section-kicker">03 · Interactive advisor</div>
           <h2>Answer five prompts, get a stack sketch</h2>
           <p class="section-intro">
-            This advisor encodes the layered order above. It recommends a pattern and candidate
-            tools — not a vendor winner. Validate against your security and purchasing rules.
+            Encodes the layered order above. Output is a <strong>direction sketch</strong> — not a
+            vendor winner and not a substitute for the fact-checked
+            <a href="../concepts/stack-wizard.html">Stack wizard</a>. Always-on does <em>not</em>
+            automatically mean OpenClaw if you chose to build a framework or BYOA app.
           </p>
           <div class="wizard">
             <div class="panel">
@@ -1192,6 +1304,7 @@
                 full stack sketch.
               </p>
               <ul class="stack-list" id="resultStack"></ul>
+              <div class="result-actions" id="resultActions"></div>
             </div>
           </div>
         </div>
@@ -1204,8 +1317,13 @@
           <p class="section-intro">
             Use the tab that matches the decision you are actually making. Cross-layer comparisons
             (for example “LangGraph vs OpenClaw”) only make sense after you decide whether you are
-            buying a runtime or building an app.
+            buying a runtime or building an app. Badges mark <strong>docs</strong> vs
+            <strong>heuristic</strong> evidence.
           </p>
+          <span id="tab-jump-pattern" hidden></span>
+          <span id="tab-jump-runtime" hidden></span>
+          <span id="tab-jump-framework" hidden></span>
+          <span id="tab-jump-platform" hidden></span>
 
           <div class="tabs" role="tablist" aria-label="Matrices">
             <button class="tab active" data-tab="pattern" type="button">Layer 0 · Pattern</button>
@@ -1215,6 +1333,7 @@
           </div>
 
           <div class="tab-panel active" id="tab-pattern">
+            <span class="evidence-badge docs">Evidence · Anthropic pattern framing (docs/essay)</span>
             <div class="table-shell">
               <table>
                 <thead>
@@ -1261,6 +1380,7 @@
           </div>
 
           <div class="tab-panel" id="tab-runtime">
+            <span class="evidence-badge heuristic">Evidence · heuristic (third-party comparisons) — not an NVIDIA matrix</span>
             <div class="table-shell">
               <table>
                 <thead>
@@ -1301,12 +1421,14 @@
             </div>
             <div class="callout info">
               <strong>Note:</strong> Third-party OpenClaw↔Hermes comparisons agree on
-              ecosystem-vs-learning as the main axis. Treat them as heuristics; run your own
-              security review.
+              ecosystem-vs-learning as the main axis. Heuristic only. On OpenShell, both (plus Deep
+              Agents Code) are NemoClaw blueprint agents when sandboxed — not Community
+              <code>--from openclaw</code>.
             </div>
           </div>
 
           <div class="tab-panel" id="tab-framework">
+            <span class="evidence-badge heuristic">Evidence · heuristic (cloud-fit / ownership) — not a product cert</span>
             <div class="table-shell">
               <table>
                 <thead>
@@ -1346,13 +1468,15 @@
               </table>
             </div>
             <div class="callout info">
-              <strong>Default heuristic:</strong> LangGraph unless Google Agent Platform materially
-              reduces work you would otherwise own. Flip to ADK when GCP is already the control
-              plane.
+              <strong>Default heuristic:</strong> LangGraph (or BYOA with your framework) unless
+              Google Agent Platform materially reduces work you would otherwise own. Flip to ADK when
+              GCP is already the control plane. Neither is a NemoClaw blueprint — sandbox with
+              OpenShell <code>--from</code> + policy (BYOA).
             </div>
           </div>
 
           <div class="tab-panel" id="tab-platform">
+            <span class="evidence-badge docs">Evidence · NVIDIA OpenShell Supported Agents + NemoClaw docs</span>
             <div class="table-shell">
               <table>
                 <thead>
@@ -1364,19 +1488,24 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>OpenClaw/Hermes with NVIDIA reference onboard, policies, routed inference</td>
+                    <td>OpenClaw or Hermes with NVIDIA reference onboard, policies, routed inference</td>
                     <td>NemoClaw</td>
-                    <td>Opinionated blueprint + CLI on OpenShell</td>
+                    <td>Blueprint-managed path on OpenShell (<code>nemoclaw onboard</code> / <code>nemohermes</code>). Not Community <code>--from openclaw</code>.</td>
                   </tr>
                   <tr>
-                    <td>Custom image or non-reference agent (LangGraph service, ADK app, internal bot)</td>
-                    <td>OpenShell alone (or other sandbox)</td>
-                    <td>You own integration; OpenShell stays the isolation engine</td>
+                    <td>LangChain Deep Agents Code (coding CLI) with NemoClaw packaging</td>
+                    <td>NemoClaw · Deep Agents</td>
+                    <td>Documented NemoClaw agent (<code>nemo-deepagents onboard</code>). Different shape from always-on OpenClaw/Hermes; still NemoClaw, not generic LangGraph BYOA.</td>
                   </tr>
                   <tr>
-                    <td>Terminal coding harness only</td>
-                    <td>Deep Agents Code / similar CLI agents</td>
-                    <td>Different product shape from always-on assistants</td>
+                    <td>Custom image / framework agent (LangGraph, ADK, CrewAI, internal bot)</td>
+                    <td>OpenShell BYOA</td>
+                    <td>First-class enterprise path: <code>openshell sandbox create --from &lt;image&gt; --policy …</code>. You own the image; OpenShell is the isolation engine. Not a NemoClaw blueprint.</td>
+                  </tr>
+                  <tr>
+                    <td>Base coding CLIs (Claude Code, Copilot, OpenCode, Codex)</td>
+                    <td>OpenShell base image</td>
+                    <td>On OpenShell Supported Agents (<code>openshell sandbox create -- &lt;agent&gt;</code>). Policy coverage differs (OpenCode partial, Codex none). Not NemoClaw blueprints.</td>
                   </tr>
                   <tr>
                     <td>Managed cloud agent platform already selected</td>
@@ -1387,17 +1516,54 @@
               </table>
             </div>
             <div class="callout info">
-              <strong>NemoClaw official matrix:</strong> NemoClaw vs OpenShell-alone, plus supported
-              agents OpenClaw / Hermes / Deep Agents. It does not position Google ADK or LangGraph as
-              first-class NemoClaw agents.
+              <strong>NemoClaw docs:</strong> sandboxed agents are OpenClaw, Hermes, and Deep Agents
+              Code. ADK / LangGraph / other frameworks are BYOA on OpenShell — not first-class
+              NemoClaw agents. Upstream OpenShell is alpha; Red Hat AI integration is planned (not a
+              RHOAI DP/TP SKU claim here).
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="examples">
+        <div class="wrap">
+          <div class="section-kicker">05 · Worked examples</div>
+          <h2>Three common stacks (illustrative)</h2>
+          <p class="section-intro">
+            Concrete shapes after you apply the layers. Validate OpenShell / NemoClaw details in the
+            <a href="../concepts/stack-wizard.html">Stack wizard</a>.
+          </p>
+          <div class="examples-grid">
+            <article class="example-card">
+              <h3>Always-on assistant</h3>
+              <p>
+                Pattern: always-on · Runtime: OpenClaw or Hermes (if approved) · Platform:
+                <strong>NemoClaw</strong> on OpenShell · Not Community <code>--from openclaw</code>.
+              </p>
+            </article>
+            <article class="example-card">
+              <h3>Enterprise BYOA app</h3>
+              <p>
+                Pattern: hybrid or workflow · Framework: LangGraph / ADK / your code · Platform:
+                <strong>OpenShell BYOA</strong> (<code>--from</code> + policy) · Optional OSC/Kata on
+                OpenShift.
+              </p>
+            </article>
+            <article class="example-card">
+              <h3>Coding agent (laptop or cluster)</h3>
+              <p>
+                Pattern: session or batch · Runtime: Claude/Copilot/OpenCode/Codex on OpenShell
+                <strong>base</strong>, or Deep Agents via NemoClaw · Check policy gaps in the Stack
+                wizard.
+              </p>
+            </article>
           </div>
         </div>
       </section>
 
       <section id="anti-patterns">
         <div class="wrap">
-          <div class="section-kicker">05 · Failure modes</div>
+          <div class="section-kicker">06 · Failure modes</div>
           <h2>Decisions that look smart and fail</h2>
           <div class="layer-grid" style="grid-template-columns: repeat(2, 1fr)">
             <article class="layer-card">
@@ -1438,11 +1604,13 @@
 
       <section id="sources">
         <div class="wrap">
-          <div class="section-kicker">06 · Evidence base</div>
+          <div class="section-kicker">07 · Evidence base</div>
           <h2>What this guide synthesizes</h2>
           <p class="section-intro">
             Use primary sources for final architecture reviews. Blog comparisons are directional,
-            not authoritative for enterprise risk.
+            not authoritative for enterprise risk. For OpenShell agent paths, prefer the
+            <a href="../concepts/stack-wizard.html">Stack wizard</a> (aligned to Supported Agents /
+            NemoClaw).
           </p>
           <div class="sources">
             <article class="source">
@@ -1453,24 +1621,25 @@
               </p>
             </article>
             <article class="source">
-              <h4>Runtime layer</h4>
+              <h4>Runtime layer (heuristic)</h4>
               <p>
-                Independent OpenClaw↔Hermes analyses (Composio, Firecrawl, xCloud, innFactory,
-                Alcazar) — ecosystem/orchestration vs learning-loop/automation.
+                Independent OpenClaw↔Hermes analyses — ecosystem/orchestration vs learning-loop.
+                NemoClaw docs for which agents are blueprint-managed (OpenClaw, Hermes, Deep Agents).
               </p>
             </article>
             <article class="source">
-              <h4>Framework layer</h4>
+              <h4>Framework layer (heuristic)</h4>
               <p>
-                Enterprise ADK↔LangGraph guides (Atlan, DVNC, Altai, and others) — GCP-native
-                platform vs multi-cloud graph control.
+                Cloud-fit heuristics (GCP → ADK; multi-cloud → LangGraph/BYOA). Not a certification.
+                Red Hat AgentOps BYOA: framework-agnostic platform wrapping.
               </p>
             </article>
             <article class="source">
-              <h4>Platform layer</h4>
+              <h4>Platform layer (docs)</h4>
               <p>
-                NemoClaw ecosystem documentation — NemoClaw vs OpenShell-alone; supported agents
-                OpenClaw, Hermes, Deep Agents Code.
+                <a href="https://docs.nvidia.com/openshell/about/supported-agents" target="_blank" rel="noopener">OpenShell Supported Agents</a>
+                · <a href="https://docs.nvidia.com/nemoclaw/" target="_blank" rel="noopener">NemoClaw</a>
+                · Red Hat AI + OpenShell / BYOA blogs (planned integration; early validations ≠ shipping SKU).
               </p>
             </article>
           </div>
@@ -1482,8 +1651,10 @@
       <div class="wrap">
         <p>
           Static decision guide for architecture discussions and GitHub Pages. Not an official
-          product endorsement. Recommendations are structural heuristics — confirm against your
-          organization’s security, legal, and platform standards before adoption.
+          product endorsement. Pattern/runtime/framework advice is structural heuristic; platform
+          paths should match NVIDIA/NemoClaw docs. Confirm against your organization’s security,
+          legal, and platform standards — then validate the sandbox stack in the
+          <a href="../concepts/stack-wizard.html">Stack wizard</a>.
         </p>
       </div>
     </footer>
@@ -1492,7 +1663,7 @@
       const steps = [
         {
           id: "path",
-          q: "Can you enumerate the main steps before the system runs?",
+          q: "Can you write down the main steps before the system runs?",
           choices: [
             {
               id: "known",
@@ -1575,7 +1746,7 @@
             {
               id: "nvidia",
               label: "NVIDIA OpenShell / NemoClaw reference path",
-              detail: "Want sandboxed OpenClaw or Hermes with routed inference",
+              detail: "Sandboxed OpenClaw, Hermes, or Deep Agents (NemoClaw) — or OpenShell BYOA",
             },
           ],
         },
@@ -1586,7 +1757,7 @@
             {
               id: "sandbox",
               label: "Strong sandbox + policy + credential proxy",
-              detail: "Unattended tools touching sensitive systems",
+              detail: "OpenShell (and NemoClaw when using its agents)",
             },
             {
               id: "platform",
@@ -1615,6 +1786,7 @@
       const resultTitle = document.getElementById("resultTitle");
       const resultBody = document.getElementById("resultBody");
       const resultStack = document.getElementById("resultStack");
+      const resultActions = document.getElementById("resultActions");
 
       function renderProgress() {
         progressEl.innerHTML = steps
@@ -1652,6 +1824,7 @@
             title: "Complete the prompts",
             body: "Your layered recommendation will appear here as you answer.",
             stack: [],
+            links: [],
           };
         }
 
@@ -1659,62 +1832,104 @@
         if (a.path === "known") pattern = "Deterministic workflow / scheduled pipeline";
         if (a.path === "open") pattern = "Autonomous agent loop (tightly gated tools)";
 
-        let runtime = "Not the primary decision yet";
+        let runtime = "Not the primary decision — you may be on a framework / BYOA path";
         let framework = "Not required if a product runtime covers the need";
         let platform = "Match isolation to risk";
+        const links = [
+          { href: "../concepts/stack-wizard.html", label: "Open Stack wizard", primary: true },
+        ];
 
-        if (a.build === "runtime" || (a.presence === "always" && a.build !== "framework")) {
+        const wantsRuntime =
+          a.build === "runtime" ||
+          (a.presence === "always" && a.build !== "framework" && a.build !== "either");
+
+        if (wantsRuntime) {
           if (a.constraint === "allowlist") {
             runtime = "Only an allowlisted always-on runtime (OpenClaw or Hermes if approved)";
           } else if (a.constraint === "nvidia") {
-            runtime = "OpenClaw or Hermes via NemoClaw (if approved)";
+            runtime = "OpenClaw or Hermes via NemoClaw (if approved) — not Community --from openclaw";
+            links.push({ href: "../concepts/stack-wizard.html?agent=openclaw", label: "Wizard · OpenClaw" });
           } else {
             runtime =
-              "OpenClaw for multi-channel orchestration; Hermes for learning-loop automation — if approved";
+              "OpenClaw (multi-channel) or Hermes (learning-loop) — if approved; sandbox via NemoClaw";
           }
         }
 
-        if (a.build === "framework" || a.constraint === "gcp" || a.constraint === "multicloud") {
+        if (a.build === "framework") {
+          runtime = "Not primary — BYOA / your app owns the harness (do not default to OpenClaw)";
           if (a.constraint === "gcp") {
-            framework = "Google ADK on Vertex / Google Agent Platform";
-          } else if (a.constraint === "multicloud" || a.build === "framework") {
-            framework = "LangGraph (or equivalent graph runtime) for owned control flow";
+            framework = "Google ADK on Vertex / Google Agent Platform (heuristic if GCP-mandated)";
+            links.push({ href: "../concepts/stack-wizard.html?agent=adk", label: "Wizard · ADK (BYOA)" });
+          } else {
+            framework = "LangGraph or equivalent graph runtime — or any BYOA image you own";
+            links.push({ href: "../concepts/stack-wizard.html?agent=langgraph", label: "Wizard · LangGraph (BYOA)" });
+            links.push({ href: "../concepts/stack-wizard.html?agent=custom", label: "Wizard · Custom BYOA" });
           }
+        } else if (a.constraint === "gcp") {
+          framework = "Lean Google ADK if you are building (heuristic)";
+        } else if (a.constraint === "multicloud" && a.build !== "runtime") {
+          framework = "LangGraph / BYOA for owned multi-cloud control flow";
         }
 
         if (a.build === "either") {
-          if (a.constraint === "gcp") framework = "Lean Google ADK";
-          if (a.constraint === "multicloud") framework = "Lean LangGraph";
-          if (a.constraint === "nvidia") runtime = "Evaluate OpenClaw/Hermes on NemoClaw";
+          if (a.constraint === "gcp") {
+            framework = "Lean Google ADK (heuristic)";
+            runtime = "Skip always-on runtime unless you truly need assistant UX";
+          } else if (a.constraint === "multicloud") {
+            framework = "Lean LangGraph / BYOA";
+            runtime = "Skip always-on runtime unless you truly need assistant UX";
+          } else if (a.constraint === "nvidia") {
+            if (a.presence === "session" || a.path === "known") {
+              runtime = "Coding path: OpenShell base CLIs, or Deep Agents via NemoClaw";
+              framework = "Not required for CLI harnesses";
+              links.push({ href: "../concepts/stack-wizard.html?agent=claude", label: "Wizard · Claude Code" });
+              links.push({ href: "../concepts/stack-wizard.html?agent=deepagents", label: "Wizard · Deep Agents" });
+            } else {
+              runtime = "Evaluate OpenClaw/Hermes on NemoClaw (if approved)";
+              links.push({ href: "../concepts/stack-wizard.html?agent=openclaw", label: "Wizard · OpenClaw" });
+            }
+          }
+        }
+
+        if (a.presence === "session" && a.build !== "runtime") {
+          if (a.constraint === "nvidia") {
+            runtime = "Session CLI: OpenShell base (Claude/Copilot/OpenCode/Codex) or Deep Agents via NemoClaw";
+          } else if (!wantsRuntime) {
+            runtime = "Session CLI / interactive harness may be enough — not an always-on claw product";
+          }
         }
 
         if (a.isolation === "sandbox") {
-          if (a.constraint === "nvidia" || a.build === "runtime") {
-            platform = "NemoClaw on OpenShell for OpenClaw/Hermes; OpenShell-alone for custom agents";
+          if (wantsRuntime || (a.constraint === "nvidia" && a.build === "runtime")) {
+            platform =
+              "NemoClaw on OpenShell for OpenClaw/Hermes/Deep Agents; OpenShell BYOA (--from + policy) for custom/framework agents";
+          } else if (a.build === "framework" || a.constraint === "multicloud" || a.constraint === "gcp") {
+            platform = "OpenShell BYOA: openshell sandbox create --from <image> --policy … (not a NemoClaw blueprint)";
+          } else if (a.constraint === "nvidia") {
+            platform =
+              "OpenShell (base or BYOA) and/or NemoClaw for its three agents — validate in Stack wizard";
           } else {
             platform = "Strong sandbox (OpenShell or equivalent) around the chosen runtime/app";
           }
         } else if (a.isolation === "platform") {
           platform = "Managed cloud agent platform identity and networking";
         } else if (a.isolation === "app") {
-          platform = "Conventional service deployment with app-managed secrets";
-        }
-
-        if (a.presence === "session" && a.path !== "open") {
-          runtime = "Session CLI / interactive harness may be enough";
+          platform = "Conventional service deployment with app-managed secrets (weaker boundary)";
         }
 
         const title =
-          a.path === "known" && a.presence !== "always"
-            ? "Lean workflow-first"
+          a.path === "known" && a.presence !== "always" && a.build !== "runtime"
+            ? "Lean workflow-first / BYOA"
             : a.presence === "always" && a.build === "runtime"
-              ? "Always-on runtime path"
-              : a.build === "framework" || a.constraint === "gcp" || a.constraint === "multicloud"
-                ? "Framework-built agentic app"
-                : "Compose a layered stack";
+              ? "Always-on runtime path (NemoClaw when sandboxed)"
+              : a.build === "framework"
+                ? "Framework / BYOA agentic app"
+                : a.presence === "session"
+                  ? "Session / coding-agent path"
+                  : "Layered stack (validate next)";
 
         const body =
-          "Recommendations below follow the five-step order: pattern → presence → build/adopt → institutional constraint → isolation. Re-check allowlists before committing.";
+          "Order: pattern → presence → build/adopt → constraint → isolation. Heuristic only — re-check allowlists. Use the Stack wizard for Supported Agents, policy gaps, and NemoClaw vs BYOA facts.";
 
         return {
           title,
@@ -1725,6 +1940,7 @@
             ["Framework", framework],
             ["Platform", platform],
           ],
+          links,
         };
       }
 
@@ -1735,7 +1951,38 @@
         resultStack.innerHTML = rec.stack
           .map(([k, v]) => `<li><strong>${k}</strong><span>${v}</span></li>`)
           .join("");
+        if (resultActions) {
+          const links = rec.links || [];
+          resultActions.innerHTML = links
+            .map(
+              (l) =>
+                `<a class="btn ${l.primary ? "btn-primary" : "btn-ghost"}" href="${l.href}">${l.label}</a>`
+            )
+            .join("");
+        }
       }
+
+      function activateMatrixTab(name) {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+        document.querySelectorAll(".tab-panel").forEach((p) => p.classList.toggle("active", p.id === `tab-${name}`));
+        document.getElementById("matrices")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      document.querySelectorAll(".role-jumps a").forEach((a) => {
+        a.addEventListener("click", (e) => {
+          const map = {
+            "tab-jump-pattern": "pattern",
+            "tab-jump-runtime": "runtime",
+            "tab-jump-framework": "framework",
+            "tab-jump-platform": "platform",
+          };
+          const id = a.getAttribute("href")?.replace("#", "");
+          if (map[id]) {
+            e.preventDefault();
+            activateMatrixTab(map[id]);
+          }
+        });
+      });
 
       prevBtn.addEventListener("click", () => {
         if (state.index > 0) {
